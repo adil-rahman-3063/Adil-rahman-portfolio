@@ -4,8 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Adil Rahiman - Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <style>
+    body {
+      font-family: 'Comfortaa', sans-serif;
+    }
     /* Invert all dock icons */
     .dock a img {
       filter: invert(1);
@@ -55,6 +61,107 @@
       background: rgba(255, 255, 255, 0.25);
       transform: translateY(-3px);
     }
+
+    /* About Me Section Styling */
+    #about h2 {
+      margin-bottom: 0.5rem; /* Reduce space below "About Me" */
+    }
+    #about h3 {
+      margin-top: 1rem;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: #e0e0e0; /* A slightly softer white */
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      padding-bottom: 0.4rem;
+      max-width: 90%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    #about p {
+      font-size: 0.9rem;
+      line-height: 1.5;
+      max-width: 90%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    #about ul {
+      list-style-type: '✓  ';
+      padding-left: 1.5rem;
+      text-align: left;
+      display: inline-block; /* Center the list block */
+      font-size: 0.9rem;
+    }
+    #about ul li {
+      padding-left: 0.5rem;
+      margin-bottom: 0.4rem;
+    }
+
+    /* Projects Section Styling */
+    .projects-grid {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+      width: 100%;
+      padding: 0 2rem; /* Add some padding to the sides */
+    }
+
+    .project-block {
+      display: block; /* Ensure anchor tags behave like blocks */
+      text-decoration: none; /* Remove underline from links */
+      color: inherit; /* Use parent text color */
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 16px;
+      padding: 1.5rem;
+      text-align: left;
+      flex-basis: 280px;
+      flex-grow: 1;
+      max-width: 320px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .project-block:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .project-block h4 {
+      margin-top: 0;
+      margin-bottom: 0.25rem;
+      font-size: 1.4rem;
+      font-weight: 700;
+    }
+
+    .project-block .project-tagline {
+      font-style: italic;
+      font-size: 0.9rem;
+      color: #d1d1d1;
+      margin-bottom: 1rem;
+    }
+
+    .project-block .project-statement {
+      font-size: 0.9rem;
+      line-height: 1.5;
+      margin-bottom: 1.2rem;
+    }
+
+    .tech-stack {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .tech-stack span {
+      background-color: rgba(255, 255, 255, 0.15);
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+    }
   </style>
 </head>
 <body>
@@ -96,16 +203,50 @@
 
     <section id="about" class="card">
       <h2>About Me</h2>
-      <p>I’m an engineering student passionate about building apps with Flutter & Supabase.</p>
+      <h3>Key Skills & Expertise</h3>
+      <ul>
+        <li>Mobile app development with Flutter</li>
+        <li>Backend integration with Supabase</li>
+        <li>Web development using modern HTML, CSS, & JavaScript</li>
+        <li>AI/ML experimentation</li>
+        <li>UI/UX design principles for intuitive apps</li>
+      </ul>
+      <h3>Work Highlights</h3>
+      <p>Developed Finly, a budget calculator app used by hundreds of students, and built UniSync, a student hub platform with attendance tracking and notes storage.</p>
+      <h3>What Drives Me</h3>
+      <p>I enjoy solving challenging problems and building apps that make life easier. I’m driven by curiosity and the desire to create practical digital solutions. Outside of coding, I love exploring AI, reading tech blogs, and experimenting with mini-projects to push my skills further.</p>
     </section>
 
     <section id="projects" class="card">
       <h2>Projects</h2>
-      <ul>
-        <li>Finly – Budget Calculator</li>
-        <li>UniSync – Student Hub</li>
-        <li>Charity Donation App</li>
-      </ul>
+      <p class="tagline">Click the projects to Goto their respective links</p>
+      <div class="projects-grid">
+        <a href="https://github.com/adil-rahman-3063/finly" target="_blank" rel="noopener noreferrer" class="project-block">
+          <h4>Finly</h4>
+          <p class="project-tagline">Your Personal Budget Calculator</p>
+          <p class="project-statement">An intuitive app to help students track their expenses and manage their finances effectively.</p>
+          <div class="tech-stack">
+            <span>Flutter</span><span>Supabase</span><span>Dart</span>
+          </div>
+        </a>
+        <a href="https://github.com/adil-rahman-3063/poshan_abhiyaan" target="_blank" rel="noopener noreferrer" class="project-block">
+          <h4>Poshan Abhiyaan – Nutrition Tracker</h4>
+          <p class="project-tagline">An app to monitor and improve child nutrition through personalized tracking and insights.</p>
+          <p class="project-statement">Helps parents and health workers track nutrition metrics effectively, promoting healthier child development.</p>
+          <div class="tech-stack">
+            <span>Flutter</span><span>Google APIs (Sheets, Drive, Calendar)</span>
+          </div>
+        </a>
+        <a href="#" onclick="alert('This app is currently in use by the Red Parrot institution, so the source code cannot be provided.'); return false;" class="project-block">
+          <h4>Red Parrot – Demo Scheduler</h4>
+          <p class="project-tagline">A platform to schedule and manage online demo sessions efficiently for educational institutions</p>
+          <p class="project-statement">Simplifies scheduling and tracking of demo sessions, saving time for both students and administrators.</p>
+          <div class="tech-stack">
+            <span>Flutter</span><span>UI/UX</span><span>Supabase</span>
+          </div>
+        </a>
+      </div>
+      <a href="https://github.com/adil-rahman-3063" class="cta-button">Explore More Projects</a>
     </section>
 
     <section id="achievements" class="card">

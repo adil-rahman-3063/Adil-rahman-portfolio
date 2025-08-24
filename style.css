@@ -114,3 +114,268 @@ h2 {
 ul {
   list-style: none;
 }
+ body {
+      font-family: 'Comfortaa', sans-serif;
+    }
+    /* Invert all dock icons */
+    .dock a img {
+      filter: invert(1);
+    }
+
+    /* Profile Picture Style */
+    .profile-picture {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      object-fit: cover; /* Ensures the image covers the area without distortion */
+      margin-bottom: 0.5rem; /* Reduced space for the tagline */
+      border: 4px solid #fff; /* White border around the picture */
+    }
+
+    /* Tagline Style */
+    .tagline {
+      font-style: italic;
+      font-size: 1.1rem;
+      margin-bottom: 1.5rem; /* Space between tagline and name */
+      max-width: 80%; /* Keeps the line from getting too wide */
+    }
+
+    /* Center content in hero section */
+    #hero > div {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* CTA Button Style */
+    .cta-button {
+      display: inline-block;
+      margin-top: 1.5rem;
+      padding: 12px 28px;
+      border-radius: 50px; /* Pill shape */
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px); /* For Safari */
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+    .cta-button:hover {
+      background: rgba(255, 255, 255, 0.25);
+      transform: translateY(-3px);
+    }
+
+    /* About Me Section Styling */
+    #about h2 {
+      margin-bottom: 0.5rem; /* Reduce space below "About Me" */
+    }
+    #about h3 {
+      margin-top: 1rem;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: #e0e0e0; /* A slightly softer white */
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      padding-bottom: 0.4rem;
+      max-width: 90%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    #about p {
+      font-size: 0.9rem;
+      line-height: 1.5;
+      max-width: 90%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    #about ul {
+      list-style-type: '✓  ';
+      padding-left: 1.5rem;
+      text-align: left;
+      display: inline-block; /* Center the list block */
+      font-size: 0.9rem;
+    }
+    #about ul li {
+      padding-left: 0.5rem;
+      margin-bottom: 0.4rem;
+    }
+
+    /* Projects Section Styling */
+    .projects-grid {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+      width: 100%;
+      padding: 0 2rem; /* Add some padding to the sides */
+    }
+
+    .project-block {
+      display: block; /* Ensure anchor tags behave like blocks */
+      text-decoration: none; /* Remove underline from links */
+      color: inherit; /* Use parent text color */
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 16px;
+      padding: 1.5rem;
+      text-align: left;
+      flex-basis: 280px;
+      flex-grow: 1;
+      max-width: 320px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .project-block:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .project-block h4 {
+      margin-top: 0;
+      margin-bottom: 0.25rem;
+      font-size: 1.4rem;
+      font-weight: 700;
+    }
+
+    .project-block .project-tagline {
+      font-style: italic;
+      font-size: 0.9rem;
+      color: #d1d1d1;
+      margin-bottom: 1rem;
+    }
+
+    .project-block .project-statement {
+      font-size: 0.9rem;
+      line-height: 1.5;
+      margin-bottom: 1.2rem;
+    }
+
+    .tech-stack {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .tech-stack span {
+      background-color: rgba(255, 255, 255, 0.15);
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+    }
+
+    /* Contact Section Styling */
+    #contact h2 {
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+    }
+
+    #contact p {
+      max-width: 85%;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.6;
+    }
+
+    #contact .freelance-offer {
+      font-size: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    #contact .cta-statement {
+      font-style: italic;
+      color: #d1d1d1;
+      font-size: 0.9rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .contact-links {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .contact-links a img {
+      width: 32px;
+      height: 32px;
+      filter: invert(1);
+      transition: transform 0.2s ease;
+    }
+
+    .contact-links a:hover img {
+      transform: scale(1.15);
+    }
+
+    /* Footer Styling */
+    #footer {
+      text-align: center;
+      padding: 2.5rem 1.5rem;
+    }
+    #footer p {
+      margin: 0.5rem 0;
+      font-size: 0.9rem;
+      color: #ccc;
+      max-width: 90%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    #footer .footer-tagline {
+      font-style: italic;
+      font-size: 1.1rem;
+      color: #fff;
+      margin-bottom: 1.5rem;
+    }
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .footer-links a {
+      display: inline-block;
+    }
+    .footer-links span {
+      color: #ccc;
+      font-size: 0.9rem;
+    }
+    .footer-links a img {
+      width: 28px;
+      height: 28px;
+      filter: invert(1);
+      transition: transform 0.2s ease;
+    }
+    .footer-links a:hover img {
+      transform: scale(1.15);
+    }
+
+     /* Dock Indicator Styling */
+    .dock ul li {
+      position: relative;
+    }
+    .dock ul li a {
+      transition: transform 0.3s ease;
+    }
+    .dock:not(.dock-right) ul li::before {
+      content: '';
+      position: absolute;
+      left: -20px; /* Position to the left of the icon */
+      top: 50%;
+      transform: translateY(-50%) scale(0); /* Start hidden */
+      width: 8px;
+      height: 8px;
+      background-color: #fff;
+      border-radius: 50%;
+      transition: transform 0.3s ease;
+    }
+    .dock:not(.dock-right) ul li.active::before {
+      transform: translateY(-50%) scale(1); /* Show when active */
+    }
+    .dock:not(.dock-right) ul li.active a {
+      transform: scale(1.3); /* Scale up the active icon */
+    }

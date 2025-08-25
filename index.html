@@ -8,6 +8,39 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <style>
+    /* Mobile Notice Popup */
+    #mobile-notice-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.6);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      opacity: 1;
+      transition: opacity 0.3s ease;
+      font-family: 'Comfortaa', sans-serif;
+    }
+
+    #mobile-notice-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #mobile-notice {
+      background-color: #2c2c2c;
+      color: #f0f0f0;
+      padding: 1.5rem 2rem;
+      border-radius: 12px;
+      text-align: center;
+      max-width: 85%;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+    }
+  </style>
 </head>
 <body>
   <!-- Floating Dock -->
@@ -143,6 +176,14 @@
     </footer>
   </main>
 
+  <!-- Mobile View Notice -->
+  <div id="mobile-notice-overlay" class="hidden">
+    <div id="mobile-notice">
+      <p>For the best experience, please switch to desktop view.</p>
+      <button id="close-notice" class="cta-button">Got it!</button>
+    </div>
+  </div>
+
   <script>
     // Snap-to-card scroll
     const container = document.querySelector('.cards-container');
@@ -189,6 +230,23 @@
           behavior: 'smooth'
         });
       }
+    });
+
+    // Mobile notice popup
+    document.addEventListener('DOMContentLoaded', () => {
+      const isMobile = window.innerWidth <= 768;
+      const noticeShown = sessionStorage.getItem('mobileNoticeShown');
+      const noticeOverlay = document.getElementById('mobile-notice-overlay');
+      const closeButton = document.getElementById('close-notice');
+
+      if (isMobile && !noticeShown) {
+        noticeOverlay.classList.remove('hidden');
+      }
+
+      closeButton.addEventListener('click', () => {
+        noticeOverlay.classList.add('hidden');
+        sessionStorage.setItem('mobileNoticeShown', 'true');
+      });
     });
   </script>
 </body>

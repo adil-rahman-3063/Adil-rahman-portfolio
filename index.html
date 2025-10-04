@@ -53,7 +53,7 @@
       <li><a href="#contact"><img src="icons/contact.png" alt="Contact"></a></li>
       <li><a href="#footer"><img src="icons/anchor.png" alt="Footer"></a></li>
     </ul>
-  </nav>\
+  </nav>
 
   <!-- Social Dock (Right Side) -->
 <nav class="dock dock-right">
@@ -248,6 +248,25 @@
         sessionStorage.setItem('mobileNoticeShown', 'true');
       });
     });
+
+    // Ensure project rows start fully scrolled to the left so first card isn't cut
+    function resetProjectsGridScroll() {
+      document.querySelectorAll('.projects-grid').forEach(grid => {
+        grid.scrollLeft = 0;
+      });
+    }
+
+    window.addEventListener('load', () => {
+      // immediate reset
+      resetProjectsGridScroll();
+      // reset again after layout/fonts/images settle
+      setTimeout(resetProjectsGridScroll, 350);
+    });
+
+    // also reset when the hash changes (navigating to the projects section)
+    window.addEventListener('hashchange', resetProjectsGridScroll);
+    // and when the window regains focus
+    window.addEventListener('focus', resetProjectsGridScroll);
   </script>
 </body>
 </html>

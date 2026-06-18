@@ -1,85 +1,78 @@
-# 🌐 Adil Rahman – Cyber-Portfolio  
+# 🌐 ADIL RAHMAN // DIGITAL INTERFACE
 
-[![Made with HTML](https://img.shields.io/badge/HTML-5-orange?logo=html5&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/HTML)  
-[![Made with CSS](https://img.shields.io/badge/CSS-3-blue?logo=css3&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/CSS)  
-[![Made with JavaScript](https://img.shields.io/badge/JavaScript-ES6-yellow?logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)  
-[![Deployed with GitHub Pages](https://img.shields.io/badge/Deployed-GitHub%20Pages-181717?logo=github)](https://adil-rahman-3063.github.io/Adil-rahman-portfolio/)  
+```
+SYSTEM STATUS: ACTIVE
+ROLE: FLUTTER & FULL-STACK DEVELOPER
+CREDENTIALS: B.TECH STUDENT & SOFTWARE INNOVATOR
+FOCUS: TURNING CHAOTIC APPS INTO SLEEK DIGITAL PRODUCTS
+```
 
-Welcome to my redesigned personal portfolio! 🚀  
-This version features an immersive **Cyberpunk** aesthetic utilizing custom interactive elements, digital canvas overlays, and fully responsive layouts.
+Welcome to my digital gateway. I build robust, responsive mobile applications, backend services, and interactive web experiences. This space acts as an overview of my current projects, technical capabilities, and professional transmission coordinates.
 
-🔗 **Live Website:** [adil-rahman-portfolio](https://adil-rahman-3063.github.io/Adil-rahman-portfolio/)  
-
----
-
-## ✨ Interface & Feature Integrations
-
-- **Matrix Rain Background:** Animated `<canvas>` engine rendering falling digital code structures.
-- **CRT Monitor Scanlines:** An overlay simulating retro terminal monitors.
-- **Glitch Headers:** CSS animations adding cyber-glitch effects to headings.
-- **Interactive Modals:** Detailed project information overlays containing features, tech lists, and outbound links.
-- **Dynamic Category Filter:** Seamlessly filter between Featured, Mobile, and Web/Backend categories.
-- **Cyber-Dock Navigation:** Glassmorphic navigation dock with active-state scroll highlights.
+🔗 **Access Main Interface:** [adil-rahman-portfolio](https://adil-rahman-3063.github.io/Adil-rahman-portfolio/)
 
 ---
 
-## 🛠️ Tech Stack & Skills
-- **Frontend:** HTML5, CSS3 (Vanilla Custom Layouts & Glitch keyframes), Javascript (ES6 Canvas API & Intersection Observer).
-- **Primary Expertise:** Flutter, Dart, Supabase (PostgreSQL), Firebase Suite, FastAPI (Python), REST APIs, OpenAI API.
+## ⚡ TECH NODES & CAPABILITIES
+
+- **Frameworks:** Flutter & Dart (iOS, Android, PWA Web)
+- **Databases & Auth:** Supabase (PostgreSQL), Firebase Suite
+- **Backend Infrastructure:** FastAPI (Python), RESTful APIs, Cloudflare Workers
+- **AI Integrations:** OpenAI GPT Model integrations, Custom TFLite edge model parsing
+- **UI Architecture:** Modern responsive structures, Glassmorphism, custom micro-animations
 
 ---
 
-## 📂 Showcased Projects
+## 📂 SYSTEM ARCHIVE (PROJECT DIRECTORY)
 
-### 🎵 ZMR Music (Featured)
-*   **Tech Stack:** Flutter, Riverpod, `just_audio`, Supabase, Cloudflare Workers
-*   Premium gesture-driven YouTube Music client featuring advanced background playback, gapless transitions, and local credential caching.
+### 🎵 ZMR Music
+*   **Status:** Complete // Production
+*   **Stack:** Flutter, Riverpod, `just_audio`, Supabase, Cloudflare Workers
+*   *A premium, gesture-driven YouTube Music client focusing on high-fidelity, background audio sessions, and local secure cookie handling.*
+*   🔗 [Inspect Repository](https://github.com/adil-rahman-3063/zmr)
 
-### 🚀 LeadFlow AI (Featured)
-*   **Tech Stack:** Flutter, Supabase, OpenAI API, FastAPI, Dart
-*   AI CRM system converting unstructured messaging texts (WhatsApp, DMs, Emails) into structured database deals. Supported languages: English, Hinglish, Malayalam, Manglish, Arabic.
+### 🚀 LeadFlow AI
+*   **Status:** Live // Deployed
+*   **Stack:** Flutter, Supabase, OpenAI API, FastAPI
+*   *AI-powered CRM designed for agencies. Automatically extracts structured deal details (budget, source, phone) from unstructured chat logs in multiple languages (English, Hinglish, Malayalam, Manglish, Arabic).*
+*   🔗 [Inspect Repository](https://github.com/adil-rahman-3063/LeadFlow_AI) | [Live CRM App](https://leadflowai-uyu1.onrender.com/)
 
-### 🎬 ViewPick (Featured)
-*   **Tech Stack:** Flutter Web (PWA), Supabase, TMDB API, Firebase Analytics
-*   Tinder-style swipe interface for movie discovery with granular dislikes and local caching.
+### 🎬 ViewPick
+*   **Status:** Live // Web Responsive
+*   **Stack:** Flutter Web, Supabase, TMDB API, Firebase
+*   *Tinder-style swipe interface for movie & TV discovery, complete with granular dislike preference filters and optimistic UI local caching.*
+*   🔗 [Live Web Version](https://viewpick.vercel.app)
 
-### ☁️ TeleStore (Ongoing Beta)
-*   **Tech Stack:** FastAPI, Python, Telethon, Flutter, Supabase
-*   Personal cloud storage application leveraging Telegram Channels as free, unlimited storage backends.
+### ☁️ TeleStore
+*   **Status:** Beta // Active Development
+*   **Stack:** FastAPI, Python, Telethon, Flutter, Supabase
+*   *Personal cloud platform converting Telegram channels into an encrypted, free, and unlimited storage backend.*
+*   🔗 [Inspect Repository](https://github.com/adil-rahman-3063/telestore)
 
-### 🛡️ C-Alert (B.Tech Main Project)
-*   **Tech Stack:** Flutter, TensorFlow Lite, Supabase, OpenStreetMap, Provider
-*   High-integrity incident reporting app utilizing TFLite deepfake verification, EXIF coordinate comparison, and real-time mapping.
+### 🛡️ C-Alert
+*   **Status:** Complete // B.Tech Main Project
+*   **Stack:** Flutter, TensorFlow Lite, Supabase, OpenStreetMap, Provider
+*   *High-integrity incident reporting app incorporating TensorFlow Lite forensic deepfake verification and EXIF GPS drift comparison protocol.*
+*   🔗 [Inspect Repository](https://github.com/Dayal-Joy/C-Alert)
 
-### 🥗 Poshan Abhiyaan (B.Tech Mini Project)
-*   **Tech Stack:** Flutter, Google APIs (Sheets, Drive, Calendars)
-*   Nutrition tracker mapping children's growth metrics for health administrators and parents.
+### 🥗 Poshan Abhiyaan
+*   **Status:** Stable // B.Tech Mini Project
+*   **Stack:** Flutter, Google APIs (Sheets, Drive, Calendars)
+*   *Nutrition tracker mapping children's growth metrics and medical schedules for health workers.*
+*   🔗 [Inspect Repository](https://github.com/adil-rahman-3063/poshan_abhiyaan)
 
 ### 📅 Red Parrot Scheduler
-*   **Tech Stack:** Flutter, Supabase
-*   Demo scheduler actively used by the Red Parrot educational institution to manage slot registration.
+*   **Status:** Stable // Institutional Deployment
+*   **Stack:** Flutter, Supabase
+*   *Demo scheduler actively deployed by the Red Parrot online academy to coordinate class schedules and student slot allocations.*
 
 ---
 
-## 🖥️ Local Setup Instructions  
+## 📡 SECURE TRANSMISSION COORDINATES
 
-To run this portfolio locally on your machine:  
+Feel free to ping my console to discuss freelance availability, project feasibility, or collaborations:
 
-1. Clone the repository:  
-   ```bash
-   git clone https://github.com/adil-rahman-3063/Adil-rahman-portfolio.git
-   ```
-2. Navigate to the project folder:  
-   ```bash
-   cd Adil-rahman-portfolio
-   ```
-3. Open `index.html` in your web browser, or launch it with a VS Code Live Server extension.
-
----
-
-## 📬 Secure Comm Channels  
-If you have a mobile or web app idea, reach out to discuss feasibility:  
-- **Email:** adilrahman3063@gmail.com  
-- **WhatsApp:** +91 9207114070  
-- **GitHub:** [adil-rahman-3063](https://github.com/adil-rahman-3063)  
-- **LinkedIn:** [Adil Rahman M S](https://www.linkedin.com/in/adil-rahman-ms/)  
+*   **Email:** [adilrahman3063@gmail.com](mailto:adilrahman3063@gmail.com)
+*   **WhatsApp:** [+91 9207114070](https://wa.me/+919207114070)
+*   **GitHub Profile:** [adil-rahman-3063](https://github.com/adil-rahman-3063)
+*   **LinkedIn Profile:** [Adil Rahman M S](https://www.linkedin.com/in/adil-rahman-ms/)

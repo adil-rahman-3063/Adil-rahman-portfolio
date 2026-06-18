@@ -23,6 +23,27 @@ Welcome to my digital gateway. I build robust, responsive mobile applications, b
 
 ---
 
+## 💼 PROFESSIONAL EXPERIENCE
+
+### Freelance Software Developer — Red Parrot Institution (2025)
+- Developed a scheduling and timetable management application for an educational institution.
+- Built structured session management workflows to improve scheduling efficiency.
+- Integrated backend services and optimized data handling for smoother operations.
+- Collaborated on requirement understanding and feature implementation.
+*   **Technologies:** Flutter, Backend Integration
+
+---
+
+## 🎓 ACADEMIC HISTORY
+
+### APJ Abdul Kalam Technological University (2022 - 2026)
+- **Degree:** B.Tech in Computer Science
+
+### The Model School, Abu Dhabi (2019 - 2021)
+- **Degree:** High School
+
+---
+
 ## 📂 SYSTEM ARCHIVE (PROJECT DIRECTORY)
 
 ### 🎵 ZMR Music

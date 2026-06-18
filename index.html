@@ -3,270 +3,551 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Adil Rahiman - Portfolio</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&display=swap" rel="stylesheet">
+  <title>Adil Rahman | Cyber-Portfolio</title>
+  <meta name="description" content="Portfolio of Adil Rahman - Mobile App & Web Developer specializing in Flutter, Supabase, and AI Integration.">
   <link rel="stylesheet" href="style.css">
-  <style>
-    /* Mobile Notice Popup */
-    #mobile-notice-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.6);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-      opacity: 1;
-      transition: opacity 0.3s ease;
-      font-family: 'Comfortaa', sans-serif;
-    }
-
-    #mobile-notice-overlay.hidden {
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    #mobile-notice {
-      background-color: #2c2c2c;
-      color: #f0f0f0;
-      padding: 1.5rem 2rem;
-      border-radius: 12px;
-      text-align: center;
-      max-width: 85%;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.5);
-    }
-  </style>
 </head>
 <body>
-  <!-- Floating Dock -->
-  <nav class="dock">
+  <!-- Canvas for Matrix/Grid Particle Animation -->
+  <canvas id="cyber-matrix"></canvas>
+
+  <!-- Cyber-Dock Nav -->
+  <nav class="cyber-dock" id="cyber-nav">
     <ul>
-      <li><a href="#hero"><img src="icons/home.svg" alt="Home"></a></li>
-      <li><a href="#about"><img src="icons/profile.png" alt="About"></a></li>
-      <li><a href="#projects"><img src="icons/checklist.png" alt="Projects"></a></li>
-      <li><a href="#ongoing-projects"><img src="icons/code.png" alt="Ongoing Projects"></a></li>
-      <li><a href="#contact"><img src="icons/contact.png" alt="Contact"></a></li>
-      <li><a href="#footer"><img src="icons/anchor.png" alt="Footer"></a></li>
+      <li class="active"><a href="#hero">Home</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#contact">Contact</a></li>
     </ul>
   </nav>
 
-  <!-- Social Dock (Right Side) -->
-<nav class="dock dock-right">
-  <ul>
-    <li><a href="https://github.com/adil-rahman-3063" target="_blank" rel="noopener noreferrer"><img src="icons/github.png" alt="GitHub"></a></li>
-    <li><a href="https://www.linkedin.com/in/adil-rahman-ms/" target="_blank" rel="noopener noreferrer"><img src="icons/linkedin.png" alt="LinkedIn"></a></li>
-    <li><a href="mailto:adilrahman3063@gmail.com"><img src="icons/mail.png" alt="Gmail"></a></li>
-    <li><a href="https://wa.me/+919207114070" target="_blank" rel="noopener noreferrer"><img src="icons/whatsapp.png" alt="WhatsApp"></a></li>
-    <li><a href="https://instagram.com/adil__rahman_" target="_blank" rel="noopener noreferrer"><img src="icons/instagram.png" alt="Instagram"></a></li>
-  </ul>
-</nav>
+  <!-- Main Container -->
+  <main class="main-wrapper">
 
-
-  <!-- Scrollable Cards -->
-  <main class="cards-container">
-    <section id="hero" class="card">
-      <div>
-        <img src="images/profile.jpg" alt="Adil Rahiman" class="profile-picture">
-        <h1>Adil Rahiman</h1>
-        <p class="tagline">Your Idea, My Code — Let's Build Apps That Work!</p>
-        <p>B.Tech Student | App Developer | Innovator</p>
-        <a href="#projects" class="cta-button">Check out my work</a>
-      </div>
-    </section>
-
-    <section id="about" class="card">
-      <h2>About Me</h2>
-      <h3>Key Skills & Expertise</h3>
-      <ul>
-        <li>Mobile app development with Flutter</li>
-        <li>Backend integration with Supabase</li>
-        <li>Web development using modern HTML, CSS, & JavaScript</li>
-        <li>AI/ML experimentation</li>
-        <li>UI/UX design principles for intuitive apps</li>
-      </ul>
-      <h3>Work Highlights</h3>
-      <p>With a strong focus on real-world problem solving, I have successfully built and deployed multiple applications across diverse use-cases, including budgeting, student productivity, and media recommendation. I enjoy developing solutions end-to-end, from UI and user flow design to backend architecture and feature implementation. My work reflects an interest in improving daily experiences — whether by simplifying finance management, centralizing academic tools, or delivering personalized discovery experiences. I consistently aim for scalable, user-centric products, and approach every project with curiosity, commitment, and a drive for quality and innovation.</p>
-      <h3>What Drives Me</h3>
-      <p>I enjoy solving challenging problems and building apps that make life easier. I’m driven by curiosity and the desire to create practical digital solutions. Outside of coding, I love exploring AI, reading tech blogs, and experimenting with mini-projects to push my skills further.</p>
-    </section>
-
-    <section id="projects" class="card">
-      <h2>Projects</h2>
-      <p class="tagline">Click the projects to Goto their respective links</p>
-      <div class="projects-grid">
-        <a href="https://github.com/adil-rahman-3063/finly" target="_blank" rel="noopener noreferrer" class="project-block">
-          <h4>Finly</h4>
-          <p class="project-tagline">Your Personal Budget Calculator</p>
-          <p class="project-statement">An intuitive app to help students track their expenses and manage their finances effectively.</p>
-          <div class="tech-stack">
-            <span>Flutter</span><span>Supabase</span><span>Dart</span>
-          </div>
-        </a>
-        <a href="https://github.com/adil-rahman-3063/poshan_abhiyaan" target="_blank" rel="noopener noreferrer" class="project-block">
-          <h4>Poshan Abhiyaan – Nutrition Tracker</h4>
-          <p class="project-tagline">An app to monitor and improve child nutrition through personalized tracking and insights.</p>
-          <p class="project-statement">Helps parents and health workers track nutrition metrics effectively, promoting healthier child development.</p>
-          <div class="tech-stack">
-            <span>Flutter</span><span>Google APIs (Sheets, Drive, Calendar)</span>
-          </div>
-        </a>
-        <a href="#" onclick="alert('This app is currently in use by the Red Parrot institution, so the source code cannot be provided.'); return false;" class="project-block">
-          <h4>Red Parrot – Demo Scheduler</h4>
-          <p class="project-tagline">A platform to schedule and manage online demo sessions efficiently for educational institutions</p>
-          <p class="project-statement">Simplifies scheduling and tracking of demo sessions, saving time for both students and administrators.</p>
-          <div class="tech-stack">
-            <span>Flutter</span><span>UI/UX</span><span>Supabase</span>
-          </div>
-        </a>
-      </div>
-      <a href="https://github.com/adil-rahman-3063" class="cta-button">Explore More Projects</a>
-    </section>
-
-    <section id="ongoing-projects" class="card">
-      <h2>Ongoing Personal Projects</h2>
-      <div class="projects-grid">
-        <div class="project-block">
-          <h4>Charity Donation App</h4>
-          <p class="project-tagline">“A platform to donate items and food locally with verified organizations.”</p>
-          <p class="project-statement"><strong>Goal:</strong> Deploy in Play Store</p>
-          <div class="tech-stack">
-            <span>Flutter</span><span>Supabase</span>
-          </div>
+    <!-- Hero Section -->
+    <section id="hero" class="cyber-panel hero-container">
+      <div class="hero-info">
+        <h1 class="glitch-title" data-text="ADIL RAHMAN">ADIL RAHMAN</h1>
+        <p class="hero-tagline">Your Idea, My Code — Let's Build Apps That Work!</p>
+        
+        <div class="terminal-stats">
+          <div class="terminal-line"><span>[sys.info]</span> STATUS: ACTIVE // OPEN_FOR_FREELANCE = TRUE</div>
+          <div class="terminal-line"><span>[sys.info]</span> CORE_FOCUS: FLUTTER // SUPABASE // NODE // AI</div>
+          <div class="terminal-line"><span>[sys.info]</span> MISSION: TURNING CHAOTIC IDEAS INTO SLEEK DIGITAL PRODUCTS</div>
         </div>
-        <div class="project-block">
-          <h4>Attendance Marker App</h4>
-          <p class="project-tagline">“A smart app to track and predict student attendance efficiently”</p>
-          <p class="project-statement"><strong>Goal:</strong>Provide them for University Students</p>
-          <div class="tech-stack">
-            <span>Flutter</span><span>Supabase</span>
-          </div>
+
+        <a href="#projects" class="cyber-btn">Access Project Files</a>
+      </div>
+
+      <div class="hero-profile">
+        <div class="avatar-frame">
+          <img src="images/profile.jpg" alt="Adil Rahman Profile Image">
         </div>
       </div>
     </section>
 
-    <section id="contact" class="card">
-      <h2>Let’s Make Your App Idea a Reality!</h2>
-      <p class="freelance-offer">I take your app ideas and turn them into fully functional mobile apps or websites. Whether it’s a personal project, student tool, or business solution, I can help bring it to life.</p>
-      <p>Email : adilrahman3063@gmail.com</p>
-      <p>Phone : +91 9207114070</p>
-      <p class="cta-statement">Contact me with your ideas to discuss feasibility, pricing, and timelines. Flexible pricing based on project complexity.</p>
-      <div class="contact-links">
-        <a href="mailto:adilrahman3063@gmail.com" title="Email"><img src="icons/mail.png" alt="Email"></a>
-        <a href="https://github.com/adil-rahman-3063" target="_blank" rel="noopener noreferrer" title="GitHub"><img src="icons/github.png" alt="GitHub"></a>
-        <a href="https://www.linkedin.com/in/adil-rahman-ms/" target="_blank" rel="noopener noreferrer" title="LinkedIn"><img src="icons/linkedin.png" alt="LinkedIn"></a>
+    <!-- About Section -->
+    <section id="about" class="cyber-panel">
+      <h2 class="cyber-section-header"><span class="header-accent">01 //</span> ABOUT ME</h2>
+      <div class="terminal-stats" style="margin-bottom: 20px;">
+        <span>$ cat profile_summary.log</span>
       </div>
-      <a href="mailto:adilrahman3063@gmail.com?subject=App Idea Inquiry" class="cta-button">Send Your Idea</a>
+      <p style="line-height: 1.7; margin-bottom: 20px; font-size: 1.05rem;">
+        I am a B.Tech Student, App Developer, and Innovator with a strong focus on real-world problem solving. 
+        I have successfully built and deployed multiple applications across diverse use-cases, including budget tracking, 
+        student productivity, media discovery, and AI-powered CRM systems.
+      </p>
+      <p style="line-height: 1.7; margin-bottom: 20px; font-size: 1.05rem;">
+        I enjoy developing solutions end-to-end—from crafting responsive UI/UX architectures to configuring database backends 
+        and feature sets. My projects are designed to make daily tasks simpler, more organized, and highly efficient.
+      </p>
+      <p style="line-height: 1.7; font-size: 1.05rem;">
+        Driven by curiosity, I actively experiment with AI/ML integrations, scalable systems, and unique, fluid user experiences.
+      </p>
     </section>
 
-    <footer id="footer" class="card">
-      <p>© 2025 Adil Rahiman | All Rights Reserved</p>
-      <p class="footer-tagline">Your Idea, My Code — Let’s Build Apps That Work!</p>
-      <div class="footer-links">
-        <span>Connect with me:</span>
-        <a href="https://github.com/adil-rahman-3063" target="_blank" rel="noopener noreferrer" title="GitHub"><img src="icons/github.png" alt="GitHub"></a>
-        <a href="https://www.linkedin.com/in/adil-rahman-ms/" target="_blank" rel="noopener noreferrer" title="LinkedIn"><img src="icons/linkedin.png" alt="LinkedIn"></a>
-        <a href="mailto:adilrahman3063@gmail.com" title="Email"><img src="icons/mail.png" alt="Email"></a>
+    <!-- Skills Section -->
+    <section id="skills" class="cyber-panel">
+      <h2 class="cyber-section-header"><span class="header-accent">02 //</span> TECH STACK & SKILLS</h2>
+      <div class="skills-grid">
+        <div class="skill-card">
+          <h3>MOBILE DEV</h3>
+          <ul>
+            <li>Flutter & Dart</li>
+            <li>Native Integrations</li>
+            <li>PWA & Responsive Web</li>
+            <li>Local Storage & Caching</li>
+          </ul>
+        </div>
+        <div class="skill-card">
+          <h3>BACKEND & DB</h3>
+          <ul>
+            <li>Supabase (PostgreSQL)</li>
+            <li>Firebase Suite</li>
+            <li>FastAPI (Python)</li>
+            <li>RESTful APIs</li>
+          </ul>
+        </div>
+        <div class="skill-card">
+          <h3>WEB & UI/UX</h3>
+          <ul>
+            <li>HTML5 / CSS3 / Vanilla JS</li>
+            <li>Modern Responsive Design</li>
+            <li>Glassmorphism & Shadows</li>
+            <li>Figma UI/UX Mockups</li>
+          </ul>
+        </div>
+        <div class="skill-card">
+          <h3>AI & WORKFLOW</h3>
+          <ul>
+            <li>OpenAI API Integrations</li>
+            <li>Multilingual NLP parsing</li>
+            <li>Git / GitHub Actions</li>
+            <li>Linux CLI / Scripting</li>
+          </ul>
+        </div>
       </div>
-      <p>Looking to collaborate? Check out my projects above or reach out directly!</p>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="cyber-panel">
+      <h2 class="cyber-section-header"><span class="header-accent">03 //</span> WORK_ARCHIVE</h2>
+      
+      <div class="showcase-filters">
+        <button class="filter-btn active" data-filter="all">All Files</button>
+        <button class="filter-btn" data-filter="featured">Featured</button>
+        <button class="filter-btn" data-filter="mobile">Mobile Apps</button>
+        <button class="filter-btn" data-filter="web-backend">Web & Backend</button>
+      </div>
+
+      <div class="projects-grid">
+        <!-- Project 1: ZMR Music -->
+        <div class="project-card" data-category="featured mobile" onclick="openProjectModal('zmr')">
+          <div class="project-card-header">
+            <div class="project-status">Featured // Complete</div>
+            <h4>ZMR Music</h4>
+            <p class="project-tagline">Premium, high-performance YouTube Music client focused on sleek background audio and gesture navigation.</p>
+          </div>
+          <div>
+            <div class="project-tech">
+              <span>Flutter</span><span>Riverpod</span><span>just_audio</span><span>Supabase</span>
+            </div>
+            <div class="card-cta">Inspect Source</div>
+          </div>
+        </div>
+
+        <!-- Project 2: LeadFlow AI -->
+        <div class="project-card" data-category="featured mobile web-backend" onclick="openProjectModal('leadflow')">
+          <div class="project-card-header">
+            <div class="project-status">Featured // Production</div>
+            <h4>LeadFlow AI</h4>
+            <p class="project-tagline">AI CRM converting chaotic WhatsApp/Instagram text into structured, trackable deals in seconds.</p>
+          </div>
+          <div>
+            <div class="project-tech">
+              <span>Flutter</span><span>Supabase</span><span>OpenAI API</span><span>FastAPI</span>
+            </div>
+            <div class="card-cta">Inspect Source</div>
+          </div>
+        </div>
+
+        <!-- Project 3: ViewPick -->
+        <div class="project-card" data-category="featured web-backend" onclick="openProjectModal('viewpick')">
+          <div class="project-card-header">
+            <div class="project-status">Featured // Live</div>
+            <h4>ViewPick</h4>
+            <p class="project-tagline">Interactive movie discovery PWA leveraging a Tinder-style swipe interface with smart recommendations.</p>
+          </div>
+          <div>
+            <div class="project-tech">
+              <span>Flutter Web</span><span>Supabase</span><span>TMDB API</span><span>Firebase</span>
+            </div>
+            <div class="card-cta">Inspect Source</div>
+          </div>
+        </div>
+
+        <!-- Project 4: TeleStore -->
+        <div class="project-card" data-category="web-backend mobile" onclick="openProjectModal('telestore')">
+          <div class="project-card-header">
+            <div class="project-status">Ongoing // Beta</div>
+            <h4>TeleStore</h4>
+            <p class="project-tagline">Custom personal cloud storage that uses Telegram channels as free, unlimited file-hosting backends.</p>
+          </div>
+          <div>
+            <div class="project-tech">
+              <span>FastAPI</span><span>Flutter</span><span>Telethon API</span><span>Supabase</span>
+            </div>
+            <div class="card-cta">Inspect Source</div>
+          </div>
+        </div>
+
+        <!-- Project 5: C-Alert -->
+        <div class="project-card" data-category="featured mobile" onclick="openProjectModal('calert')">
+          <div class="project-card-header">
+            <div class="project-status">B.Tech Main Project // Finished</div>
+            <h4>C-Alert</h4>
+            <p class="project-tagline">High-performance incident reporting mobile app leveraging TFLite deepfake detection and GPS verification.</p>
+          </div>
+          <div>
+            <div class="project-tech">
+              <span>Flutter</span><span>TensorFlow Lite</span><span>Supabase</span><span>Provider</span>
+            </div>
+            <div class="card-cta">Inspect Source</div>
+          </div>
+        </div>
+
+        <!-- Project 6: Poshan Abhiyaan -->
+        <div class="project-card" data-category="mobile" onclick="openProjectModal('poshan')">
+          <div class="project-card-header">
+            <div class="project-status">B.Tech Mini Project // Stable</div>
+            <h4>Poshan Abhiyaan</h4>
+            <p class="project-tagline">Nutrition Tracker built for health workers to track child nutrition metrics via Google Sheets/Drive.</p>
+          </div>
+          <div>
+            <div class="project-tech">
+              <span>Flutter</span><span>Google APIs</span><span>Sheets / Drive</span>
+            </div>
+            <div class="card-cta">Inspect Source</div>
+          </div>
+        </div>
+
+        <!-- Project 7: Red Parrot -->
+        <div class="project-card" data-category="mobile" onclick="openProjectModal('redparrot')">
+          <div class="project-card-header">
+            <div class="project-status">Stable // Active Use</div>
+            <h4>Red Parrot Scheduler</h4>
+            <p class="project-tagline">Institution Demo Scheduler simplifying class tracking and slot booking for administrators and students.</p>
+          </div>
+          <div>
+            <div class="project-tech">
+              <span>Flutter</span><span>Supabase</span><span>UI/UX</span>
+            </div>
+            <div class="card-cta">Inspect Source</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="cyber-panel">
+      <h2 class="cyber-section-header"><span class="header-accent">04 //</span> SECURE_COMM_TERMINAL</h2>
+      
+      <div class="comm-terminal">
+        <div class="comm-terminal-header">
+          <span>COMMS CHANNEL #09207114070</span>
+          <span class="terminal-blink">ONLINE</span>
+        </div>
+
+        <div class="contact-layout">
+          <div class="contact-text">
+            <p>
+              I take your ideas and transform them into functional mobile apps or websites. 
+              Whether you need to outline feasibility, negotiate pricing, or check timelines, 
+              send over a message to initiate a secure ping.
+            </p>
+            <ul class="contact-methods">
+              <li><span>EMAIL:</span> adilrahman3063@gmail.com</li>
+              <li><span>PHONE:</span> +91 9207114070</li>
+              <li><span>LOCATION:</span> Kerala, India</li>
+            </ul>
+          </div>
+
+          <div class="contact-grid">
+            <div class="social-bar">
+              <a href="https://github.com/adil-rahman-3063" target="_blank" rel="noopener noreferrer" class="social-icon" title="GitHub">
+                <img src="icons/github.png" alt="GitHub">
+              </a>
+              <a href="https://www.linkedin.com/in/adil-rahman-ms/" target="_blank" rel="noopener noreferrer" class="social-icon" title="LinkedIn">
+                <img src="icons/linkedin.png" alt="LinkedIn">
+              </a>
+              <a href="mailto:adilrahman3063@gmail.com" class="social-icon" title="Email">
+                <img src="icons/mail.png" alt="Email">
+              </a>
+              <a href="https://wa.me/+919207114070" target="_blank" rel="noopener noreferrer" class="social-icon" title="WhatsApp">
+                <img src="icons/whatsapp.png" alt="WhatsApp">
+              </a>
+              <a href="https://instagram.com/adil__rahman_" target="_blank" rel="noopener noreferrer" class="social-icon" title="Instagram">
+                <img src="icons/instagram.png" alt="Instagram">
+              </a>
+            </div>
+            <a href="mailto:adilrahman3063@gmail.com?subject=App Idea Inquiry" class="cyber-btn cyber-btn-green" style="margin-top: 10px;">Send Your App Idea</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <p>© 2026 Adil Rahman | All Rights Reserved</p>
+      <p style="font-size: 0.75rem; opacity: 0.6;">SYSTEM VERSION 2.0.0 // HOSTED ON GITHUB PAGES</p>
     </footer>
+
   </main>
 
-  <!-- Mobile View Notice -->
-  <div id="mobile-notice-overlay" class="hidden">
-    <div id="mobile-notice">
-      <p>For the best experience, please switch to desktop view.</p>
-      <button id="close-notice" class="cta-button">Got it!</button>
+  <!-- Project Details Modal Overlay -->
+  <div class="modal-overlay" id="project-modal" onclick="closeProjectModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <button class="modal-close-btn" onclick="toggleModal(false)">X</button>
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-title">Project Title</h3>
+        <div class="modal-subtitle" id="modal-subtitle">Sub Info</div>
+      </div>
+      <div class="modal-body" id="modal-body">
+        <!-- Content will be injected dynamically -->
+      </div>
+      <div class="modal-footer" id="modal-footer">
+        <!-- Links will be injected dynamically -->
+      </div>
     </div>
   </div>
 
   <script>
-    // Snap-to-card scroll
-    const container = document.querySelector('.cards-container');
-    const cards = document.querySelectorAll('.card');
-    const dockLinks = document.querySelectorAll('.dock:not(.dock-right) a');
+    // Matrix Rain Canvas Animation
+    const canvas = document.getElementById('cyber-matrix');
+    const ctx = canvas.getContext('2d');
 
-    let isScrolling;
-    container.addEventListener('scroll', () => {
-      window.clearTimeout(isScrolling);
-      isScrolling = setTimeout(() => {
-        let scrollPos = container.scrollTop;
-        let cardHeight = window.innerHeight * 0.8; // Adjust for 80% height
-        let nearest = Math.round(scrollPos / cardHeight) * cardHeight;
-        container.scrollTo({ top: nearest, behavior: 'smooth' });
-      }, 100);
+    let width = canvas.width = window.innerWidth;
+    let height = canvas.height = window.innerHeight;
 
-      // Active dock highlight
-      const index = Math.round(container.scrollTop / (window.innerHeight * 0.8));
-      dockLinks.forEach((link, i) => {
-        const listItem = link.parentElement;
-        i === index ? listItem.classList.add('active') : listItem.classList.remove('active');
-      });
-    });
+    const hexChars = '0123456789ABCDEF<>[]/\\|_-=+%$#@!'.split('');
+    const fontSize = 14;
+    let columns = Math.floor(width / fontSize);
+    let drops = Array(columns).fill(1);
 
-    // Card entrance animation
-    const observer = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if(entry.isIntersecting){
-          entry.target.classList.add('visible');
+    function drawMatrix() {
+      ctx.fillStyle = 'rgba(8, 8, 10, 0.08)';
+      ctx.fillRect(0, 0, width, height);
+
+      ctx.fillStyle = '#39ff14';
+      ctx.font = `bold ${fontSize}px monospace`;
+
+      for (let i = 0; i < drops.length; i++) {
+        const text = hexChars[Math.floor(Math.random() * hexChars.length)];
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+        if (drops[i] * fontSize > height && Math.random() > 0.975) {
+          drops[i] = 0;
         }
-      });
-    }, { threshold: 0.5 });
-
-    cards.forEach(card => observer.observe(card));
-
-    // Smooth scroll for CTA button
-    document.querySelector('.cta-button')?.addEventListener('click', function(e) {
-      e.preventDefault(); // Prevent default anchor jump
-      const targetId = this.getAttribute('href');
-      const targetElement = document.querySelector(targetId);
-      if (targetElement) {
-        container.scrollTo({
-          top: targetElement.offsetTop,
-          behavior: 'smooth'
-        });
+        drops[i]++;
       }
-    });
-
-    // Mobile notice popup
-    document.addEventListener('DOMContentLoaded', () => {
-      const isMobile = window.innerWidth <= 768;
-      const noticeShown = sessionStorage.getItem('mobileNoticeShown');
-      const noticeOverlay = document.getElementById('mobile-notice-overlay');
-      const closeButton = document.getElementById('close-notice');
-
-      if (isMobile && !noticeShown) {
-        noticeOverlay.classList.remove('hidden');
-      }
-
-      closeButton.addEventListener('click', () => {
-        noticeOverlay.classList.add('hidden');
-        sessionStorage.setItem('mobileNoticeShown', 'true');
-      });
-    });
-
-    // Ensure project rows start fully scrolled to the left so first card isn't cut
-    function resetProjectsGridScroll() {
-      document.querySelectorAll('.projects-grid').forEach(grid => {
-        grid.scrollLeft = 0;
-      });
     }
 
-    window.addEventListener('load', () => {
-      // immediate reset
-      resetProjectsGridScroll();
-      // reset again after layout/fonts/images settle
-      setTimeout(resetProjectsGridScroll, 350);
+    let matrixInterval = setInterval(drawMatrix, 45);
+
+    window.addEventListener('resize', () => {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+      columns = Math.floor(width / fontSize);
+      drops = Array(columns).fill(1);
     });
 
-    // also reset when the hash changes (navigating to the projects section)
-    window.addEventListener('hashchange', resetProjectsGridScroll);
-    // and when the window regains focus
-    window.addEventListener('focus', resetProjectsGridScroll);
+    // Active Nav Indicator on Scroll
+    const sections = document.querySelectorAll('section');
+    const navItems = document.querySelectorAll('#cyber-nav ul li');
+
+    window.addEventListener('scroll', () => {
+      let current = '';
+      sections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        const sectionHeight = section.clientHeight;
+        if (pageYOffset >= (sectionTop - 250)) {
+          current = section.getAttribute('id');
+        }
+      });
+
+      navItems.forEach(li => {
+        li.classList.remove('active');
+        const link = li.querySelector('a').getAttribute('href').substring(1);
+        if (link === current) {
+          li.classList.add('active');
+        }
+      });
+    });
+
+    // Filtering System
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const projectCards = document.querySelectorAll('.project-card');
+
+    filterButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        // Toggle Active
+        filterButtons.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+
+        const filter = button.getAttribute('data-filter');
+
+        projectCards.forEach(card => {
+          const categories = card.getAttribute('data-category').split(' ');
+          if (filter === 'all' || categories.includes(filter)) {
+            card.style.display = 'flex';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+    });
+
+    // Project Repository / Metadata
+    const projectData = {
+      zmr: {
+        title: "ZMR Music",
+        subtitle: "Premium YouTube Music Client // Flutter",
+        description: "A gorgeous, high-fidelity YouTube Music client designed to provide a premium gesture-based mobile audio experience.",
+        features: [
+          "Dynamic discovery home feed featuring category filtering chips and Quick Picks.",
+          "Advanced playback engines: integrated crossfade, gapless playback, and volume normalization.",
+          "Full background playback support with system lock screen media controls.",
+          "Fully local secure session handling (YouTube cookies saved locally, never sent to external servers)."
+        ],
+        tech: ["Flutter", "Riverpod", "just_audio", "Supabase", "Cloudflare Workers"],
+        links: [
+          { text: "GitHub Repository", url: "https://github.com/adil-rahman-3063/zmr" }
+        ]
+      },
+      leadflow: {
+        title: "LeadFlow AI",
+        subtitle: "AI-Powered Multilingual CRM // Production",
+        description: "The ultimate CRM suite that turns unstructured client message text into fully structured, manageable pipeline deals.",
+        features: [
+          "Copy-paste chats from WhatsApp, Instagram, or Email, and let the AI extract deal size, contact info, source, and details.",
+          "Supports multilingual NLP parsing for English, Hinglish, Malayalam, Manglish, and Arabic.",
+          "Visual, interactive Kanban pipeline containing 6 drag-and-drop stages.",
+          "Context-aware AI follow-up message generation directly deep-linked to WhatsApp and Mail Clients.",
+          "Organization collaboration workspace using invite codes, plus aging warnings for slow deals."
+        ],
+        tech: ["Flutter", "Supabase", "FastAPI", "OpenAI GPT API", "Dart"],
+        links: [
+          { text: "Live Web CRM", url: "https://leadflowai-uyu1.onrender.com/" },
+          { text: "Download Android APK", url: "https://github.com/adil-rahman-3063/LeadFlow_AI/releases" }
+        ]
+      },
+      viewpick: {
+        title: "ViewPick",
+        subtitle: "Tinder-Style Movie Discovery PWA // Flutter Web",
+        description: "A creative web app and PWA designed to overhaul standard movie searching with responsive swipe discovery card stacks.",
+        features: [
+          "Swipe Right to watchlist, Swipe Left to skip, with a dynamic TMDB recommendation engine.",
+          "Granular preference filters (avoid specific years, genres, or languages).",
+          "Comprehensive details: trailers, cast details, plots, and streaming providers.",
+          "Optimistic UI state syncing and local database caching for near-instant offline load times."
+        ],
+        tech: ["Flutter Web", "Supabase", "TMDB API", "Firebase Analytics", "PWA Manifest"],
+        links: [
+          { text: "Live Application", url: "https://viewpick.vercel.app" }
+        ]
+      },
+      telestore: {
+        title: "TeleStore",
+        subtitle: "Unlimited Free Cloud Storage App // Ongoing Beta",
+        description: "A storage platform leveraging Telegram channels and chat bots as a completely free, unlimited database storage engine.",
+        features: [
+          "Automatically chunks and uploads large files to target channels using Telethon client API.",
+          "FastAPI and Supabase metadata backend to track recursive folders and file permissions.",
+          "Gorgeous stacked glassmorphic navigation deck with swipe gestures.",
+          "Authenticates user access via secure Telegram OTP logins."
+        ],
+        tech: ["FastAPI", "Python", "Telethon (Telegram API)", "Flutter", "Supabase"],
+        links: [
+          { text: "Frontend Codebase", url: "https://github.com/adil-rahman-3063/telestore" }
+        ]
+      },
+      calert: {
+        title: "C-Alert",
+        subtitle: "B.Tech Main Project // Flutter App",
+        description: "A community-driven incident reporting mobile application that empowers citizens to report incidents with cryptographic-level integrity and AI forensics.",
+        features: [
+          "AI Forensic Analysis: Dual-model TensorFlow Lite integration (Base + Hyperreal) to identify deepfakes and manipulated evidence.",
+          "Secure Camera Engine: Custom camera capturing with orientation normalization.",
+          "Location Verification Protocol: Parallel verification of device GPS and EXIF metadata to identify spoofed/drifted locations.",
+          "Authorities Command Center: Intelligent incident case management portal with performance optimizations.",
+          "Crime Mapping: Real-time dynamic heatmaps of community incident reports."
+        ],
+        tech: ["Flutter", "TensorFlow Lite", "Supabase", "OpenStreetMap", "Provider"],
+        links: [
+          { text: "GitHub Repository", url: "https://github.com/Dayal-Joy/C-Alert" }
+        ]
+      },
+      poshan: {
+        title: "Poshan Abhiyaan",
+        subtitle: "B.Tech Mini Project // Flutter App",
+        description: "An app deployed for health administrators and parents to track children's nutritional and developmental growth metrics.",
+        features: [
+          "Track nutrition milestones, vaccination histories, and medical checklists.",
+          "Google API integrations syncing data directly to target Google Sheets, Drive, and Calendars."
+        ],
+        tech: ["Flutter", "Google Sheets API", "Google Drive API", "Calendar API"],
+        links: [
+          { text: "GitHub Source", url: "https://github.com/adil-rahman-3063/poshan_abhiyaan" }
+        ]
+      },
+      redparrot: {
+        title: "Red Parrot Scheduler",
+        subtitle: "Demo Session Scheduler // Institutional Use",
+        description: "A production demo scheduling software used by the Red Parrot educational institution to register and coordinate student tutoring slots.",
+        features: [
+          "Allows seamless scheduling and real-time slot checking.",
+          "Reduces administrative friction and calendar overlap automatically.",
+          "Secure coordinator dash panel to handle institutional registrations."
+        ],
+        tech: ["Flutter", "Supabase DB", "UI/UX Figma Architecture"],
+        links: [
+          { text: "Code Status Details", url: "https://github.com/adil-rahman-3063" }
+        ]
+      }
+    };
+
+    // Modal Controller functions
+    function toggleModal(show) {
+      const modal = document.getElementById('project-modal');
+      if (show) {
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      } else {
+        modal.classList.remove('active');
+        document.body.style.overflow = 'auto';
+      }
+    }
+
+    function openProjectModal(key) {
+      const data = projectData[key];
+      if (!data) return;
+
+      document.getElementById('modal-title').textContent = data.title;
+      document.getElementById('modal-subtitle').textContent = data.subtitle;
+
+      // Body assembly
+      let html = `<p>${data.description}</p>`;
+      
+      html += `<div class="modal-section-title">Key Integration Features</div><ul>`;
+      data.features.forEach(feat => {
+        html += `<li>${feat}</li>`;
+      });
+      html += `</ul>`;
+
+      html += `<div class="modal-section-title">Technological Stack</div><div class="project-tech" style="margin-top: 5px;">`;
+      data.tech.forEach(t => {
+        html += `<span>${t}</span>`;
+      });
+      html += `</div>`;
+
+      document.getElementById('modal-body').innerHTML = html;
+
+      // Footer links assembly
+      let footerHtml = '';
+      data.links.forEach(lnk => {
+        footerHtml += `<a href="${lnk.url}" target="_blank" rel="noopener noreferrer" class="cyber-btn cyber-btn-green">${lnk.text}</a>`;
+      });
+      document.getElementById('modal-footer').innerHTML = footerHtml;
+
+      toggleModal(true);
+    }
+
+    function closeProjectModal(event) {
+      if (event.target === document.getElementById('project-modal')) {
+        toggleModal(false);
+      }
+    }
   </script>
 </body>
 </html>

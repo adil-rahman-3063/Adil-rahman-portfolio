@@ -816,39 +816,141 @@ footer p {
   margin-bottom: 10px;
 }
 
+/* Education & Experience Grid */
+.edu-exp-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+}
+
 /* Responsive Styles */
 @media (max-width: 768px) {
+  .main-wrapper {
+    padding: 20px 10px 100px 10px;
+  }
+
+  .cyber-panel {
+    padding: 20px 15px;
+    margin-bottom: 30px;
+  }
+
   .hero-container {
     flex-direction: column-reverse;
     text-align: center;
     align-items: center;
+    padding: 20px 10px;
+    gap: 25px;
   }
 
   .avatar-frame {
-    width: 160px;
-    height: 160px;
+    width: 150px;
+    height: 150px;
   }
 
   .glitch-title {
-    font-size: 2.8rem;
+    font-size: 2.2rem;
+    letter-spacing: 2px;
   }
 
   .cyber-section-header {
-    font-size: 1.8rem;
+    font-size: 1.5rem;
+    gap: 8px;
+    margin-bottom: 20px;
   }
 
   .terminal-stats {
     text-align: left;
+    font-size: 0.8rem;
+    padding: 10px;
+  }
+
+  .edu-exp-grid {
+    grid-template-columns: 1fr;
+    gap: 30px;
   }
 
   .cyber-dock {
-    padding: 8px 16px;
-    bottom: 15px;
+    width: 95%;
+    border-radius: 20px;
+    padding: 6px 8px;
+    bottom: 12px;
+  }
+
+  .cyber-dock ul {
+    gap: 4px;
+    width: 100%;
+    justify-content: space-around;
   }
 
   .cyber-dock a {
-    font-size: 0.75rem;
-    padding: 4px 8px;
-    letter-spacing: 0.5px;
+    font-size: 0.65rem;
+    padding: 4px 6px;
+    letter-spacing: 0.2px;
+  }
+
+  /* Modal Mobile Tweaks */
+  .modal-content {
+    padding: 15px;
+    width: 95%;
+    max-height: 90vh;
+  }
+
+  .modal-title {
+    font-size: 1.4rem;
+  }
+
+  .modal-close-btn {
+    top: 10px;
+    right: 10px;
+    width: 28px;
+    height: 28px;
+    font-size: 0.8rem;
+  }
+
+  .modal-footer {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .modal-footer .cyber-btn {
+    width: 100%;
+    font-size: 0.8rem;
+    padding: 10px;
+  }
+
+  /* Contact Comms Mobile Tweaks */
+  .comm-terminal {
+    padding: 15px;
+  }
+
+  .comm-terminal-header {
+    margin: -15px -15px 15px -15px;
+    padding: 8px 12px;
+    font-size: 0.7rem;
+  }
+
+  .contact-layout {
+    gap: 20px;
+  }
+
+  .social-bar {
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .social-icon {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+@media (max-width: 480px) {
+  .glitch-title {
+    font-size: 1.8rem;
+  }
+  .cyber-dock a {
+    font-size: 0.6rem;
+    padding: 4px 3px;
   }
 }

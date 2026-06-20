@@ -238,43 +238,43 @@ body::before {
 .glitch-title::before {
   left: 2px;
   text-shadow: -2px 0 var(--cyber-yellow);
-  clip: rect(44px, 450px, 56px, 0);
+  clip-path: inset(15% 0 70% 0);
   animation: glitch-anim 5s infinite linear alternate-reverse;
 }
 
 .glitch-title::after {
   left: -2px;
   text-shadow: -2px 0 var(--neon-green), 0 2px var(--cyber-yellow);
-  clip: rect(85px, 450px, 140px, 0);
+  clip-path: inset(55% 0 10% 0);
   animation: glitch-anim2 5s infinite linear alternate-reverse;
 }
 
 @keyframes glitch-anim {
-  0% { clip: rect(15px, 9999px, 66px, 0); }
-  10% { clip: rect(34px, 9999px, 5px, 0); }
-  20% { clip: rect(81px, 9999px, 28px, 0); }
-  30% { clip: rect(11px, 9999px, 92px, 0); }
-  40% { clip: rect(47px, 9999px, 81px, 0); }
-  50% { clip: rect(3px, 9999px, 18px, 0); }
-  60% { clip: rect(72px, 9999px, 54px, 0); }
-  70% { clip: rect(98px, 9999px, 11px, 0); }
-  80% { clip: rect(25px, 9999px, 49px, 0); }
-  90% { clip: rect(56px, 9999px, 73px, 0); }
-  100% { clip: rect(12px, 9999px, 35px, 0); }
+  0%  { clip-path: inset(10% 0 75% 0); transform: translate(2px, 0); }
+  10% { clip-path: inset(40% 0 45% 0); transform: translate(-2px, 0); }
+  20% { clip-path: inset(70% 0 15% 0); transform: translate(2px, 0); }
+  30% { clip-path: inset(5%  0 85% 0); transform: translate(-2px, 0); }
+  40% { clip-path: inset(50% 0 35% 0); transform: translate(2px, 0); }
+  50% { clip-path: inset(25% 0 60% 0); transform: translate(-2px, 0); }
+  60% { clip-path: inset(80% 0 5%  0); transform: translate(2px, 0); }
+  70% { clip-path: inset(30% 0 55% 0); transform: translate(-2px, 0); }
+  80% { clip-path: inset(60% 0 25% 0); transform: translate(2px, 0); }
+  90% { clip-path: inset(15% 0 70% 0); transform: translate(-2px, 0); }
+  100%{ clip-path: inset(45% 0 40% 0); transform: translate(2px, 0); }
 }
 
 @keyframes glitch-anim2 {
-  0% { clip: rect(65px, 9999px, 12px, 0); }
-  10% { clip: rect(12px, 9999px, 88px, 0); }
-  20% { clip: rect(96px, 9999px, 42px, 0); }
-  30% { clip: rect(34px, 9999px, 67px, 0); }
-  40% { clip: rect(51px, 9999px, 19px, 0); }
-  50% { clip: rect(9px, 9999px, 93px, 0); }
-  60% { clip: rect(77px, 9999px, 5px, 0); }
-  70% { clip: rect(23px, 9999px, 31px, 0); }
-  80% { clip: rect(48px, 9999px, 87px, 0); }
-  90% { clip: rect(14px, 9999px, 55px, 0); }
-  100% { clip: rect(88px, 9999px, 2px, 0); }
+  0%  { clip-path: inset(55% 0 10% 0); transform: translate(-2px, 0); }
+  10% { clip-path: inset(10% 0 65% 0); transform: translate(2px, 0); }
+  20% { clip-path: inset(75% 0 5%  0); transform: translate(-2px, 0); }
+  30% { clip-path: inset(30% 0 50% 0); transform: translate(2px, 0); }
+  40% { clip-path: inset(5%  0 80% 0); transform: translate(-2px, 0); }
+  50% { clip-path: inset(60% 0 20% 0); transform: translate(2px, 0); }
+  60% { clip-path: inset(20% 0 65% 0); transform: translate(-2px, 0); }
+  70% { clip-path: inset(85% 0 2%  0); transform: translate(2px, 0); }
+  80% { clip-path: inset(40% 0 45% 0); transform: translate(-2px, 0); }
+  90% { clip-path: inset(15% 0 70% 0); transform: translate(2px, 0); }
+  100%{ clip-path: inset(70% 0 15% 0); transform: translate(-2px, 0); }
 }
 
 /* Hero Section */
@@ -418,7 +418,7 @@ body::before {
 /* Skill Hub Grid */
 .skills-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
   gap: 20px;
 }
 
@@ -496,7 +496,7 @@ body::before {
 
 .projects-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
   gap: 24px;
 }
 
@@ -823,92 +823,135 @@ footer p {
   gap: 40px;
 }
 
-/* Responsive Styles */
+/* ============================================
+   Responsive Styles — Mobile First
+   ============================================ */
+
 @media (max-width: 768px) {
+  /* Layout */
   .main-wrapper {
-    padding: 20px 10px 100px 10px;
+    padding: 20px 12px 110px 12px;
   }
 
   .cyber-panel {
-    padding: 20px 15px;
-    margin-bottom: 30px;
+    padding: 20px 16px;
+    margin-bottom: 28px;
   }
 
+  /* Hero */
   .hero-container {
     flex-direction: column-reverse;
     text-align: center;
     align-items: center;
-    padding: 20px 10px;
-    gap: 25px;
+    padding: 24px 0 16px;
+    gap: 24px;
+  }
+
+  .hero-info {
+    width: 100%;
   }
 
   .avatar-frame {
-    width: 150px;
-    height: 150px;
+    width: 140px;
+    height: 140px;
   }
 
   .glitch-title {
-    font-size: 2.2rem;
+    font-size: 2rem;
     letter-spacing: 2px;
+    word-break: break-word;
   }
 
-  .cyber-section-header {
-    font-size: 1.5rem;
-    gap: 8px;
-    margin-bottom: 20px;
+  .hero-tagline {
+    font-size: 1rem;
   }
 
+  /* Terminal stats — ensure text wraps cleanly */
   .terminal-stats {
     text-align: left;
-    font-size: 0.8rem;
-    padding: 10px;
+    font-size: 0.78rem;
+    padding: 10px 12px;
+    overflow-x: hidden;
   }
 
+  .terminal-line {
+    flex-wrap: wrap;
+    gap: 4px;
+    word-break: break-word;
+  }
+
+  /* Section headers */
+  .cyber-section-header {
+    font-size: 1.35rem;
+    gap: 8px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
+  /* Experience / Education grid */
   .edu-exp-grid {
     grid-template-columns: 1fr;
-    gap: 30px;
+    gap: 28px;
   }
 
+  /* Skills grid → single column on very narrow screens */
+  .skills-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Projects grid → single column */
+  .projects-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Hero CTA button */
+  .hero-info .cyber-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Navigation Dock */
   .cyber-dock {
-    width: 95%;
-    border-radius: 20px;
-    padding: 6px 8px;
-    bottom: 12px;
+    width: 96%;
+    border-radius: 18px;
+    padding: 8px 6px;
+    bottom: 14px;
   }
 
   .cyber-dock ul {
-    gap: 4px;
+    gap: 0;
     width: 100%;
     justify-content: space-around;
   }
 
   .cyber-dock a {
-    font-size: 0.65rem;
-    padding: 4px 6px;
-    letter-spacing: 0.2px;
+    font-size: 0.6rem;
+    padding: 6px 4px;
+    letter-spacing: 0;
   }
 
-  /* Modal Mobile Tweaks */
+  /* Modal */
   .modal-content {
-    padding: 15px;
-    width: 95%;
-    max-height: 90vh;
+    padding: 16px;
+    width: 96%;
+    max-height: 92vh;
   }
 
   .modal-title {
-    font-size: 1.4rem;
+    font-size: 1.3rem;
+    padding-right: 36px; /* space for close button */
   }
 
   .modal-close-btn {
-    top: 10px;
-    right: 10px;
+    top: 12px;
+    right: 12px;
     width: 28px;
     height: 28px;
     font-size: 0.8rem;
   }
 
   .modal-footer {
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: 10px;
   }
 
@@ -916,21 +959,50 @@ footer p {
     width: 100%;
     font-size: 0.8rem;
     padding: 10px;
+    text-align: center;
+    justify-content: center;
   }
 
-  /* Contact Comms Mobile Tweaks */
+  /* Contact Section */
   .comm-terminal {
-    padding: 15px;
+    padding: 14px;
   }
 
   .comm-terminal-header {
-    margin: -15px -15px 15px -15px;
+    margin: -14px -14px 16px -14px;
     padding: 8px 12px;
-    font-size: 0.7rem;
+    font-size: 0.68rem;
+    flex-wrap: wrap;
+    gap: 4px;
   }
 
   .contact-layout {
+    flex-direction: column;
     gap: 20px;
+  }
+
+  .contact-text {
+    min-width: unset;
+    width: 100%;
+  }
+
+  .contact-text p {
+    font-size: 0.92rem;
+  }
+
+  .contact-methods {
+    font-size: 0.9rem;
+  }
+
+  .contact-grid {
+    width: 100%;
+    align-items: stretch;
+  }
+
+  .contact-grid .cyber-btn {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
   }
 
   .social-bar {
@@ -940,17 +1012,41 @@ footer p {
   }
 
   .social-icon {
-    width: 44px;
-    height: 44px;
+    width: 46px;
+    height: 46px;
   }
 }
 
-@media (max-width: 480px) {
+/* Extra Small: phones ≤ 400px */
+@media (max-width: 400px) {
   .glitch-title {
-    font-size: 1.8rem;
+    font-size: 1.6rem;
+    letter-spacing: 1px;
   }
+
+  .cyber-section-header {
+    font-size: 1.15rem;
+  }
+
   .cyber-dock a {
-    font-size: 0.6rem;
-    padding: 4px 3px;
+    font-size: 0.55rem;
+    padding: 5px 3px;
+  }
+
+  .cyber-panel {
+    padding: 16px 12px;
+  }
+
+  .avatar-frame {
+    width: 120px;
+    height: 120px;
+  }
+
+  .terminal-stats {
+    font-size: 0.72rem;
+  }
+
+  .project-card h4 {
+    font-size: 1.1rem;
   }
 }

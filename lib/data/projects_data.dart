@@ -184,3 +184,32 @@ const List<ProjectData> allProjects = [
     categories: ['freelance'],
   ),
 ];
+
+class ReviewModel {
+  final String name;
+  final String role;
+  final int rating;
+  final String review;
+  final String? date;
+
+  const ReviewModel({
+    required this.name,
+    required this.role,
+    required this.rating,
+    required this.review,
+    this.date,
+  });
+
+  factory ReviewModel.fromJson(Map<String, dynamic> json) {
+    return ReviewModel(
+      name: json['name'] ?? '',
+      role: json['role'] ?? '',
+      rating: (json['rating'] is num) ? (json['rating'] as num).toInt() : 5,
+      review: json['review'] ?? '',
+      date: json['timestamp']?.toString(),
+    );
+  }
+}
+
+// Deployed Google Apps Script Web App URL for reviews backend
+const String reviewsApiUrl = 'https://script.google.com/macros/s/AKfycbyLKCO5CjCIqry4nauFf71nH425Ym41Yrp2wReST1KfHURl5rRJU1HnAqps8z84EM7kiA/exec';

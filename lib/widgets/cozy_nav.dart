@@ -6,7 +6,7 @@ class CozyNav extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
 
-  static const _labels = ['HOME', 'ABOUT', 'EXPERIENCE', 'SKILLS', 'PROJECTS', 'WORKSPACE', 'CONTACT'];
+  static const _labels = ['HOME', 'ABOUT', 'EXPERIENCE', 'SKILLS', 'PROJECTS', 'WORKSPACE', 'REVIEWS', 'CONTACT'];
 
   const CozyNav({super.key, required this.currentIndex, required this.onTap});
 

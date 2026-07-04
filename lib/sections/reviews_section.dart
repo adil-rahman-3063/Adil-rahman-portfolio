@@ -65,44 +65,84 @@ class _ReviewsSectionState extends State<ReviewsSection> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         // Section Header
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                Text(
-                  '07 // ',
-                  style: CozyTheme.handwrittenStyle(fontSize: 26, color: CozyTheme.accentGold),
-                ),
-                Text(
-                  'CLIENT REVIEWS',
-                  style: CozyTheme.headerStyle(
-                    fontSize: isDesktop ? 22 : 18,
-                    color: CozyTheme.textDark,
-                    weight: FontWeight.bold,
+        isDesktop
+            ? Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        '07 // ',
+                        style: CozyTheme.handwrittenStyle(fontSize: 26, color: CozyTheme.accentGold),
+                      ),
+                      Text(
+                        'CLIENT REVIEWS',
+                        style: CozyTheme.headerStyle(
+                          fontSize: 22,
+                          color: CozyTheme.textDark,
+                          weight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
-            ElevatedButton.icon(
-              onPressed: _showSubmissionModal,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: CozyTheme.accentBrown,
-                foregroundColor: CozyTheme.paperCream,
-                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
-                ),
+                  ElevatedButton.icon(
+                    onPressed: _showSubmissionModal,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: CozyTheme.accentBrown,
+                      foregroundColor: CozyTheme.paperCream,
+                      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                    ),
+                    icon: const Icon(Icons.rate_review_rounded, size: 14),
+                    label: Text(
+                      'Leave a Review',
+                      style: CozyTheme.monoStyle(fontSize: 11, color: CozyTheme.paperCream)
+                          .copyWith(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              )
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        '07 // ',
+                        style: CozyTheme.handwrittenStyle(fontSize: 22, color: CozyTheme.accentGold),
+                      ),
+                      Text(
+                        'CLIENT REVIEWS',
+                        style: CozyTheme.headerStyle(
+                          fontSize: 18,
+                          color: CozyTheme.textDark,
+                          weight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  ElevatedButton.icon(
+                    onPressed: _showSubmissionModal,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: CozyTheme.accentBrown,
+                      foregroundColor: CozyTheme.paperCream,
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                    ),
+                    icon: const Icon(Icons.rate_review_rounded, size: 13),
+                    label: Text(
+                      'Leave a Review',
+                      style: CozyTheme.monoStyle(fontSize: 11, color: CozyTheme.paperCream)
+                          .copyWith(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
               ),
-              icon: const Icon(Icons.rate_review_rounded, size: 14),
-              label: Text(
-                'Leave a Review',
-                style: CozyTheme.monoStyle(fontSize: 11, color: CozyTheme.paperCream)
-                    .copyWith(fontWeight: FontWeight.bold),
-              ),
-            ),
-          ],
-        ),
         const SizedBox(height: 32),
 
         _isLoading

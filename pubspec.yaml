@@ -1,0 +1,38 @@
+name: portfolio
+description: Adil Rahman — Cyberpunk Portfolio
+publish_to: 'none'
+version: 2.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  url_launcher: ^6.3.0
+  google_fonts: ^6.2.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/Gemini_Generated_Image_cfgv0jcfgv0jcfgv-removebg-preview.png
+    - assets/Filipino_Freelance_Graphic_Designer_Instagram_Post-removebg-preview.png
+    - assets/images/profile.jpg
+    - assets/icons/github.png
+    - assets/icons/linkedin.png
+    - assets/icons/mail.png
+    - assets/icons/whatsapp.png
+    - assets/icons/instagram.png
+    - assets/icons/anchor.png
+    - assets/icons/checklist.png
+    - assets/icons/code.png
+    - assets/icons/contact.png
+    - assets/icons/profile.png
+    - assets/icons/trophy.png
+    - assets/icons/home.svg

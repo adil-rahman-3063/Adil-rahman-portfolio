@@ -2,12 +2,12 @@
 
 ```
 SYSTEM STATUS: ACTIVE
-ROLE: FLUTTER & FULL-STACK DEVELOPER
+ROLE: APP, WEB & SHOPIFY DEVELOPER
 CREDENTIALS: B.TECH GRADUATE & SOFTWARE INNOVATOR
 FOCUS: TURNING CHAOTIC APPS INTO SLEEK DIGITAL PRODUCTS
 ```
 
-Welcome to my digital gateway. I build robust, responsive mobile applications, backend services, and interactive web experiences. This space acts as an overview of my current projects, technical capabilities, and professional transmission coordinates.
+Welcome to my digital gateway. I build robust, responsive mobile applications, interactive web experiences, and custom Shopify e-commerce solutions. This space acts as an overview of my current projects, technical capabilities, and professional transmission coordinates.
 
 🔗 **Access Main Interface:** [adil-rahman-portfolio](https://adil-rahman-3063.github.io/Adil-rahman-portfolio/)
 
@@ -16,6 +16,7 @@ Welcome to my digital gateway. I build robust, responsive mobile applications, b
 ## ⚡ TECH NODES & CAPABILITIES
 
 - **Frameworks:** Flutter & Dart (iOS, Android, PWA Web)
+- **E-Commerce:** Custom Shopify Theme Development, Liquid scripting, custom e-commerce sections
 - **Databases & Auth:** Supabase (PostgreSQL), Firebase Suite
 - **Backend Infrastructure:** FastAPI (Python), RESTful APIs, Cloudflare Workers
 - **AI Integrations:** OpenAI GPT Model integrations, Custom TFLite edge model parsing

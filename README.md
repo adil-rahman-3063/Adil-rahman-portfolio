@@ -9,7 +9,7 @@ FOCUS: TURNING CHAOTIC APPS INTO SLEEK DIGITAL PRODUCTS
 
 Welcome to my digital gateway. I build robust, responsive mobile applications, interactive web experiences, and custom Shopify e-commerce solutions. This space acts as an overview of my current projects, technical capabilities, and professional transmission coordinates.
 
-🔗 **Access Main Interface:** [adil-rahman-portfolio](https://adil-rahman-3063.github.io/Adil-rahman-portfolio/)
+🔗 **Access Main Interface:** [adilrahman.cc](https://adilrahman.cc/)
 
 ---
 

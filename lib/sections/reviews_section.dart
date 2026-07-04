@@ -16,31 +16,6 @@ class _ReviewsSectionState extends State<ReviewsSection> {
   List<ReviewModel> _reviews = [];
   bool _isLoading = true;
 
-  // Fallback mock reviews in case the sheet is empty or offline
-  final List<ReviewModel> _mockReviews = [
-    const ReviewModel(
-      name: 'Sarah Jenkins',
-      role: 'Product Lead at DesignCo',
-      rating: 5,
-      review: 'Adil built our custom e-commerce PWA from scratch. His attention to detail, code structure, and fast delivery completely blew us away. Highly recommended!',
-      date: '2026-06-15',
-    ),
-    const ReviewModel(
-      name: 'Michael Chen',
-      role: 'Founder of AutoHaus',
-      rating: 5,
-      review: 'Exceptional Shopify developer. Adil customized our automotive brand storefront with advanced custom section modules and converted our complex Figma files flawlessly.',
-      date: '2026-05-20',
-    ),
-    const ReviewModel(
-      name: 'David Joy',
-      role: 'Lead Architect',
-      rating: 5,
-      review: 'Collaborated with Adil on a GPS forensics mapping application. His integration of TensorFlow Lite for deepfake verification was absolute genius.',
-      date: '2026-04-10',
-    ),
-  ];
-
   @override
   void initState() {
     super.initState();
@@ -55,16 +30,16 @@ class _ReviewsSectionState extends State<ReviewsSection> {
         final fetchedReviews = data.map((json) => ReviewModel.fromJson(json)).toList();
         
         setState(() {
-          _reviews = fetchedReviews.isNotEmpty ? fetchedReviews : _mockReviews;
+          _reviews = fetchedReviews;
         });
       } else {
         setState(() {
-          _reviews = _mockReviews; // Use mock reviews on failure
+          _reviews = [];
         });
       }
     } catch (e) {
       setState(() {
-        _reviews = _mockReviews; // Use mock reviews on exception
+        _reviews = [];
       });
     } finally {
       setState(() {
@@ -130,7 +105,6 @@ class _ReviewsSectionState extends State<ReviewsSection> {
         ),
         const SizedBox(height: 32),
 
-        // Grid/List of Reviews
         _isLoading
             ? const Center(
                 child: Padding(
@@ -140,26 +114,63 @@ class _ReviewsSectionState extends State<ReviewsSection> {
                   ),
                 ),
               )
-            : isDesktop
-                ? GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      crossAxisSpacing: 20,
-                      mainAxisSpacing: 20,
-                      childAspectRatio: 1.25,
+            : _reviews.isEmpty
+                ? Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 60),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.rate_review_outlined,
+                            size: 64,
+                            color: CozyTheme.accentGold,
+                          ),
+                          const SizedBox(height: 20),
+                          Text(
+                            'NO REVIEWS YET...',
+                            style: CozyTheme.headerStyle(
+                              fontSize: 18,
+                              color: CozyTheme.textCream,
+                              weight: FontWeight.bold,
+                            ).copyWith(letterSpacing: 1.5),
+                          ),
+                          const SizedBox(height: 10),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 24),
+                            child: Text(
+                              'My clients are probably busy scaling their empires (or enjoying a hot coffee).\nBe the legendary first client to break the silence!',
+                              style: CozyTheme.monoStyle(
+                                fontSize: 13,
+                                color: CozyTheme.textGray,
+                              ).copyWith(height: 1.6),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    itemCount: _reviews.length,
-                    itemBuilder: (context, index) => _buildReviewCard(_reviews[index]),
                   )
-                : ListView.separated(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: _reviews.length,
-                    separatorBuilder: (context, index) => const SizedBox(height: 16),
-                    itemBuilder: (context, index) => _buildReviewCard(_reviews[index]),
-                  ),
+                : isDesktop
+                    ? GridView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          crossAxisSpacing: 20,
+                          mainAxisSpacing: 20,
+                          childAspectRatio: 1.25,
+                        ),
+                        itemCount: _reviews.length,
+                        itemBuilder: (context, index) => _buildReviewCard(_reviews[index]),
+                      )
+                    : ListView.separated(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: _reviews.length,
+                        separatorBuilder: (context, index) => const SizedBox(height: 16),
+                        itemBuilder: (context, index) => _buildReviewCard(_reviews[index]),
+                      ),
       ],
     );
   }

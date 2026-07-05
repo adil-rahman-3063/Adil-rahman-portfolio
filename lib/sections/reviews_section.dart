@@ -1,9 +1,12 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import '../theme/cozy_theme.dart';
 import '../data/projects_data.dart';
 import '../widgets/review_form_modal.dart';
+
+// ignore: avoid_web_libraries_in_flutter
+import 'dart:html' as html;
+import 'dart:js' as js;
 
 class ReviewsSection extends StatefulWidget {
   const ReviewsSection({super.key});
@@ -19,30 +22,54 @@ class _ReviewsSectionState extends State<ReviewsSection> {
   @override
   void initState() {
     super.initState();
+    _injectFetchScript();
     _fetchReviews();
+  }
+
+  void _injectFetchScript() {
+    final doc = html.document;
+    if (doc.getElementById('apps-script-fetch-helper') == null) {
+      final script = html.ScriptElement()
+        ..id = 'apps-script-fetch-helper'
+        ..innerHtml = '''
+          window.fetchReviewsFromAppsScript = function(url, successCallback, errorCallback) {
+            fetch(url)
+              .then(function(response) { return response.json(); })
+              .then(function(data) { if (successCallback) successCallback(JSON.stringify(data)); })
+              .catch(function(e) { if (errorCallback) errorCallback(e.toString()); });
+          };
+        ''';
+      doc.head?.append(script);
+    }
   }
 
   Future<void> _fetchReviews() async {
     try {
-      final response = await http.get(Uri.parse(reviewsApiUrl));
-      if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
-        final fetchedReviews = data.map((json) => ReviewModel.fromJson(json)).toList();
-        
-        setState(() {
-          _reviews = fetchedReviews;
-        });
-      } else {
-        setState(() {
-          _reviews = [];
-        });
-      }
+      // Call JS fetch helper to cleanly pull reviews without CORS issues
+      js.context.callMethod('fetchReviewsFromAppsScript', [
+        reviewsApiUrl,
+        (jsonString) {
+          if (mounted) {
+            final List<dynamic> data = json.decode(jsonString);
+            final fetchedReviews = data.map((json) => ReviewModel.fromJson(json)).toList();
+            setState(() {
+              _reviews = fetchedReviews;
+              _isLoading = false;
+            });
+          }
+        },
+        (e) {
+          if (mounted) {
+            setState(() {
+              _reviews = [];
+              _isLoading = false;
+            });
+          }
+        }
+      ]);
     } catch (e) {
       setState(() {
         _reviews = [];
-      });
-    } finally {
-      setState(() {
         _isLoading = false;
       });
     }

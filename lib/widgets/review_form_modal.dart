@@ -45,11 +45,11 @@ class _ReviewFormModalState extends State<ReviewFormModal> {
         'review': _reviewController.text.trim(),
       };
 
-      // Send POST request
+      // Send POST request (use text/plain to bypass CORS preflight checks on Apps Script)
       final response = await http.post(
         Uri.parse(reviewsApiUrl),
         body: json.encode(body),
-        headers: {'Content-Type': 'application/json'},
+        headers: {'Content-Type': 'text/plain'},
       );
 
       if (response.statusCode == 200) {

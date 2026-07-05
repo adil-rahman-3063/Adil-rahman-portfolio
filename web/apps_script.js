@@ -1,30 +1,35 @@
 /**
  * Google Apps Script for Portfolio Reviews Backend
  * 
- * INSTRUCTIONS FOR SETTING UP:
- * 1. Open Google Sheets (https://sheets.google.com).
- * 2. Create a new sheet, rename it (e.g., "Portfolio Reviews").
- * 3. Make sure the first row has these header names in order:
- *    A1: Timestamp  |  B1: Name  |  C1: Company/Role  |  D1: Rating  |  E1: Review  |  F1: Approved
- * 4. Go to Extensions -> Apps Script.
- * 5. Delete any existing code, paste this script.
- * 6. Click Deploy -> New Deployment.
- * 7. Select "Web App" as the type.
- * 8. Set Configuration:
- *    - Description: Portfolio Reviews API
+ * SETUP INSTRUCTIONS:
+ * 1. Go to extensions -> Apps Script in your Google Sheet:
+ *    https://docs.google.com/spreadsheets/d/1iDiFdQ1VKj1-Fx6QjUKgKB3-qAie4pSKFWHfrPhiaGA/edit
+ * 2. Delete any existing code and paste this script.
+ * 3. Click "Deploy" -> "New Deployment".
+ * 4. Choose "Web App" as the type.
+ * 5. Configure:
  *    - Execute as: Me (your-email)
  *    - Who has access: Anyone
- * 9. Click Deploy, authorize permissions, and copy the "Web app URL" (ends in /exec).
- * 10. Paste this URL into `lib/sections/reviews_section.dart` in your project.
+ * 6. Click Deploy, authorize permissions, and copy the new "Web app URL" (ends in /exec).
+ * 7. Ensure your AppScript URL matches this new URL in your portfolio code settings.
  */
+
+const SPREADSHEET_ID = "1iDiFdQ1VKj1-Fx6QjUKgKB3-qAie4pSKFWHfrPhiaGA";
+const SHEET_NAME = "Reviews";
 
 function doGet(e) {
   try {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    let sheet = ss.getSheetByName(SHEET_NAME);
+    if (!sheet) {
+      return ContentService.createTextOutput(JSON.stringify([]))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
     const data = sheet.getDataRange().getValues();
     const reviews = [];
     
-    // Skip header row (index 0)
+    // Skip header row
     for (let i = 1; i < data.length; i++) {
       const row = data[i];
       // Column F (index 5) is "Approved"
@@ -32,17 +37,17 @@ function doGet(e) {
       
       if (approved) {
         reviews.push({
-          timestamp: row[0],
-          name: row[1],
-          role: row[2],
-          rating: Number(row[3]),
-          review: row[4]
+          name: row[1] || '',
+          role: row[2] || '',
+          rating: Number(row[3]) || 5,
+          review: row[4] || '',
+          timestamp: row[0] ? new Date(row[0]).toISOString() : ''
         });
       }
     }
     
-    // Return approved reviews as JSON with CORS support
-    return ContentService.createTextOutput(JSON.stringify(reviews))
+    // Return newest reviews first
+    return ContentService.createTextOutput(JSON.stringify(reviews.reverse()))
       .setMimeType(ContentService.MimeType.JSON);
       
   } catch (error) {
@@ -55,7 +60,7 @@ function doPost(e) {
   try {
     let postData;
     
-    // Parse incoming POST body (JSON or Form parameter)
+    // Parse incoming POST body
     if (e.postData && e.postData.contents) {
       postData = JSON.parse(e.postData.contents);
     } else {
@@ -72,12 +77,18 @@ function doPost(e) {
         .setMimeType(ContentService.MimeType.JSON);
     }
     
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    let sheet = ss.getSheetByName(SHEET_NAME);
+    if (!sheet) {
+      sheet = ss.insertSheet(SHEET_NAME);
+      sheet.appendRow(['Timestamp', 'Name', 'Company/Role', 'Rating', 'Review', 'Approved']);
+      sheet.setFrozenRows(1);
+    }
     
-    // Append row: Timestamp, Name, Company/Role, Rating, Review, Approved (default to false)
-    sheet.appendRow([new Date(), name, role, rating, review, false]);
+    // Append row: Timestamp, Name, Company/Role, Rating, Review, Approved (default to true so they appear instantly!)
+    sheet.appendRow([new Date(), name, role, rating, review, true]);
     
-    return ContentService.createTextOutput(JSON.stringify({ status: 'success', message: 'Review submitted for approval.' }))
+    return ContentService.createTextOutput(JSON.stringify({ status: 'success', message: 'Review submitted successfully.' }))
       .setMimeType(ContentService.MimeType.JSON);
       
   } catch (error) {

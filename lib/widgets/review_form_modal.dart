@@ -1,8 +1,11 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import '../theme/cozy_theme.dart';
 import '../data/projects_data.dart';
+
+// ignore: avoid_web_libraries_in_flutter
+import 'dart:html' as html;
+import 'dart:js' as js;
 
 class ReviewFormModal extends StatefulWidget {
   const ReviewFormModal({super.key});
@@ -20,6 +23,37 @@ class _ReviewFormModalState extends State<ReviewFormModal> {
   bool _isLoading = false;
   bool _isSuccess = false;
   String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _injectSubmitScript();
+  }
+
+  void _injectSubmitScript() {
+    final doc = html.document;
+    if (doc.getElementById('apps-script-submit-helper') == null) {
+      final script = html.ScriptElement()
+        ..id = 'apps-script-submit-helper'
+        ..innerHtml = '''
+          window.submitReviewToAppsScript = function(url, dataJsonString, successCallback, errorCallback) {
+            fetch(url, {
+              method: 'POST',
+              mode: 'no-cors',
+              headers: {
+                'Content-Type': 'text/plain'
+              },
+              body: dataJsonString
+            }).then(function() {
+              if (successCallback) successCallback();
+            }).catch(function(e) {
+              if (errorCallback) errorCallback(e);
+            });
+          };
+        ''';
+      doc.head?.append(script);
+    }
+  }
 
   @override
   void dispose() {
@@ -45,31 +79,30 @@ class _ReviewFormModalState extends State<ReviewFormModal> {
         'review': _reviewController.text.trim(),
       };
 
-      // Send POST request (use text/plain to bypass CORS preflight checks on Apps Script)
-      final response = await http.post(
-        Uri.parse(reviewsApiUrl),
-        body: json.encode(body),
-        headers: {'Content-Type': 'text/plain'},
-      );
-
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        if (data['status'] == 'success') {
-          setState(() {
-            _isSuccess = true;
-          });
-        } else {
-          setState(() {
-            _errorMessage = data['message'] ?? 'Failed to submit review.';
-          });
+      // Call JS helper with raw Dart callbacks to handle success/failure transparently
+      js.context.callMethod('submitReviewToAppsScript', [
+        reviewsApiUrl,
+        json.encode(body),
+        () {
+          if (mounted) {
+            setState(() {
+              _isLoading = false;
+              _isSuccess = true;
+            });
+          }
+        },
+        () {
+          if (mounted) {
+            setState(() {
+              _isLoading = false;
+              _errorMessage = 'Connection failed: Make sure Apps Script URL is correct.';
+            });
+          }
         }
-      } else {
-        setState(() {
-          _errorMessage = 'Server returned error status: ${response.statusCode}';
-        });
-      }
+      ]);
     } catch (e) {
       setState(() {
+        _isLoading = false;
         _errorMessage = 'Connection failed: Make sure Apps Script URL is correct.';
       });
     } finally {

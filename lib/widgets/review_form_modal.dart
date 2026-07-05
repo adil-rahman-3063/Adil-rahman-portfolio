@@ -105,10 +105,6 @@ class _ReviewFormModalState extends State<ReviewFormModal> {
         _isLoading = false;
         _errorMessage = 'Connection failed: Make sure Apps Script URL is correct.';
       });
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
     }
   }
 

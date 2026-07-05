@@ -183,6 +183,44 @@ const List<ProjectData> allProjects = [
     ],
     categories: ['freelance'],
   ),
+  ProjectData(
+    id: 'issaa_event',
+    title: 'ISSAA Maha Sangamam',
+    subtitle: 'Event Registration System // Private Client',
+    status: 'Complete // Private Portal',
+    tagline: 'A responsive, lightweight event registration portal built with HTML, CSS, and vanilla JS, integrated directly with Google Sheets.',
+    description: 'A responsive, lightweight event registration portal built with HTML, CSS, and vanilla JS, integrated directly with Google Sheets for data storage. Custom-built for mobile and desktop screens.',
+    features: [
+      'Writes directly to Google Sheets using a secure JSONP (GET-based) script architecture to bypass CORS limitations.',
+      'Fully Responsive Design: Clean dark glassmorphic UI styled for both desktops and mobile viewports.',
+      'Secure Admin Dashboard: Login gate verifying credentials stored server-side in Google Sheets, persisting state locally.',
+      'Dynamic QR Code Generator: Immediately compiles validation URLs encoding the participant\'s unique Registration ID.',
+      'Offline Verification: Admin scans participant QR codes on-site, fetching data from Google Sheets to confirm details.',
+      'Clamped Number Inputs: Malayalam numeric selectors with dynamic range clamps and auto-updating total fields.',
+    ],
+    tech: ['HTML5', 'CSS3', 'JavaScript', 'Google Sheets API', 'JSONP', 'qrcode.js'],
+    links: [],
+    categories: ['freelance'],
+  ),
+  ProjectData(
+    id: 'cloudagent',
+    title: 'Cloud Agent',
+    subtitle: 'Personal Cloud Daemon // In Production',
+    status: 'Production // Active Use',
+    tagline: 'A lightweight cloud agent daemon to monitor and coordinate server resource deployment pipelines.',
+    description: 'A modular, production-ready daemon built to run on remote host servers, facilitating real-time process monitoring, automated deployment triggers, and encrypted payload communication between central orchestrators and cloud nodes.',
+    features: [
+      'Process Monitoring: Tracks memory, CPU utilization, and container runtimes with direct logging hooks.',
+      'Webhooks/Triggers: Automatically acts on webhook payloads to redeploy containers or run setup tasks.',
+      'Secure Communications: Leverages custom encrypted token handshakes to ensure agent authenticity.',
+      'Docker Integration: Communicates directly with local Docker sockets to orchestrate containers.',
+    ],
+    tech: ['Golang', 'Docker API', 'gRPC', 'Prometheus', 'Linux Scripting'],
+    links: [
+      ProjectLink(text: 'GitHub Source', url: 'https://github.com/adil-rahman-3063/cloudagent'),
+    ],
+    categories: ['personal'],
+  ),
 ];
 
 class ReviewModel {

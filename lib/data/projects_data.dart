@@ -48,7 +48,7 @@ class ProjectData {
       tagline: json['tagline'] as String? ?? '',
       description: json['description'] as String? ?? '',
       features: (json['features'] as String? ?? '')
-          .split(',')
+          .split(';')
           .map((s) => s.trim())
           .where((s) => s.isNotEmpty)
           .toList(),

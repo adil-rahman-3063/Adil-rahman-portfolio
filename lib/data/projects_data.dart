@@ -22,12 +22,59 @@ class ProjectData {
     required this.links,
     required this.categories,
   });
+
+  factory ProjectData.fromJson(Map<String, dynamic> json) {
+    // Parse pipe-separated links: texts and urls as parallel lists
+    final linkTexts = (json['link_texts'] as String? ?? '')
+        .split('|')
+        .map((s) => s.trim())
+        .where((s) => s.isNotEmpty)
+        .toList();
+    final linkUrls = (json['link_urls'] as String? ?? '')
+        .split('|')
+        .map((s) => s.trim())
+        .where((s) => s.isNotEmpty)
+        .toList();
+    final links = <ProjectLink>[];
+    for (int i = 0; i < linkTexts.length && i < linkUrls.length; i++) {
+      links.add(ProjectLink.fromStrings(linkTexts[i], linkUrls[i]));
+    }
+
+    return ProjectData(
+      id: json['id'] as String? ?? '',
+      title: json['title'] as String? ?? '',
+      subtitle: json['subtitle'] as String? ?? '',
+      status: json['status'] as String? ?? '',
+      tagline: json['tagline'] as String? ?? '',
+      description: json['description'] as String? ?? '',
+      features: (json['features'] as String? ?? '')
+          .split(',')
+          .map((s) => s.trim())
+          .where((s) => s.isNotEmpty)
+          .toList(),
+      tech: (json['tech'] as String? ?? '')
+          .split(',')
+          .map((s) => s.trim())
+          .where((s) => s.isNotEmpty)
+          .toList(),
+      links: links,
+      categories: (json['categories'] as String? ?? '')
+          .split(',')
+          .map((s) => s.trim())
+          .where((s) => s.isNotEmpty)
+          .toList(),
+    );
+  }
 }
 
 class ProjectLink {
   final String text;
   final String url;
   const ProjectLink({required this.text, required this.url});
+
+  factory ProjectLink.fromStrings(String text, String url) {
+    return ProjectLink(text: text.trim(), url: url.trim());
+  }
 }
 
 const List<ProjectData> allProjects = [
@@ -252,3 +299,7 @@ class ReviewModel {
 
 // Deployed Google Apps Script Web App URL for reviews backend
 const String reviewsApiUrl = 'https://script.google.com/macros/s/AKfycbyLKCO5CjCIqry4nauFf71nH425Ym41Yrp2wReST1KfHURl5rRJU1HnAqps8z84EM7kiA/exec';
+
+// Projects backend — same Apps Script, action=getProjects
+const String projectsApiUrl = 'https://script.google.com/macros/s/AKfycbyLKCO5CjCIqry4nauFf71nH425Ym41Yrp2wReST1KfHURl5rRJU1HnAqps8z84EM7kiA/exec?action=getProjects';
+

@@ -133,12 +133,12 @@ class _ReviewFormModalState extends State<ReviewFormModal> {
           ],
         ),
         padding: const EdgeInsets.all(24),
-        child: _isSuccess ? _buildSuccessView() : _buildFormView(isMobile),
+        child: _isSuccess ? _buildSuccessView(context) : _buildFormView(context, isMobile),
       ),
     );
   }
 
-  Widget _buildSuccessView() {
+  Widget _buildSuccessView(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -167,7 +167,7 @@ class _ReviewFormModalState extends State<ReviewFormModal> {
         ),
         const SizedBox(height: 24),
         ElevatedButton(
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
           style: ElevatedButton.styleFrom(
             backgroundColor: CozyTheme.accentBrown,
             foregroundColor: CozyTheme.paperCream,
@@ -186,7 +186,7 @@ class _ReviewFormModalState extends State<ReviewFormModal> {
     );
   }
 
-  Widget _buildFormView(bool isMobile) {
+  Widget _buildFormView(BuildContext context, bool isMobile) {
     return SingleChildScrollView(
       child: Form(
         key: _formKey,
@@ -206,7 +206,7 @@ class _ReviewFormModalState extends State<ReviewFormModal> {
                   ),
                 ),
                 IconButton(
-                  onPressed: () => Navigator.of(context).pop(),
+                  onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
                   icon: const Icon(Icons.close_rounded, color: CozyTheme.textGray),
                 ),
               ],

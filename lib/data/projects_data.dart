@@ -249,26 +249,6 @@ const List<ProjectData> allProjects = [
     links: [],
     categories: ['freelance'],
   ),
-  ProjectData(
-    id: 'cloudagent',
-    title: 'Cloud Agent',
-    subtitle: 'Local-First Workspace AI Assistant',
-    status: 'Production // Active Development',
-    tagline: 'A privacy-focused, local-first AI assistant for Google Workspace (Gmail, Drive, Calendar) and local dev environments, built entirely in Node.js.',
-    description: 'CloudAgent is a privacy-focused, local-first AI assistant for Google Workspace (Gmail, Drive, Calendar) and your local development environment. Built entirely in Node.js, it translates natural language instructions into secure, local tool executions. It relies on the Google Workspace CLI (gws) for secure, command-line-driven workspace control, functioning as an AI frontend for local terminal/filesystem operations, git orchestration, and LLM queries.',
-    features: [
-      'Local-First & Secure: Translates user prompts into local API/system commands via secure JSON structures.',
-      'Google Workspace Integration: Connects with Gmail, Drive, Tasks, and Calendar via Google\'s gws utility.',
-      'Session Resumption & Multi-Model Fallbacks: Prompts to resume chat sessions on startup and falls back through models (OpenAI, Gemini, Anthropic) if rate-limited.',
-      'Offline Diagnostics & Health Check: Diagnostic doctor commands verify Node, Git, and Google Workspace credentials.',
-      'System & Git Orchestration: Handles local filesystem navigation and performs git repository staging, committing, and remote pushing.',
-    ],
-    tech: ['Node.js', 'SQLite3', 'Google Workspace CLI (gws)', 'OpenRouter API', 'Gemini API', 'Git'],
-    links: [
-      ProjectLink(text: 'GitHub Source', url: 'https://github.com/adil-rahman-3063/cloudagent'),
-    ],
-    categories: ['personal'],
-  ),
 ];
 
 class ReviewModel {

@@ -109,7 +109,7 @@ class _ContactSectionState extends State<ContactSection>
             padding: const EdgeInsets.all(24),
             child: isDesktop
                 ? Row(
-                    crossAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(flex: 3, child: _buildContactDetails()),
                       const SizedBox(width: 40),

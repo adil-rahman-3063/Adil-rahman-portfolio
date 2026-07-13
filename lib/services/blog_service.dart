@@ -53,7 +53,7 @@ class BlogService {
     }
   }
 
-  static bool get isCacheFresh => _isCacheFresh();
+  static bool get isCacheFresh => false;
 
   static void _fetchFromNetwork({
     required void Function(List<BlogPost>) onSuccess,

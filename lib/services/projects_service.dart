@@ -56,7 +56,7 @@ class ProjectsService {
   }
 
   /// Public getter — true when localStorage cache exists and is < 24h old.
-  static bool get isCacheFresh => _isCacheFresh();
+  static bool get isCacheFresh => false;
 
   static void _fetchFromNetwork({
     required void Function(List<ProjectData>) onSuccess,

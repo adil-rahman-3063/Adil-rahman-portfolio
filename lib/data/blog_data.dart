@@ -1,3 +1,4 @@
+
 class BlogPost {
   final String id;
   final String title;

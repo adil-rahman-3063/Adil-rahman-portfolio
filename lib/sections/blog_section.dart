@@ -42,8 +42,6 @@ class _BlogSectionState extends State<BlogSection> {
 
   @override
   Widget build(BuildContext context) {
-    final isDesktop = MediaQuery.of(context).size.width >= 900;
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -81,20 +79,32 @@ class _BlogSectionState extends State<BlogSection> {
                   style: CozyTheme.monoStyle(fontSize: 14, color: CozyTheme.textGray),
                 ),
               )
-            : GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: _blogs.length,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: isDesktop ? 2 : 1,
-                  crossAxisSpacing: 24,
-                  mainAxisSpacing: 24,
-                  childAspectRatio: isDesktop ? 1.6 : 1.3,
-                ),
-                itemBuilder: (context, index) {
-                  return _BlogCard(
-                    blog: _blogs[index],
-                    onTap: () => _showBlogReader(_blogs[index]),
+            : LayoutBuilder(
+                builder: (context, constraints) {
+                  final w = constraints.maxWidth;
+                  int crossAxisCount = 1;
+                  if (w >= 900) {
+                    crossAxisCount = 3;
+                  } else if (w >= 600) {
+                    crossAxisCount = 2;
+                  }
+                  final double spacing = 16.0;
+                  final double itemWidth = (w - (crossAxisCount - 1) * spacing) / crossAxisCount;
+
+                  return Wrap(
+                    spacing: spacing,
+                    runSpacing: spacing,
+                    children: _blogs.map((blog) {
+                      return SizedBox(
+                        key: ValueKey(blog.id),
+                        width: itemWidth,
+                        height: 230, // Reduced block size matching works style
+                        child: _BlogCard(
+                          blog: blog,
+                          onTap: () => _showBlogReader(blog),
+                        ),
+                      );
+                    }).toList(),
                   );
                 },
               ),
@@ -127,7 +137,7 @@ class _BlogCardState extends State<_BlogCard> {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           decoration: CozyTheme.cozyPanelDecoration(hovered: _hovered),
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -136,53 +146,53 @@ class _BlogCardState extends State<_BlogCard> {
                 children: [
                   Text(
                     widget.blog.date,
-                    style: CozyTheme.monoStyle(fontSize: 11, color: CozyTheme.textDarkGray),
+                    style: CozyTheme.monoStyle(fontSize: 10, color: CozyTheme.textDarkGray),
                   ),
                   Text(
                     widget.blog.readTime,
-                    style: CozyTheme.monoStyle(fontSize: 11, color: CozyTheme.accentBrown)
+                    style: CozyTheme.monoStyle(fontSize: 10, color: CozyTheme.accentBrown)
                         .copyWith(fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
               Text(
                 widget.blog.title,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: CozyTheme.headerStyle(
-                  fontSize: 18,
+                  fontSize: 15,
                   color: CozyTheme.textDark,
                   weight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 8),
               Expanded(
                 child: Text(
                   widget.blog.excerpt,
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                   style: CozyTheme.monoStyle(
-                    fontSize: 13,
+                    fontSize: 12,
                     color: CozyTheme.textDarkGray.withOpacity(0.85),
-                  ).copyWith(height: 1.5),
+                  ).copyWith(height: 1.4),
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 8),
               Row(
                 children: [
                   Text(
                     'READ ENTRY',
                     style: CozyTheme.headerStyle(
-                      fontSize: 11,
+                      fontSize: 10,
                       color: _hovered ? CozyTheme.accentBrown : CozyTheme.textDark,
                       weight: FontWeight.bold,
                     ).copyWith(letterSpacing: 1),
                   ),
-                  const SizedBox(width: 6),
+                  const SizedBox(width: 4),
                   Icon(
                     Icons.arrow_right_alt_rounded,
-                    size: 16,
+                    size: 14,
                     color: _hovered ? CozyTheme.accentBrown : CozyTheme.textDark,
                   ),
                 ],
@@ -240,7 +250,7 @@ class _BlogReaderModal extends StatelessWidget {
                     ),
                   ),
                   IconButton(
-                    onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
+                    onPressed: () => Navigator.of(context).pop(),
                     icon: const Icon(Icons.close_rounded, color: CozyTheme.textDark),
                   ),
                 ],
@@ -347,7 +357,6 @@ class _BlogReaderModal extends StatelessWidget {
       }
       // Paragraph
       else {
-        // Strip out basic markdown formats like bold '**' or link syntax '[text](url)' for clean display
         var cleanLine = trimmed.replaceAll('**', '');
         
         widgets.add(

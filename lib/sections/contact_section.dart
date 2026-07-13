@@ -297,7 +297,7 @@ class _SendIdeaButtonState extends State<_SendIdeaButton> {
             borderRadius: BorderRadius.circular(30),
           ),
           child: Text(
-            'SEND YOUR APP IDEA',
+            'SEND PROJECT REQUIREMENT',
             style: CozyTheme.headerStyle(
               fontSize: 12,
               color: _hovered ? CozyTheme.paperCream : CozyTheme.accentBrown,

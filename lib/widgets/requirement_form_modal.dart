@@ -94,7 +94,8 @@ class _RequirementFormModalState extends State<RequirementFormModal> {
           if (mounted) {
             setState(() {
               _isLoading = false;
-              _errorMessage = 'Connection failed. Please check your network and try again.';
+              _errorMessage =
+                  'Connection failed. Please check your network and try again.';
             });
           }
         }
@@ -102,7 +103,8 @@ class _RequirementFormModalState extends State<RequirementFormModal> {
     } catch (e) {
       setState(() {
         _isLoading = false;
-        _errorMessage = 'Connection failed. Please check your network and try again.';
+        _errorMessage =
+            'Connection failed. Please check your network and try again.';
       });
     }
   }
@@ -122,7 +124,8 @@ class _RequirementFormModalState extends State<RequirementFormModal> {
         decoration: BoxDecoration(
           color: CozyTheme.bgDark,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: CozyTheme.paperBorder.withOpacity(0.2), width: 1.5),
+          border: Border.all(
+              color: CozyTheme.paperBorder.withOpacity(0.2), width: 1.5),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.5),
@@ -132,7 +135,9 @@ class _RequirementFormModalState extends State<RequirementFormModal> {
           ],
         ),
         padding: const EdgeInsets.all(24),
-        child: _isSuccess ? _buildSuccessView(context) : _buildFormView(context, isMobile),
+        child: _isSuccess
+            ? _buildSuccessView(context)
+            : _buildFormView(context, isMobile),
       ),
     );
   }
@@ -177,8 +182,9 @@ class _RequirementFormModalState extends State<RequirementFormModal> {
           ),
           child: Text(
             'Close Window',
-            style: CozyTheme.monoStyle(fontSize: 12, color: CozyTheme.paperCream)
-                .copyWith(fontWeight: FontWeight.bold),
+            style:
+                CozyTheme.monoStyle(fontSize: 12, color: CozyTheme.paperCream)
+                    .copyWith(fontWeight: FontWeight.bold),
           ),
         ),
       ],
@@ -205,8 +211,10 @@ class _RequirementFormModalState extends State<RequirementFormModal> {
                   ),
                 ),
                 IconButton(
-                  onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
-                  icon: const Icon(Icons.close_rounded, color: CozyTheme.textGray),
+                  onPressed: () =>
+                      Navigator.of(context, rootNavigator: true).pop(),
+                  icon: const Icon(Icons.close_rounded,
+                      color: CozyTheme.textGray),
                 ),
               ],
             ),
@@ -218,7 +226,9 @@ class _RequirementFormModalState extends State<RequirementFormModal> {
               controller: _nameController,
               label: 'Your Name',
               hint: 'John Doe',
-              validator: (val) => val == null || val.trim().isEmpty ? 'Please enter your name.' : null,
+              validator: (val) => val == null || val.trim().isEmpty
+                  ? 'Please enter your name.'
+                  : null,
             ),
             const SizedBox(height: 16),
 
@@ -228,7 +238,9 @@ class _RequirementFormModalState extends State<RequirementFormModal> {
               label: 'WhatsApp / Phone Number',
               hint: '+91 98765 43210',
               keyboardType: TextInputType.phone,
-              validator: (val) => val == null || val.trim().isEmpty ? 'Please enter your phone number.' : null,
+              validator: (val) => val == null || val.trim().isEmpty
+                  ? 'Please enter your phone number.'
+                  : null,
             ),
             const SizedBox(height: 16),
 
@@ -236,16 +248,20 @@ class _RequirementFormModalState extends State<RequirementFormModal> {
             _buildTextField(
               controller: _requirementController,
               label: 'Project Details',
-              hint: 'Describe your app idea, design details or Shopify store requirements...',
+              hint:
+                  'Describe your app idea, design details or Shopify store requirements...',
               maxLines: 4,
-              validator: (val) => val == null || val.trim().isEmpty ? 'Please enter project details.' : null,
+              validator: (val) => val == null || val.trim().isEmpty
+                  ? 'Please enter project details.'
+                  : null,
             ),
             const SizedBox(height: 16),
 
             if (_errorMessage != null) ...[
               Text(
                 _errorMessage!,
-                style: CozyTheme.monoStyle(fontSize: 12, color: Colors.redAccent),
+                style:
+                    CozyTheme.monoStyle(fontSize: 12, color: Colors.redAccent),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 16),
@@ -267,13 +283,15 @@ class _RequirementFormModalState extends State<RequirementFormModal> {
                       height: 18,
                       width: 18,
                       child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation(CozyTheme.paperCream),
+                        valueColor:
+                            AlwaysStoppedAnimation(CozyTheme.paperCream),
                         strokeWidth: 2,
                       ),
                     )
                   : Text(
                       'Submit Requirement',
-                      style: CozyTheme.monoStyle(fontSize: 12, color: CozyTheme.paperCream)
+                      style: CozyTheme.monoStyle(
+                              fontSize: 12, color: CozyTheme.paperCream)
                           .copyWith(fontWeight: FontWeight.bold),
                     ),
             ),
@@ -307,17 +325,20 @@ class _RequirementFormModalState extends State<RequirementFormModal> {
           style: CozyTheme.monoStyle(fontSize: 14, color: CozyTheme.textCream),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: CozyTheme.monoStyle(fontSize: 13, color: CozyTheme.textGray.withOpacity(0.5)),
+            hintStyle: CozyTheme.monoStyle(
+                fontSize: 13, color: CozyTheme.textGray.withOpacity(0.5)),
             filled: true,
             fillColor: Colors.black.withOpacity(0.2),
             contentPadding: const EdgeInsets.all(16),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: CozyTheme.paperBorder, width: 1),
+              borderSide:
+                  const BorderSide(color: CozyTheme.paperBorder, width: 1),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: CozyTheme.accentGold, width: 1.5),
+              borderSide:
+                  const BorderSide(color: CozyTheme.accentGold, width: 1.5),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),

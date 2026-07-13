@@ -55,6 +55,35 @@ function doGet(e) {
       return ContentService.createTextOutput(JSON.stringify(projects))
         .setMimeType(ContentService.MimeType.JSON);
     }
+    // Check if we are requesting blog posts
+    if (e.parameter && e.parameter.action === 'getBlogs') {
+      let sheet = ss.getSheetByName("Blog");
+      if (!sheet) {
+        return ContentService.createTextOutput(JSON.stringify([]))
+          .setMimeType(ContentService.MimeType.JSON);
+      }
+      
+      const data = sheet.getDataRange().getValues();
+      const blogs = [];
+      
+      // Skip header row
+      for (let i = 1; i < data.length; i++) {
+        const row = data[i];
+        if (row[0] && row[1]) { // Require ID and Title
+          blogs.push({
+            id: String(row[0]),
+            title: String(row[1]),
+            date: String(row[2] || ''),
+            readTime: String(row[3] || ''),
+            excerpt: String(row[4] || ''),
+            content: String(row[5] || '')
+          });
+        }
+      }
+      
+      return ContentService.createTextOutput(JSON.stringify(blogs))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
     
     // Default: Get reviews
     let sheet = ss.getSheetByName(SHEET_NAME);

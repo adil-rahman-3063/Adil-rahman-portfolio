@@ -10,6 +10,7 @@ import 'sections/projects_section.dart';
 import 'sections/live_workspace_section.dart';
 import 'sections/contact_section.dart';
 import 'sections/reviews_section.dart';
+import 'sections/blog_section.dart';
 import 'widgets/review_form_modal.dart';
 import 'widgets/requirement_form_modal.dart';
 
@@ -40,7 +41,7 @@ class PortfolioHome extends StatefulWidget {
 
 class _PortfolioHomeState extends State<PortfolioHome> {
   final ScrollController _scrollController = ScrollController();
-  final List<GlobalKey> _keys = List.generate(8, (i) => GlobalKey());
+  final List<GlobalKey> _keys = List.generate(9, (i) => GlobalKey());
   int _currentIndex = 0;
   bool _isScrollingToSection = false;
   double _scrollOffset = 0.0;
@@ -174,7 +175,7 @@ class _PortfolioHomeState extends State<PortfolioHome> {
                           ),
                           child: HeroSection(
                             onAccessProjects: () => _scrollToSection(4),
-                            onContactMe: () => _scrollToSection(7),
+                            onContactMe: () => _scrollToSection(8),
                           ),
                         ),
                       ),
@@ -229,21 +230,31 @@ class _PortfolioHomeState extends State<PortfolioHome> {
                         ),
                       ),
                       const Divider(color: CozyTheme.paperBorder, thickness: 0.5),
-                      // Section 6: Reviews
+                      // Section 6: Blog
                       ScrollReveal(
                         delay: const Duration(milliseconds: 80),
                         child: Container(
                           key: _keys[6],
                           padding: const EdgeInsets.symmetric(vertical: 50),
-                          child: const ReviewsSection(),
+                          child: const BlogSection(),
                         ),
                       ),
                       const Divider(color: CozyTheme.paperBorder, thickness: 0.5),
-                      // Section 7: Contact
+                      // Section 7: Reviews
                       ScrollReveal(
                         delay: const Duration(milliseconds: 80),
                         child: Container(
                           key: _keys[7],
+                          padding: const EdgeInsets.symmetric(vertical: 50),
+                          child: const ReviewsSection(),
+                        ),
+                      ),
+                      const Divider(color: CozyTheme.paperBorder, thickness: 0.5),
+                      // Section 8: Contact
+                      ScrollReveal(
+                        delay: const Duration(milliseconds: 80),
+                        child: Container(
+                          key: _keys[8],
                           padding: const EdgeInsets.symmetric(vertical: 50),
                           child: const ContactSection(),
                         ),

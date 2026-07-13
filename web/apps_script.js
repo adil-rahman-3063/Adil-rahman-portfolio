@@ -20,6 +20,43 @@ const SHEET_NAME = "Reviews";
 function doGet(e) {
   try {
     const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    
+    // Check if we are requesting projects
+    if (e.parameter && e.parameter.action === 'getProjects') {
+      let sheet = ss.getSheetByName("Projects");
+      if (!sheet) {
+        return ContentService.createTextOutput(JSON.stringify([]))
+          .setMimeType(ContentService.MimeType.JSON);
+      }
+      
+      const data = sheet.getDataRange().getValues();
+      const projects = [];
+      
+      // Skip header row
+      for (let i = 1; i < data.length; i++) {
+        const row = data[i];
+        if (row[0] && row[1]) { // Require ID and Title
+          projects.push({
+            id: String(row[0]),
+            title: String(row[1]),
+            subtitle: String(row[2] || ''),
+            status: String(row[3] || ''),
+            tagline: String(row[4] || ''),
+            description: String(row[5] || ''),
+            features: String(row[6] || ''),
+            tech: String(row[7] || ''),
+            link_texts: String(row[8] || ''),
+            link_urls: String(row[9] || ''),
+            categories: String(row[10] || '')
+          });
+        }
+      }
+      
+      return ContentService.createTextOutput(JSON.stringify(projects))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+    
+    // Default: Get reviews
     let sheet = ss.getSheetByName(SHEET_NAME);
     if (!sheet) {
       return ContentService.createTextOutput(JSON.stringify([]))

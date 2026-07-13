@@ -81,7 +81,13 @@ class ProjectsService {
               .map((j) => ProjectData.fromJson(j))
               .where((p) => p.id.isNotEmpty && p.title.isNotEmpty)
               .toList();
-          onSuccess(projects);
+          
+          if (projects.isEmpty) {
+            // Fallback to local hardcoded list if sheet returns no valid projects
+            onSuccess(allProjects);
+          } else {
+            onSuccess(projects);
+          }
         } catch (e) {
           onError?.call('Parse error: $e');
         }

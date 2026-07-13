@@ -6,8 +6,8 @@ import '../data/projects_data.dart';
 
 /// Handles fetching projects from Apps Script and caching in localStorage.
 class ProjectsService {
-  static const String _cacheKey = 'cached_projects_v1';
-  static const String _cacheTsKey = 'cached_projects_ts_v1';
+  static const String _cacheKey = 'cached_projects_v2';
+  static const String _cacheTsKey = 'cached_projects_ts_v2';
   // 24-hour TTL in milliseconds
   static const int _ttlMs = 24 * 60 * 60 * 1000;
 

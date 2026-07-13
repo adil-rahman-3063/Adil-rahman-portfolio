@@ -7,8 +7,8 @@ import '../data/projects_data.dart' show reviewsApiUrl;
 
 /// Handles fetching blog posts from Apps Script and caching in localStorage.
 class BlogService {
-  static const String _cacheKey = 'cached_blogs_v1';
-  static const String _cacheTsKey = 'cached_blogs_ts_v1';
+  static const String _cacheKey = 'cached_blogs_v2';
+  static const String _cacheTsKey = 'cached_blogs_ts_v2';
   // 24-hour TTL in milliseconds
   static const int _ttlMs = 24 * 60 * 60 * 1000;
 

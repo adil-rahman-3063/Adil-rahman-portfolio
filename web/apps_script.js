@@ -67,6 +67,32 @@ function doPost(e) {
       postData = e.parameter;
     }
     
+    // Check if this is a Project Requirement submission
+    if (postData.type === 'requirement' || (postData.phone && postData.requirement)) {
+      const name = postData.name || '';
+      const phone = postData.phone || '';
+      const requirement = postData.requirement || '';
+      
+      if (!name || !phone || !requirement) {
+        return ContentService.createTextOutput(JSON.stringify({ status: 'error', message: 'Name, phone, and requirements are required.' }))
+          .setMimeType(ContentService.MimeType.JSON);
+      }
+      
+      const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+      let sheet = ss.getSheetByName("Requirements");
+      if (!sheet) {
+        sheet = ss.insertSheet("Requirements");
+        sheet.appendRow(['Timestamp', 'Name', 'Phone/WhatsApp', 'Requirement Details']);
+        sheet.setFrozenRows(1);
+      }
+      
+      sheet.appendRow([new Date(), name, phone, requirement]);
+      
+      return ContentService.createTextOutput(JSON.stringify({ status: 'success', message: 'Requirement submitted successfully.' }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+    
+    // Review submission flow
     const name = postData.name || '';
     const role = postData.role || '';
     const rating = Number(postData.rating) || 5;
@@ -89,7 +115,7 @@ function doPost(e) {
     sheet.appendRow([new Date(), name, role, rating, review, true]);
     
     return ContentService.createTextOutput(JSON.stringify({ status: 'success', message: 'Review submitted successfully.' }))
-      .setMimeType(ContentService.MimeType.JSON);
+        .setMimeType(ContentService.MimeType.JSON);
       
   } catch (error) {
     return ContentService.createTextOutput(JSON.stringify({ status: 'error', message: error.toString() }))

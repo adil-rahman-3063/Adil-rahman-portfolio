@@ -11,6 +11,7 @@ import 'sections/live_workspace_section.dart';
 import 'sections/contact_section.dart';
 import 'sections/reviews_section.dart';
 import 'widgets/review_form_modal.dart';
+import 'widgets/requirement_form_modal.dart';
 
 void main() {
   runApp(const MyApp());
@@ -49,13 +50,19 @@ class _PortfolioHomeState extends State<PortfolioHome> {
     super.initState();
     _scrollController.addListener(_onScroll);
     
-    // Check for ?review=true query parameter on startup to trigger modal
+    // Check for query parameters on startup to trigger modals
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (Uri.base.queryParameters['review'] == 'true') {
         showDialog(
           context: context,
           barrierDismissible: true,
           builder: (context) => const ReviewFormModal(),
+        );
+      } else if (Uri.base.queryParameters['hire'] == 'true') {
+        showDialog(
+          context: context,
+          barrierDismissible: true,
+          builder: (context) => const RequirementFormModal(),
         );
       }
     });

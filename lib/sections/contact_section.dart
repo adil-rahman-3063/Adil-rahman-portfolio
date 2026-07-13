@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../theme/cozy_theme.dart';
+import '../widgets/requirement_form_modal.dart';
 
 class ContactSection extends StatefulWidget {
   const ContactSection({super.key});
@@ -35,6 +36,14 @@ class _ContactSectionState extends State<ContactSection>
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
+  }
+
+  void _openRequirementModal() {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) => const RequirementFormModal(),
+    );
   }
 
   @override
@@ -100,7 +109,7 @@ class _ContactSectionState extends State<ContactSection>
             padding: const EdgeInsets.all(24),
             child: isDesktop
                 ? Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Expanded(flex: 3, child: _buildContactDetails()),
                       const SizedBox(width: 40),
@@ -150,7 +159,7 @@ class _ContactSectionState extends State<ContactSection>
         Text(
           'I take your ideas and transform them into functional mobile apps or websites. '
           'Whether you need to outline feasibility, negotiate pricing, or check timelines, '
-          'send over a message to initiate a secure ping.',
+          'submit your project requirement using the form, or reach out directly.',
           style: CozyTheme.monoStyle(fontSize: 14, color: CozyTheme.textCream)
               .copyWith(height: 1.6),
         ),
@@ -202,7 +211,7 @@ class _ContactSectionState extends State<ContactSection>
           ],
         ),
         const SizedBox(height: 24),
-        _SendIdeaButton(onTap: () => _launchUrl('mailto:adilrahman3063@gmail.com?subject=App Idea Inquiry')),
+        _SendIdeaButton(onTap: _openRequirementModal),
       ],
     );
   }
@@ -285,7 +294,7 @@ class _SendIdeaButtonState extends State<_SendIdeaButton> {
           decoration: BoxDecoration(
             color: _hovered ? CozyTheme.accentBrown : Colors.transparent,
             border: Border.all(color: CozyTheme.accentBrown, width: 2),
-            borderRadius: BorderRadius.circular(30), // Rounded pill style to match Shopify headers
+            borderRadius: BorderRadius.circular(30),
           ),
           child: Text(
             'SEND YOUR APP IDEA',

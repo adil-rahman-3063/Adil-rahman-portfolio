@@ -2,12 +2,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:screenshot/screenshot.dart';
-import 'package:share_plus/share_plus.dart';
 import '../theme/cozy_theme.dart';
 import '../data/projects_data.dart';
 import '../widgets/review_form_modal.dart';
-import '../widgets/branded_review_share.dart';
 
 // ignore: avoid_web_libraries_in_flutter
 import 'dart:html' as html;
@@ -288,20 +285,13 @@ class _ReviewsSectionState extends State<ReviewsSection> {
                         );
                       }),
                     ),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        _buildShareButton(context, review),
-                        const SizedBox(width: 8),
-                        IconButton(
-                          onPressed: () => Navigator.of(context).pop(),
-                          icon: const Icon(Icons.close_rounded, color: CozyTheme.textGray, size: 24),
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
-                          splashRadius: 20,
-                          hoverColor: CozyTheme.accentBrown.withOpacity(0.1),
-                        ),
-                      ],
+                    IconButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      icon: const Icon(Icons.close_rounded, color: CozyTheme.textGray, size: 24),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                      splashRadius: 20,
+                      hoverColor: CozyTheme.accentBrown.withOpacity(0.1),
                     ),
                   ],
                 ),
@@ -376,71 +366,6 @@ class _ReviewsSectionState extends State<ReviewsSection> {
         );
       },
     );
-  }
-
-  Widget _buildShareButton(BuildContext context, ReviewModel review) {
-    bool isCapturing = false;
-
-    return StatefulBuilder(
-      builder: (context, setState) {
-        return IconButton(
-          tooltip: 'Share Review as Image',
-          icon: isCapturing
-              ? const SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(strokeWidth: 2, color: CozyTheme.accentGold),
-                )
-              : const Icon(Icons.share_rounded, color: CozyTheme.textGray, size: 20),
-          onPressed: isCapturing
-              ? null
-              : () async {
-                  setState(() => isCapturing = true);
-                  try {
-                    final controller = ScreenshotController();
-                    final imageBytes = await controller.captureFromWidget(
-                      BrandedReviewShare(review: review),
-                      delay: const Duration(milliseconds: 100),
-                      context: context,
-                    );
-
-                    try {
-                      final result = await Share.shareXFiles(
-                        [XFile.fromData(imageBytes, name: 'review.png', mimeType: 'image/png')],
-                        text: 'Check out this review for Adil Rahman!',
-                      );
-                      
-                      if (result.status == ShareResultStatus.unavailable) {
-                        _downloadImageFallback(imageBytes);
-                      }
-                    } catch (e) {
-                      _downloadImageFallback(imageBytes);
-                    }
-                  } catch (e) {
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Failed to generate image.', style: CozyTheme.monoStyle(fontSize: 12, color: CozyTheme.paperCream)),
-                          backgroundColor: Colors.redAccent,
-                        ),
-                      );
-                    }
-                  } finally {
-                    if (context.mounted) setState(() => isCapturing = false);
-                  }
-                },
-        );
-      },
-    );
-  }
-
-  void _downloadImageFallback(Uint8List bytes) {
-    final blob = html.Blob([bytes]);
-    final url = html.Url.createObjectUrlFromBlob(blob);
-    final anchor = html.AnchorElement(href: url)
-      ..setAttribute("download", "review_adil_rahman.png")
-      ..click();
-    html.Url.revokeObjectUrl(url);
   }
 
   Widget _buildReviewCard(ReviewModel review) {

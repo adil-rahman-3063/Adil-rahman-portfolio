@@ -27,12 +27,13 @@ class BrandedReviewShare extends StatelessWidget {
           width: 1080,
           height: 1920, 
           color: CozyTheme.bgDark,
-          child: Stack(
+          padding: const EdgeInsets.symmetric(horizontal: 80, vertical: 120),
+          child: Column(
             children: [
-              Center(
+              Expanded(
                 child: Container(
-                  width: 900,
-                  padding: const EdgeInsets.all(80),
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(60),
                   decoration: BoxDecoration(
                     color: CozyTheme.bgDark,
                     border: Border.all(color: CozyTheme.accentBrown.withOpacity(0.3), width: 3),
@@ -46,7 +47,6 @@ class BrandedReviewShare extends StatelessWidget {
                     ],
                   ),
                   child: Column(
-                    mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Stars
@@ -55,29 +55,36 @@ class BrandedReviewShare extends StatelessWidget {
                           return Icon(
                             i < review.rating ? Icons.star_rounded : Icons.star_border_rounded,
                             color: CozyTheme.accentGold,
-                            size: 50,
+                            size: 40,
                           );
                         }),
                       ),
-                      const SizedBox(height: 60),
+                      const SizedBox(height: 40),
                       
                       // Review Text
-                      Text(
-                        '"${review.review}"',
-                        style: CozyTheme.monoStyle(
-                          fontSize: 36,
-                          color: CozyTheme.textCream,
-                        ).copyWith(height: 1.6, fontStyle: FontStyle.italic),
+                      Expanded(
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            '"${review.review}"',
+                            style: CozyTheme.monoStyle(
+                              fontSize: 24, // Much smaller for readability
+                              color: CozyTheme.textCream,
+                            ).copyWith(height: 1.6, fontStyle: FontStyle.italic),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 25,
+                          ),
+                        ),
                       ),
-                      const SizedBox(height: 80),
+                      const SizedBox(height: 40),
                       
                       // Client Info
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Container(
-                            width: 110,
-                            height: 110,
+                            width: 80,
+                            height: 80,
                             decoration: BoxDecoration(
                               color: CozyTheme.accentBrown.withOpacity(0.2),
                               shape: BoxShape.circle,
@@ -87,14 +94,14 @@ class BrandedReviewShare extends StatelessWidget {
                               child: Text(
                                 review.name.isNotEmpty ? review.name[0].toUpperCase() : '?',
                                 style: CozyTheme.headerStyle(
-                                  fontSize: 45,
+                                  fontSize: 32,
                                   color: CozyTheme.accentGold,
                                   weight: FontWeight.bold,
                                 ),
                               ),
                             ),
                           ),
-                          const SizedBox(width: 40),
+                          const SizedBox(width: 30),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -102,17 +109,21 @@ class BrandedReviewShare extends StatelessWidget {
                                 Text(
                                   review.name,
                                   style: CozyTheme.monoStyle(
-                                    fontSize: 38,
+                                    fontSize: 28,
                                     color: CozyTheme.paperCream,
                                   ).copyWith(fontWeight: FontWeight.bold),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
-                                const SizedBox(height: 5),
+                                const SizedBox(height: 4),
                                 Text(
                                   review.role,
                                   style: CozyTheme.monoStyle(
-                                    fontSize: 32,
+                                    fontSize: 22,
                                     color: CozyTheme.textGray,
                                   ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ],
                             ),
@@ -120,7 +131,7 @@ class BrandedReviewShare extends StatelessWidget {
                           if (review.date != null && review.date!.isNotEmpty)
                             Text(
                               _formatDate(review.date!),
-                              style: CozyTheme.monoStyle(fontSize: 30, color: CozyTheme.textGray.withOpacity(0.6)),
+                              style: CozyTheme.monoStyle(fontSize: 20, color: CozyTheme.textGray.withOpacity(0.6)),
                             ),
                         ],
                       ),
@@ -129,34 +140,31 @@ class BrandedReviewShare extends StatelessWidget {
                 ),
               ),
 
+              const SizedBox(height: 60),
+
               // Bottom Branding
-              Positioned(
-                bottom: 80,
-                left: 0,
-                right: 0,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'Adil Rahman',
-                      textAlign: TextAlign.center,
-                      style: CozyTheme.headerStyle(
-                        fontSize: 40,
-                        color: CozyTheme.accentGold,
-                        weight: FontWeight.bold,
-                      ),
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Adil Rahman',
+                    textAlign: TextAlign.center,
+                    style: CozyTheme.headerStyle(
+                      fontSize: 32,
+                      color: CozyTheme.accentGold,
+                      weight: FontWeight.bold,
                     ),
-                    const SizedBox(height: 10),
-                    Text(
-                      'Software Engineer & Designer',
-                      textAlign: TextAlign.center,
-                      style: CozyTheme.monoStyle(
-                        fontSize: 32,
-                        color: CozyTheme.textGray,
-                      ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Software Engineer & Designer',
+                    textAlign: TextAlign.center,
+                    style: CozyTheme.monoStyle(
+                      fontSize: 24,
+                      color: CozyTheme.textGray,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ],
           ),

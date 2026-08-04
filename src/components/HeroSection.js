@@ -326,10 +326,10 @@ export default function HeroSection({ scrollOffset, onAccessProjects, onContactM
       render: () => <div className="frag-avatar-initials">AR</div>,
     },
     {
-      mX: cx - 100,
+      mX: cx - 220,
       mY: cy - 100,
-      mW: 200,
-      mH: 200,
+      mW: 130,
+      mH: 130,
       dX: cx - 280,
       dY: cy + 20,
       dW: 240,

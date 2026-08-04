@@ -1,26 +1,75 @@
-@import "tailwindcss";
-
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Fonts */
+  --font-header: var(--font-special-elite), monospace;
+  --font-mono: var(--font-special-elite), monospace;
+  --font-handwritten: var(--font-la-belle-aurore), cursive;
+
+  /* Colors */
+  --bg-dark: #231513;       /* Deep warm espresso */
+  --bg-medium: #2E1C19;     /* Medium warm espresso */
+  --bg-light: #3B2521;      /* Warm clay brown */
+  
+  --paper-cream: #FAF6EE;   /* Aged paper/cream */
+  --paper-white: #FFFDF9;   /* Bright warm paper */
+  --paper-border: #E8DFD0;  /* Darker cream border */
+
+  --text-dark: #3E2723;     /* Deep brown text */
+  --text-dark-gray: #5D4037;/* Muted brown text */
+  --text-cream: #EFEBE9;    /* Light text on dark bg */
+  --text-gray: #BCAAA4;     /* Muted light text */
+  
+  --accent-brown: #8D6E63;  /* Warm brown accent */
+  --accent-gold: #8C7355;   /* Vintage gold/bronze accent */
+  --accent-rose: #D7CCC8;   /* Very light warm clay */
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--bg-dark);
+  color: var(--text-cream);
+  font-family: var(--font-mono);
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* Scroll reveal helper classes */
+.scroll-reveal-container {
+  opacity: 0;
+  width: 100%;
+  transform: translateY(24px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.scroll-reveal-container.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Page Divider styling */
+.section-divider {
+  width: 100%;
+  height: 0.5px;
+  background-color: rgba(232, 223, 208, 0.3); /* paperBorder with opacity */
+  border: none;
+  margin: 0;
+}
+
+/* Hide default scrollbars for customized layout if needed */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-dark);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--accent-gold);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-brown);
 }

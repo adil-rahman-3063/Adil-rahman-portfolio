@@ -242,7 +242,7 @@ export default function Home() {
           {/* Footer */}
           <footer className="footer-section">
             <p className="footer-copyright">© 2026 Adil Rahman | All Rights Reserved</p>
-            <p className="footer-version">SHOPIFY-MARKETING EDITION // PORTFOLIO v3.0.0</p>
+            <p className="footer-version">MADE AND DEPLOYED BY ME // PORTFOLIO v3.0.0</p>
           </footer>
         </div>
       </div>

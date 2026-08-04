@@ -687,7 +687,7 @@ export default function HeroSection({ scrollOffset, onAccessProjects, onContactM
           width: 100%;
           height: 100%;
           pointer-events: none;
-          opacity: 0.12;
+          opacity: 0.04;
         }
 
         .logs-left, .logs-right {

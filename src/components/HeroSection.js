@@ -415,7 +415,7 @@ export default function HeroSection({ scrollOffset, onAccessProjects, onContactM
           <div className="hero-pinned-viewport" style={{ top: 0 }}>
             {/* Background Logs */}
             {progress < 0.75 && (
-              <div className="console-logs-layer" style={{ opacity: 1.0 - p5 }}>
+              <div className="console-logs-layer" style={{ opacity: (1.0 - p5) * 0.02 }}>
                 <div className="logs-left">
                   {logsLeft.map((l, idx) => (
                     <div key={idx}>{l}</div>

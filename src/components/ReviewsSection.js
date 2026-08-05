@@ -242,7 +242,7 @@ function ModalShell({ onClose, title, headerComment, children }) {
     return () => window.removeEventListener('keydown', handler);
   }, [onClose]);
 
-  if (!mounted) return null;
+  if (!mounted || !document?.body) return null;
 
   return ReactDOM.createPortal(
     <div className="sheet-overlay" onClick={onClose}>

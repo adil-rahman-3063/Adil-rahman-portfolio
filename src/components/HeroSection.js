@@ -162,6 +162,10 @@ export default function HeroSection({ scrollOffset, onAccessProjects, onContactM
             src="/assets/Filipino_Freelance_Graphic_Designer_Instagram_Post-removebg-preview.png"
             alt="Adil Rahman Portrait"
             className="hero-avatar-img"
+            fetchPriority="high"
+            width="420"
+            height="560"
+            decoding="async"
           />
         </div>
 

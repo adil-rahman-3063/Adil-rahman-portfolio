@@ -144,6 +144,14 @@ const jsonLd = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${specialElite.variable} ${laBelleAurore.variable}`}>
+      <head>
+        {/* Preload LCP hero image so browser fetches it immediately */}
+        <link
+          rel="preload"
+          as="image"
+          href="/assets/Filipino_Freelance_Graphic_Designer_Instagram_Post-removebg-preview.png"
+        />
+      </head>
       <body>
         {children}
         {/* JSON-LD Structured Data for Google Knowledge Panel */}

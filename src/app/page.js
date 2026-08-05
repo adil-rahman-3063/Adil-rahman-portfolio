@@ -17,6 +17,7 @@ import ContactSection, { RequirementFormModal } from '../components/ContactSecti
 import { allProjects, projectsApiUrl } from '../data/projectsData';
 import ProjectModal from '../components/ProjectModal';
 import BlogModal from '../components/BlogModal';
+import LoadingScreen from '../components/LoadingScreen';
 
 export default function Home() {
   const [scrollOffset, setScrollOffset] = useState(0);
@@ -164,6 +165,9 @@ export default function Home() {
 
   return (
     <main className="main-viewport">
+      {/* Loading splash — covers FOUC on first paint */}
+      <LoadingScreen />
+
       {/* 1. Parallax background canvas */}
       <ParallaxBackground scrollOffset={scrollOffset} />
 

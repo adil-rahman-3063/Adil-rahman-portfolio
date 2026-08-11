@@ -22,27 +22,6 @@ export const allProjects = [
     categories: ['featured', 'mobile', 'personal'],
   },
   {
-    id: 'leadflow',
-    title: 'LeadFlow AI',
-    subtitle: 'AI-Powered Multilingual CRM // Production',
-    status: 'Featured // Production',
-    tagline: 'AI CRM converting chaotic WhatsApp/Instagram text into structured, trackable deals in seconds.',
-    description: 'The ultimate CRM suite that turns unstructured client message text into fully structured, manageable pipeline deals.',
-    features: [
-      'Copy-paste chats from WhatsApp, Instagram, or Email, and let the AI extract deal size, contact info, source, and details.',
-      'Supports multilingual NLP parsing for English, Hinglish, Malayalam, Manglish, and Arabic.',
-      'Visual, interactive Kanban pipeline containing 6 drag-and-drop stages.',
-      'Context-aware AI follow-up message generation directly deep-linked to WhatsApp and Mail Clients.',
-      'Organization collaboration workspace using invite codes, plus aging warnings for slow deals.',
-    ],
-    tech: ['Flutter', 'Supabase', 'FastAPI', 'OpenAI GPT API', 'Dart'],
-    links: [
-      { text: 'Live Web CRM', url: 'https://leadflowai-uyu1.onrender.com/' },
-      { text: 'Download Android APK', url: 'https://github.com/adil-rahman-3063/LeadFlow_AI/releases' },
-    ],
-    categories: ['featured', 'mobile', 'web-backend', 'personal'],
-  },
-  {
     id: 'viewpick',
     title: 'ViewPick',
     subtitle: 'Tinder-Style Movie Discovery PWA // Flutter Web',
@@ -60,25 +39,6 @@ export const allProjects = [
       { text: 'Live Application', url: 'https://viewpick.vercel.app' },
     ],
     categories: ['featured', 'web-backend', 'personal'],
-  },
-  {
-    id: 'telestore',
-    title: 'TeleStore',
-    subtitle: 'Unlimited Free Cloud Storage App // Ongoing Beta',
-    status: 'Ongoing // Beta',
-    tagline: 'Custom personal cloud storage that uses Telegram channels as free, unlimited file-hosting backends.',
-    description: 'A storage platform leveraging Telegram channels and chat bots as a completely free, unlimited database storage engine.',
-    features: [
-      'Automatically chunks and uploads large files to target channels using Telethon client API.',
-      'FastAPI and Supabase metadata backend to track recursive folders and file permissions.',
-      'Gorgeous stacked glassmorphic navigation deck with swipe gestures.',
-      'Authenticates user access via secure Telegram OTP logins.',
-    ],
-    tech: ['FastAPI', 'Python', 'Telethon (Telegram API)', 'Flutter', 'Supabase'],
-    links: [
-      { text: 'Frontend Codebase', url: 'https://github.com/adil-rahman-3063/telestore' },
-    ],
-    categories: ['web-backend', 'mobile', 'personal'],
   },
   {
     id: 'calert',

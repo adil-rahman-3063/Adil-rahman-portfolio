@@ -19,7 +19,7 @@ export const allBlogs = [
 
     In India, UPI QR payments are the lifeblood of daily commerce. But payment apps like Google Pay usually just ask the iPhone for the "standard" camera, which defaults to that broken primary lens. Because there’s no button inside the app to switch to the working 2x lens, my main payment app was completely useless.
 
-        Instead of paying for an expensive, out-of-warranty hardware repair, I decided to do what any stubborn tinkerer would do: over-engineer a custom web app to bypass the problem entirely. 
+    Instead of paying for an expensive, out-of-warranty hardware repair, I decided to do what any stubborn tinkerer would do: over-engineer a custom web app to bypass the problem entirely. 
 
     What started as a quick hack turned into a fascinating dive into how web browsers talk to phone hardware—and ended with a totally unexpected plot twist.
 
@@ -30,48 +30,50 @@ export const allBlogs = [
 
     ### Exploring the Workarounds
     Before I started writing any code, I tried some obvious workarounds:
-  *   **The Stock Camera App:** If I opened Apple's own camera app and switched to 2x, it could scan a QR code. But because of how my phone's default links were set up, it kept trying to open the wrong payment app. 
-*   **Gallery Uploads:** I could take a photo of the QR code with the 2x lens and manually upload it inside Google Pay. It worked, but tapping through 5 menus while holding up the line at a busy checkout counter is a nightmare.
 
-I needed a "1-tap" scanner that would force my phone to use the working 2x lens, read the QR code, and instantly hand the info back to Google Pay.
+    * **The Stock Camera App:** If I opened Apple's own camera app and switched to 2x, it could scan a QR code. But because of how my phone's default links were set up, it kept trying to open the wrong payment app. 
+    * **Gallery Uploads:** I could take a photo of the QR code with the 2x lens and manually upload it inside Google Pay. It worked, but tapping through 5 menus while holding up the line at a busy checkout counter is a nightmare.
 
-### Tackling the Challenges: Building a Direct Hotline to the Hardware
-I decided to build a quick web app. Modern web browsers (like Safari on your iPhone) have incredibly powerful features that can interact with your phone's hardware if you ask nicely.
+    I needed a "1-tap" scanner that would force my phone to use the working 2x lens, read the QR code, and instantly hand the info back to Google Pay.
 
-#### Challenge 1: Forcing the Phone to Use the Right Lens
-Normally, a website just asks for "a camera." I needed to be much more specific. 
 
-Think of it like calling a company's customer service line. Normally, you get the front desk (the default broken camera). I needed to find the direct extension for the specific employee I wanted (the 2x telephoto lens).
+    ### Tackling the Challenges: Building a Direct Hotline to the Hardware
+    I decided to build a quick web app. Modern web browsers (like Safari on your iPhone) have incredibly powerful features that can interact with your phone's hardware if you ask nicely.
 
-Using modern web tools, I wrote a script that essentially asked the iPhone to list every camera it had. Once it spotted the one labeled "telephoto" or "2x," it set up a direct, locked connection to that specific lens, ignoring the broken default one.
+    #### Challenge 1: Forcing the Phone to Use the Right Lens
+    Normally, a website just asks for "a camera." I needed to be much more specific. 
 
-#### Challenge 2: Translating the Secret Languages of QR Codes
-During testing, I realized merchant QR codes don't all speak the same language. 
+    Think of it like calling a company's customer service line. Normally, you get the front desk (the default broken camera). I needed to find the direct extension for the specific employee I wanted (the 2x telephoto lens).
 
-Some are simple text links that say "Pay this person at this address." Others are complex strings of numbers used by heavy-duty bank machines. 
+    Using modern web tools, I wrote a script that essentially asked the iPhone to list every camera it had. Once it spotted the one labeled "telephoto" or "2x," it set up a direct, locked connection to that specific lens, ignoring the broken default one.
 
-I had to add a quick translator to the web app. If the scanner saw a standard link, it just passed it straight to Google Pay. If it saw the complex bank numbers, it dressed them up in a format Google Pay could understand before passing them along. 
+    #### Challenge 2: Translating the Secret Languages of QR Codes
+    During testing, I realized merchant QR codes don't all speak the same language. 
 
-### The Plot Twist: The "Heisenbug"
-With my custom web app finished, I opened Safari on my iPhone to test it out. I tapped the button to give the website camera permissions.
+    Some are simple text links that say "Pay this person at this address." Others are complex strings of numbers used by heavy-duty bank machines. 
 
-And then, something completely unexpected happened. 
+    I had to add a quick translator to the web app. If the scanner saw a standard link, it just passed it straight to Google Pay. If it saw the complex bank numbers, it dressed them up in a format Google Pay could understand before passing them along. 
 
-The main, primary camera—the one that had been dead for weeks—suddenly snapped back to life. 
+    ### The Plot Twist: The "Heisenbug"
+    With my custom web app finished, I opened Safari on my iPhone to test it out. I tapped the button to give the website camera permissions.
 
-#### What Actually Happened?
-By building this web app, I had accidentally fixed my phone. 
+    And then, something completely unexpected happened. 
 
-When my web app bypassed the normal channels and demanded a specific, direct connection to the hardware, it sent a low-level "wake up and reset" signal to the iPhone's camera system. 
+    The main, primary camera—the one that had been dead for weeks—suddenly snapped back to life. 
 
-It turns out the camera hardware wasn't physically broken; the software driver managing it had frozen in a glitchy state. Opening normal apps wasn't enough to clear the error. But my web app's highly specific hardware request forced the system to completely recalibrate and restart the camera drivers.
+    #### What Actually Happened?
+    By building this web app, I had accidentally fixed my phone. 
 
-The very act of building a workaround for a broken camera is exactly what fixed it.
+    When my web app bypassed the normal channels and demanded a specific, direct connection to the hardware, it sent a low-level "wake up and reset" signal to the iPhone's camera system. 
 
-### Key Takeaways
-*   **Tinkering Pays Off:** Sometimes the best way to understand a problem is to try and build your way around it. Even if the project is just a silly workaround, you always learn something new.
-*   **Don't Always Trust the Surface:** What looks like a physical, expensive hardware failure might just be a stubborn software glitch waiting for the right kind of reset.
-*   **The Journey is the Destination:** I spent hours building a tool I ended up never needing to use. But the satisfaction of accidentally solving the root problem—and the fun of figuring out how it all connected—was entirely worth it.`,
+    It turns out the camera hardware wasn't physically broken; the software driver managing it had frozen in a glitchy state. Opening normal apps wasn't enough to clear the error. But my web app's highly specific hardware request forced the system to completely recalibrate and restart the camera drivers.
+
+    The very act of building a workaround for a broken camera is exactly what fixed it.
+
+    ### Key Takeaways
+    * **Tinkering Pays Off:** Sometimes the best way to understand a problem is to try and build your way around it. Even if the project is just a silly workaround, you always learn something new.
+    * **Don't Always Trust the Surface:** What looks like a physical, expensive hardware failure might just be a stubborn software glitch waiting for the right kind of reset.
+    * **The Journey is the Destination:** I spent hours building a tool I ended up never needing to use. But the satisfaction of accidentally solving the root problem—and the fun of figuring out how it all connected—was entirely worth it.\`,
   },
   {
     id: 'viewpick-build',

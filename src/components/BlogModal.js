@@ -106,6 +106,7 @@ export default function BlogModal({ blog, onClose }) {
         .modal-body {
           padding: 36px 40px;
           overflow-y: auto;
+          overflow-x: hidden;
           flex-grow: 1;
           background-color: #F4EFEA;
         }
@@ -145,6 +146,39 @@ export default function BlogModal({ blog, onClose }) {
           color: #8D6E63;
           padding: 2px 4px;
           border-radius: 4px;
+          white-space: pre-wrap;
+          word-break: break-word;
+        }
+
+        .markdown-body pre {
+          white-space: pre-wrap;
+          word-break: break-word;
+          overflow-x: auto;
+          max-width: 100%;
+        }
+
+        .markdown-body img {
+          max-width: 100%;
+          height: auto;
+        }
+
+        @media (max-width: 768px) {
+          .modal-overlay {
+            padding: 12px;
+          }
+          .modal-header {
+            padding: 16px 20px;
+          }
+          .modal-body {
+            padding: 20px 20px;
+            overflow-x: hidden;
+          }
+          .markdown-body {
+            font-size: 13px;
+          }
+          .modal-title-handwritten {
+            font-size: 20px;
+          }
         }
       `}</style>
     </div>

@@ -15,6 +15,7 @@ import BlogSection from '../components/BlogSection';
 import ReviewsSection, { ReviewFormModal } from '../components/ReviewsSection';
 import ContactSection, { RequirementFormModal } from '../components/ContactSection';
 import { allProjects, projectsApiUrl } from '../data/projectsData';
+import { allBlogs } from '../data/blogData';
 import ProjectModal from '../components/ProjectModal';
 import BlogModal from '../components/BlogModal';
 import LoadingScreen from '../components/LoadingScreen';
@@ -140,8 +141,50 @@ export default function Home() {
       setShowRequirementModal(true);
     }
 
+    const blogId = params.get('blog');
+    if (blogId) {
+      const blog = allBlogs.find(b => b.id === blogId);
+      if (blog) setActiveModalBlog(blog);
+    }
+
+    const projectId = params.get('project');
+    if (projectId) {
+      const project = allProjects.find(p => p.id === projectId);
+      if (project) setActiveModalProject(project);
+    }
+
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const handleOpenProject = (project) => {
+    window.history.pushState(null, '', `?project=${project.id}`);
+    setActiveModalProject(project);
+  };
+
+  const handleCloseProject = () => {
+    window.history.pushState(null, '', window.location.pathname);
+    setActiveModalProject(null);
+  };
+
+  const handleOpenBlog = (blog) => {
+    window.history.pushState(null, '', `?blog=${blog.id}`);
+    setActiveModalBlog(blog);
+  };
+
+  const handleCloseBlog = () => {
+    window.history.pushState(null, '', window.location.pathname);
+    setActiveModalBlog(null);
+  };
+
+  const handleCloseReviewModal = () => {
+    window.history.pushState(null, '', window.location.pathname);
+    setShowReviewModal(false);
+  };
+
+  const handleCloseRequirementModal = () => {
+    window.history.pushState(null, '', window.location.pathname);
+    setShowRequirementModal(false);
+  };
 
   // Smooth scroll helper matching Flutter ensuring visibility curves
   const scrollToSection = (index) => {
@@ -159,6 +202,7 @@ export default function Home() {
   };
 
   const handleGetQuote = (serviceName) => {
+    window.history.pushState(null, '', '?hire=true');
     setInitialQuoteText(`I would like to get a quote for ${serviceName}.`);
     setShowRequirementModal(true);
   };
@@ -211,7 +255,7 @@ export default function Home() {
           {/* Section 4: Work Archive */}
           <div ref={sectionRefs[4]} className="section-wrapper">
             <ScrollReveal delay={80}>
-              <WorkArchiveSection projects={projects} onProjectClick={setActiveModalProject} />
+              <WorkArchiveSection projects={projects} onProjectClick={handleOpenProject} />
             </ScrollReveal>
           </div>
 
@@ -225,7 +269,7 @@ export default function Home() {
           {/* Section 6: Blog */}
           <div ref={sectionRefs[6]} className="section-wrapper">
             <ScrollReveal delay={80}>
-              <BlogSection onBlogClick={setActiveModalBlog} />
+              <BlogSection onBlogClick={handleOpenBlog} />
             </ScrollReveal>
           </div>
 
@@ -253,12 +297,12 @@ export default function Home() {
 
       {/* Query parameters triggered modal overlays */}
       {showReviewModal && (
-        <ReviewFormModal onClose={() => setShowReviewModal(false)} />
+        <ReviewFormModal onClose={handleCloseReviewModal} />
       )}
 
       {showRequirementModal && (
         <RequirementFormModal
-          onClose={() => setShowRequirementModal(false)}
+          onClose={handleCloseRequirementModal}
           initialRequirement={initialQuoteText}
         />
       )}
@@ -266,14 +310,14 @@ export default function Home() {
       {activeModalProject && (
         <ProjectModal
           project={activeModalProject}
-          onClose={() => setActiveModalProject(null)}
+          onClose={handleCloseProject}
         />
       )}
 
       {activeModalBlog && (
         <BlogModal
           blog={activeModalBlog}
-          onClose={() => setActiveModalBlog(null)}
+          onClose={handleCloseBlog}
         />
       )}
 

@@ -77,7 +77,10 @@ export default function ReviewsSection() {
           </h2>
         </div>
 
-        <button onClick={() => setShowModal(true)} className="leave-review-btn">
+        <button onClick={() => {
+            window.history.pushState(null, '', '?review=true');
+            setShowModal(true);
+          }} className="leave-review-btn">
           Leave a Review
         </button>
       </div>
@@ -113,6 +116,7 @@ export default function ReviewsSection() {
       {showModal && (
         <ReviewFormModal
           onClose={() => {
+            window.history.pushState(null, '', window.location.pathname);
             setShowModal(false);
             fetchReviews();
           }}

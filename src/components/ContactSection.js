@@ -38,7 +38,7 @@ export default function ContactSection({ onGetQuote }) {
           </p>
 
           <div className="contact-links-list">
-            <a href="mailto:adilrahman3063@gmail.com" className="contact-link-item">
+            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=adilrahman3063@gmail.com" target="_blank" rel="noreferrer" className="contact-link-item">
               <span className="contact-icon">📧</span> adilrahman3063@gmail.com
             </a>
             <a href="https://wa.me/919207114070" target="_blank" rel="noreferrer" className="contact-link-item">
@@ -69,14 +69,20 @@ export default function ContactSection({ onGetQuote }) {
           <p className="contact-info-text">
             Submit your specific feature requirements, timeline constraints, and contact details to get a structured cost and architecture quote directly.
           </p>
-          <button onClick={() => setShowQuoteModal(true)} className="quote-launch-btn">
+          <button onClick={() => {
+            window.history.pushState(null, '', '?hire=true');
+            setShowQuoteModal(true);
+          }} className="quote-launch-btn">
             Request a Quote
           </button>
         </div>
       </div>
 
       {showQuoteModal && (
-        <RequirementFormModal onClose={() => setShowQuoteModal(false)} />
+        <RequirementFormModal onClose={() => {
+          window.history.pushState(null, '', window.location.pathname);
+          setShowQuoteModal(false);
+        }} />
       )}
 
       <style jsx global>{`

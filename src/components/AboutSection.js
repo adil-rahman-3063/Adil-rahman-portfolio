@@ -42,16 +42,13 @@ export default function AboutSection() {
         maxWidth: '100%'
       }}>
         <p style={{ marginBottom: '16px', marginTop: 0 }}>
-          I am a B.Tech Graduate, App Developer, and Innovator with a strong focus on real-world problem solving. 
-          I have successfully built and deployed multiple applications across diverse use-cases, including budget tracking, 
-          student productivity, media discovery, and AI-powered CRM systems.
+          I'm a freelance Developer and Digital Builder who turns ideas into working products—fast. Over the past few projects, I've shipped everything from Flutter web apps with token-gated video streaming to automated WhatsApp workflows powered by Google Apps Script, along with React frontends and Shopify storefronts for clients who need results, not just code.
         </p>
         <p style={{ marginBottom: '16px' }}>
-          I enjoy developing solutions end-to-end—from crafting responsive UI/UX architectures to configuring database backends 
-          and feature sets. My projects are designed to make daily tasks simpler, more organized, and highly efficient.
+          I work across the full stack—UI/UX, backend automation, deployment, and infrastructure—so clients get a single point of contact instead of juggling multiple freelancers. Whether it's building a learning platform from scratch or automating a manual process into a seamless script, I focus on solutions that are practical, scalable, and built to actually get used.
         </p>
         <p style={{ marginBottom: 0 }}>
-          Driven by curiosity, I actively experiment with AI/ML integrations, scalable systems, and unique, fluid user experiences.
+          I stay hands-on with new tools and frameworks—AI-assisted development, modern React ecosystems, and cloud infrastructure—because the best solution today might not be the best one six months from now, and I'd rather stay ahead of that curve than catch up to it.
         </p>
       </div>
     </section>

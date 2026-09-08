@@ -20,6 +20,7 @@ export const allProjects = [
       { text: 'GitHub Repository', url: 'https://github.com/adil-rahman-3063/zmr' },
     ],
     categories: ['featured', 'mobile', 'personal'],
+    order: '1',
   },
   {
     id: 'viewpick',
@@ -39,6 +40,7 @@ export const allProjects = [
       { text: 'Live Application', url: 'https://viewpick.vercel.app' },
     ],
     categories: ['featured', 'web-backend', 'personal'],
+    order: '2',
   },
   {
     id: 'calert',
@@ -59,6 +61,7 @@ export const allProjects = [
       { text: 'GitHub Repository', url: 'https://github.com/Dayal-Joy/C-Alert' },
     ],
     categories: ['featured', 'mobile', 'personal'],
+    order: '3',
   },
   {
     id: 'poshan',
@@ -76,6 +79,7 @@ export const allProjects = [
       { text: 'GitHub Source', url: 'https://github.com/adil-rahman-3063/poshan_abhiyaan' },
     ],
     categories: ['mobile', 'personal'],
+    order: '4',
   },
   {
     id: 'redparrot',
@@ -94,6 +98,7 @@ export const allProjects = [
       { text: 'Code Status Details', url: 'https://github.com/adil-rahman-3063' },
     ],
     categories: ['mobile', 'freelance'],
+    order: '5',
   },
   {
     id: 'shopify',
@@ -113,6 +118,7 @@ export const allProjects = [
       { text: 'Live Storefront', url: 'https://t2autohaus.myshopify.com/' },
     ],
     categories: ['freelance'],
+    order: '6',
   },
   {
     id: 'issaa_event',
@@ -132,5 +138,6 @@ export const allProjects = [
     tech: ['HTML5', 'CSS3', 'JavaScript', 'Google Sheets API', 'JSONP', 'qrcode.js'],
     links: [],
     categories: ['freelance'],
+    order: '7',
   },
 ];

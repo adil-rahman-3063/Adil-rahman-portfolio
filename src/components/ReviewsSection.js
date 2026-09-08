@@ -1,18 +1,19 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import { reviewsApiUrl } from '../data/projectsData';
+import { reviewsApiUrl, allProjects } from '../data/projectsData';
 
 const defaultReviews = [
   {
     name: 'aslambinkader',
     role: 'CEO',
     rating: 5,
-    review: 'I had a great experience working with Adil Rehman on the T2 Autohaus website. From the beginning, he understood the vision of creating a professional automotive brand and delivered a clean, modern Shopify store that reflects our business well. He was responsive, patient with revisions, and always willing to implement changes until everything matched what we wanted. The website is well-structured, easy to navigate, and provides a solid foundation for our growing business. I appreciate his professionalism, communication, and commitment throughout the project. I would confidently recommend Adil Rehman to anyone looking for a reliable Shopify website developer. Thank you, Adil, for helping bring the T2 Autohaus vision to life. I wish you continued success.'
+    review: 'I had a great experience working with Adil Rehman on the T2 Autohaus website. From the beginning, he understood the vision of creating a professional automotive brand and delivered a clean, modern Shopify store that reflects our business well. He was responsive, patient with revisions, and always willing to implement changes until everything matched what we wanted. The website is well-structured, easy to navigate, and provides a solid foundation for our growing business. I appreciate his professionalism, communication, and commitment throughout the project. I would confidently recommend Adil Rehman to anyone looking for a reliable Shopify website developer. Thank you, Adil, for helping bring the T2 Autohaus vision to life. I wish you continued success.',
+    project: '6',
   }
 ];
 
-export default function ReviewsSection() {
+export default function ReviewsSection({ projects = allProjects, onProjectClick }) {
   const [reviews, setReviews] = useState(defaultReviews);
   const [isLoading, setIsLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -93,28 +94,76 @@ export default function ReviewsSection() {
         </div>
       ) : (
         <div className="reviews-grid">
-          {reviews.map((r, idx) => (
-            <div key={idx} className="review-card">
-              <div className="review-rating">
-                {Array.from({ length: r.rating || 5 }).map((_, starIdx) => (
-                  <span key={starIdx} style={{ color: '#8C7355' }}>★</span>
-                ))}
-                {Array.from({ length: 5 - (r.rating || 5) }).map((_, starIdx) => (
-                  <span key={starIdx} style={{ color: '#E8DFD0' }}>★</span>
-                ))}
+          {reviews.map((r, idx) => {
+            const matchedProject = (projects || []).find(
+              (p) => (r.project && String(p.order) === String(r.project)) || (r.project && p.id === String(r.project))
+            );
+
+            return (
+              <div key={idx} className="review-card">
+                <div className="review-rating">
+                  {Array.from({ length: r.rating || 5 }).map((_, starIdx) => (
+                    <span key={starIdx} style={{ color: '#8C7355' }}>★</span>
+                  ))}
+                  {Array.from({ length: 5 - (r.rating || 5) }).map((_, starIdx) => (
+                    <span key={starIdx} style={{ color: '#E8DFD0' }}>★</span>
+                  ))}
+                </div>
+                <p className="review-text">"{r.review}"</p>
+                <div className="review-author">
+                  <span className="author-name">{r.name}</span>
+                  <span className="author-role">{r.role}</span>
+                </div>
+
+                {/* Project Box inside the bottom of the review box */}
+                {matchedProject || (r.project && String(r.project).trim() !== '') ? (
+                  <div
+                    className={`review-project-box ${matchedProject && onProjectClick ? 'clickable' : ''}`}
+                    onClick={() => {
+                      if (matchedProject && onProjectClick) {
+                        onProjectClick(matchedProject);
+                      }
+                    }}
+                    title={matchedProject ? `View project details: ${matchedProject.title}` : undefined}
+                  >
+                    <div className="project-box-header">
+                      <span className="project-box-tag">// PROJECT</span>
+                      {matchedProject && onProjectClick && (
+                        <span className="project-box-arrow">↗</span>
+                      )}
+                    </div>
+                    <div className="project-box-title">
+                      {matchedProject ? matchedProject.title : `Project #${r.project}`}
+                    </div>
+                    {matchedProject?.subtitle && (
+                      <div className="project-box-subtitle">
+                        {matchedProject.subtitle}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="review-project-box review-project-unassigned">
+                    <div className="project-box-header">
+                      <span className="project-box-tag">// PROJECT: UNASSIGNED</span>
+                    </div>
+                    <div className="unassigned-gif-wrapper">
+                      <img
+                        src="/assets/Confused Stephen Colbert GIF by The Late Show With Stephen Colbert.gif"
+                        alt="Unassigned Project"
+                        className="unassigned-project-gif"
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
-              <p className="review-text">"{r.review}"</p>
-              <div className="review-author">
-                <span className="author-name">{r.name}</span>
-                <span className="author-role">{r.role}</span>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
       {showModal && (
         <ReviewFormModal
+          projects={projects}
           onClose={() => {
             window.history.pushState(null, '', window.location.pathname);
             setShowModal(false);
@@ -215,6 +264,95 @@ export default function ReviewsSection() {
           font-size: 11px;
           color: #8D6E63;
           margin-top: 2px;
+        }
+
+        .review-project-box {
+          margin-top: 14px;
+          background-color: rgba(141, 110, 99, 0.08);
+          border: 1px solid rgba(141, 110, 99, 0.22);
+          border-radius: 6px;
+          padding: 10px 12px;
+          display: flex;
+          flex-direction: column;
+          gap: 3px;
+          transition: background-color 0.2s, border-color 0.2s, transform 0.15s;
+        }
+
+        .review-project-box.clickable {
+          cursor: pointer;
+        }
+
+        .review-project-box.clickable:hover {
+          background-color: rgba(141, 110, 99, 0.16);
+          border-color: #8D6E63;
+          transform: translateY(-1px);
+        }
+
+        .project-box-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+
+        .project-box-tag {
+          font-family: var(--font-mono);
+          font-size: 10px;
+          font-weight: bold;
+          color: #8D6E63;
+          letter-spacing: 0.8px;
+        }
+
+        .project-box-arrow {
+          font-size: 11px;
+          color: #8D6E63;
+          transition: transform 0.2s;
+        }
+
+        .review-project-box.clickable:hover .project-box-arrow {
+          transform: translate(2px, -2px);
+          color: #3E2723;
+        }
+
+        .project-box-title {
+          font-family: var(--font-header);
+          font-size: 12px;
+          font-weight: bold;
+          color: #3E2723;
+          line-height: 1.3;
+        }
+
+        .project-box-subtitle {
+          font-family: var(--font-mono);
+          font-size: 10px;
+          color: #5D4037;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .review-project-unassigned {
+          background-color: rgba(141, 110, 99, 0.05);
+          border: 1px dashed rgba(141, 110, 99, 0.28);
+        }
+
+        .unassigned-gif-wrapper {
+          margin-top: 6px;
+          width: 100%;
+          height: 100px;
+          border-radius: 4px;
+          overflow: hidden;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background-color: #231513;
+          border: 1px solid rgba(141, 110, 99, 0.2);
+        }
+
+        .unassigned-project-gif {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          display: block;
         }
 
         .empty-reviews-state {
@@ -586,11 +724,12 @@ function ModalShell({ onClose, title, headerComment, children }) {
 }
 
 // ─── Review Form Modal ─────────────────────────────────────────────────────────
-export function ReviewFormModal({ onClose }) {
-  const [name, setName]     = useState('');
-  const [role, setRole]     = useState('');
-  const [rating, setRating] = useState(5);
-  const [review, setReview] = useState('');
+export function ReviewFormModal({ projects = allProjects, onClose }) {
+  const [name, setName]         = useState('');
+  const [role, setRole]         = useState('');
+  const [rating, setRating]     = useState(5);
+  const [review, setReview]     = useState('');
+  const [selectedProject, setSelectedProject] = useState('');
   const [loading, setLoading]   = useState(false);
   const [success, setSuccess]   = useState(false);
   const [errorMsg, setErrorMsg] = useState(null);
@@ -605,7 +744,13 @@ export function ReviewFormModal({ onClose }) {
         method: 'POST',
         mode: 'no-cors',
         headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify({ name: name.trim(), role: role.trim(), rating, review: review.trim() }),
+        body: JSON.stringify({
+          name: name.trim(),
+          role: role.trim(),
+          rating,
+          review: review.trim(),
+          project: selectedProject,
+        }),
       });
       setSuccess(true);
     } catch (err) {
@@ -644,6 +789,22 @@ export function ReviewFormModal({ onClose }) {
               onChange={(e) => setRole(e.target.value)}
               className="sheet-form-input" placeholder="e.g. CEO at TechCorp"
             />
+          </div>
+
+          <div className="sheet-form-group">
+            <label className="sheet-form-label">Related Project (Optional)</label>
+            <select
+              value={selectedProject}
+              onChange={(e) => setSelectedProject(e.target.value)}
+              className="sheet-form-input sheet-form-select"
+            >
+              <option value="" style={{ background: '#231513', color: '#EFEBE9' }}>-- Select Project --</option>
+              {(projects || []).map((p) => (
+                <option key={p.id} value={p.order || p.id} style={{ background: '#231513', color: '#EFEBE9' }}>
+                  {p.title} {p.subtitle ? `(${p.subtitle})` : ''}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="sheet-form-group">

@@ -65,6 +65,7 @@ export default function Home() {
               ? p.link_texts.split('|').map((t, idx) => ({ text: t.trim(), url: p.link_urls.split('|')[idx]?.trim() || '' }))
               : (p.links || []),
             categories: typeof p.categories === 'string' ? p.categories.split(',').map(s => s.trim()) : (p.categories || []),
+            order: p.order !== undefined ? String(p.order) : '',
           }))
           .filter(p => p.id && p.title);
         
@@ -276,7 +277,7 @@ export default function Home() {
           {/* Section 7: Reviews */}
           <div ref={sectionRefs[7]} className="section-wrapper">
             <ScrollReveal delay={80}>
-              <ReviewsSection />
+              <ReviewsSection projects={projects} onProjectClick={handleOpenProject} />
             </ScrollReveal>
           </div>
 
@@ -297,7 +298,10 @@ export default function Home() {
 
       {/* Query parameters triggered modal overlays */}
       {showReviewModal && (
-        <ReviewFormModal onClose={handleCloseReviewModal} />
+        <ReviewFormModal
+          projects={projects}
+          onClose={handleCloseReviewModal}
+        />
       )}
 
       {showRequirementModal && (

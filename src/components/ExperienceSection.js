@@ -116,7 +116,7 @@ export default function ExperienceSection() {
                 fontSize: '13px',
                 color: '#8C7355'
               }}>
-                B.Tech // 2022 - 2026
+                B.Tech in CSE // 7.01 CGPA (First Class)
               </span>
             </div>
 

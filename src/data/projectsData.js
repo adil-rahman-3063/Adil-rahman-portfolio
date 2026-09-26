@@ -1,5 +1,6 @@
-export const reviewsApiUrl = 'https://script.google.com/macros/s/AKfycbx9kD2SMJtPkG9g4I-1nkL7FJvNgeHEMeaBhaMmjfAU74ughomLS95mpkGeu8zteGikfw/exec';
-export const projectsApiUrl = 'https://script.google.com/macros/s/AKfycbx9kD2SMJtPkG9g4I-1nkL7FJvNgeHEMeaBhaMmjfAU74ughomLS95mpkGeu8zteGikfw/exec?action=getProjects';
+export const WORKER_GATEWAY_URL = 'https://adil-portfolio-worker.adilrahman3063.workers.dev';
+export const reviewsApiUrl = `${WORKER_GATEWAY_URL}/api/reviews`;
+export const projectsApiUrl = `${WORKER_GATEWAY_URL}/api/projects?action=getProjects`;
 
 export const allProjects = [
   {

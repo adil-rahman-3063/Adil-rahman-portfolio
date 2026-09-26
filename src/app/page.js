@@ -225,6 +225,7 @@ export default function Home() {
          <div ref={sectionRefs[0]} className="section-wrapper hero-wrapper">
           <HeroSection
             scrollOffset={scrollOffset}
+            onNavigateSection={(idx) => scrollToSection(idx)}
             onAccessProjects={() => scrollToSection(4)}
             onContactMe={() => scrollToSection(8)}
             onGetQuote={handleGetQuote}
@@ -337,13 +338,13 @@ export default function Home() {
           flex-direction: column;
           align-items: center;
           width: 100%;
-          padding-top: 40px;
+          padding-top: 0;
           padding-bottom: 110px;
         }
 
         @media (min-width: 1100px) {
           .content-container {
-            padding-top: 120px;
+            padding-top: 0;
             padding-bottom: 80px;
           }
         }

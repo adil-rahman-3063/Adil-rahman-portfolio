@@ -29,6 +29,11 @@
   padding: 0;
 }
 
+html {
+  scroll-behavior: smooth;
+  scroll-snap-type: y proximity;
+}
+
 body {
   background-color: var(--bg-dark);
   color: var(--text-cream);

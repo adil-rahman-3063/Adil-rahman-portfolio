@@ -740,10 +740,9 @@ export function ReviewFormModal({ projects = allProjects, onClose }) {
     setLoading(true);
     setErrorMsg(null);
     try {
-      await fetch(reviewsApiUrl, {
+      const res = await fetch(reviewsApiUrl, {
         method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'text/plain' },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: name.trim(),
           role: role.trim(),
@@ -752,6 +751,7 @@ export function ReviewFormModal({ projects = allProjects, onClose }) {
           project: selectedProject,
         }),
       });
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
       setSuccess(true);
     } catch (err) {
       setErrorMsg('Submission failed. Check your internet connection.');

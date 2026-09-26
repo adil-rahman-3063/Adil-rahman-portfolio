@@ -526,10 +526,9 @@ export function RequirementFormModal({ onClose, initialRequirement = '' }) {
     setLoading(true);
     setErrorMsg(null);
     try {
-      await fetch(reviewsApiUrl, {
+      const res = await fetch(reviewsApiUrl, {
         method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'text/plain' },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           type: 'requirement',
           name: name.trim(),
@@ -537,6 +536,7 @@ export function RequirementFormModal({ onClose, initialRequirement = '' }) {
           requirement: requirement.trim(),
         }),
       });
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
       setSuccess(true);
     } catch (err) {
       setErrorMsg('Submission failed. Check your internet connection.');

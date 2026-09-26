@@ -1,5 +1,6 @@
 'use client';
 import React, { useState, useRef, useEffect } from 'react';
+import { WORKER_GATEWAY_URL } from '../data/projectsData';
 
 const MAX_USER_MESSAGES = 50;
 const MAX_CHAR_LENGTH = 500;
@@ -50,7 +51,8 @@ export default function InteractiveChatSection({ onGetQuote, onAccessProjects, o
     setIsLoading(true);
 
     try {
-      const res = await fetch('/api/chat', {
+      const endpoint = WORKER_GATEWAY_URL ? `${WORKER_GATEWAY_URL}/api/chat` : '/api/chat';
+      const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ messages: updatedMessages }),

@@ -4,13 +4,6 @@ import React, { useState, useRef, useEffect } from 'react';
 const MAX_USER_MESSAGES = 50;
 const MAX_CHAR_LENGTH = 500;
 
-const QUICK_QUESTIONS = [
-  '📱 Can you build a cross-platform Flutter mobile app?',
-  '🛍️ Can you build a custom or Shopify e-commerce store?',
-  '⚡ What is Adil\'s typical timeline for building an MVP?',
-  '💼 How can I get a quote and hire Adil for my project?',
-];
-
 export default function InteractiveChatSection({ onGetQuote, onAccessProjects, onNavigateSection }) {
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
@@ -343,26 +336,10 @@ export default function InteractiveChatSection({ onGetQuote, onAccessProjects, o
             </span>
           </div>
 
-          <h2 className="chat-main-title">What are you looking for?</h2>
+          <h2 className="chat-main-title">Let's talk about your project.</h2>
           <p className="chat-subtitle">
-            Ask about project estimates, Flutter mobile apps, custom e-commerce or Shopify stores, or type what you need below.
+            Tell me about your mobile app, website, e-commerce store, or software ideas — or ask about Adil's work and skills.
           </p>
-
-          {/* Quick Questions */}
-          <div className="quick-questions-container">
-            <span className="quick-questions-label">Suggestions:</span>
-            <div className="quick-questions-grid">
-              {QUICK_QUESTIONS.map((q, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => handleSendMessage(q)}
-                  className="quick-question-btn"
-                >
-                  {q}
-                </button>
-              ))}
-            </div>
-          </div>
 
           {/* Big Input Bar */}
           <div className="big-input-wrapper">
@@ -372,7 +349,7 @@ export default function InteractiveChatSection({ onGetQuote, onAccessProjects, o
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Ask anything about Adil's skills, pricing, past projects, or your idea..."
+              placeholder="Tell me about your project idea, or ask about Adil's work..."
               className="big-chat-input"
             />
             <button
@@ -517,23 +494,30 @@ export default function InteractiveChatSection({ onGetQuote, onAccessProjects, o
           width: 100%;
           display: flex;
           justify-content: center;
-          padding: 20px 20px 50px;
+          padding: 8px 12px 24px;
           position: relative;
           z-index: 2;
+          box-sizing: border-box;
+        }
+
+        @media (min-width: 600px) {
+          .chat-section-root {
+            padding: 16px 20px 36px;
+          }
         }
 
         @media (min-width: 1100px) {
           .chat-section-root {
-            padding: 30px 40px 70px;
+            padding: 24px 40px 50px;
           }
         }
 
         /* ─── INITIAL SEARCH CARD ─── */
         .chat-initial-card {
-          background: linear-gradient(135deg, rgba(46, 28, 25, 0.85) 0%, rgba(35, 21, 19, 0.95) 100%);
+          background: linear-gradient(135deg, rgba(46, 28, 25, 0.88) 0%, rgba(35, 21, 19, 0.96) 100%);
           border: 1.5px solid rgba(232, 223, 208, 0.25);
-          border-radius: 20px;
-          padding: 36px 24px;
+          border-radius: 18px;
+          padding: 22px 16px;
           max-width: 960px;
           width: 100%;
           box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
@@ -544,11 +528,19 @@ export default function InteractiveChatSection({ onGetQuote, onAccessProjects, o
           align-items: center;
           text-align: center;
           transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+          box-sizing: border-box;
+        }
+
+        @media (min-width: 600px) {
+          .chat-initial-card {
+            padding: 32px 24px;
+            border-radius: 20px;
+          }
         }
 
         @media (min-width: 768px) {
           .chat-initial-card {
-            padding: 48px 44px;
+            padding: 44px 40px;
           }
         }
 
@@ -557,37 +549,64 @@ export default function InteractiveChatSection({ onGetQuote, onAccessProjects, o
           align-items: center;
           justify-content: space-between;
           width: 100%;
-          margin-bottom: 16px;
+          margin-bottom: 12px;
+        }
+
+        @media (min-width: 600px) {
+          .chat-header-row {
+            margin-bottom: 16px;
+          }
         }
 
         .chat-badge {
           font-family: var(--font-mono);
-          font-size: 11px;
+          font-size: 10px;
           color: #8D6E63;
-          letter-spacing: 1px;
+          letter-spacing: 0.8px;
           font-weight: bold;
+        }
+
+        @media (min-width: 600px) {
+          .chat-badge {
+            font-size: 11px;
+            letter-spacing: 1px;
+          }
         }
 
         .chat-status-indicator {
           display: flex;
           align-items: center;
-          gap: 6px;
+          gap: 5px;
           font-family: var(--font-mono);
-          font-size: 11px;
+          font-size: 10px;
           color: #A5D6A7;
           background: rgba(46, 125, 50, 0.15);
           border: 1px solid rgba(129, 199, 132, 0.3);
           border-radius: 20px;
-          padding: 3px 10px;
+          padding: 2px 8px;
+        }
+
+        @media (min-width: 600px) {
+          .chat-status-indicator {
+            font-size: 11px;
+            padding: 3px 10px;
+          }
         }
 
         .pulsing-dot {
-          width: 7px;
-          height: 7px;
+          width: 6px;
+          height: 6px;
           background-color: #66BB6A;
           border-radius: 50%;
           display: inline-block;
           animation: pulseDot 1.8s infinite;
+        }
+
+        @media (min-width: 600px) {
+          .pulsing-dot {
+            width: 7px;
+            height: 7px;
+          }
         }
 
         @keyframes pulseDot {
@@ -598,79 +617,49 @@ export default function InteractiveChatSection({ onGetQuote, onAccessProjects, o
 
         .chat-main-title {
           font-family: var(--font-header);
-          font-size: 28px;
+          font-size: 20px;
+          line-height: 1.25;
           color: #FAF6EE;
           font-weight: bold;
-          margin: 0 0 12px 0;
-          letter-spacing: 0.3px;
+          margin: 0 0 8px 0;
+          letter-spacing: 0.2px;
+        }
+
+        @media (min-width: 480px) {
+          .chat-main-title {
+            font-size: 24px;
+            margin-bottom: 10px;
+          }
         }
 
         @media (min-width: 768px) {
           .chat-main-title {
-            font-size: 38px;
+            font-size: 36px;
+            margin-bottom: 12px;
           }
         }
 
         .chat-subtitle {
           font-family: var(--font-mono);
-          font-size: 13px;
+          font-size: 12px;
           color: #BCAAA4;
-          line-height: 1.6;
+          line-height: 1.5;
           max-width: 680px;
-          margin: 0 0 28px 0;
+          margin: 0 0 16px 0;
+        }
+
+        @media (min-width: 600px) {
+          .chat-subtitle {
+            font-size: 13.5px;
+            margin-bottom: 22px;
+          }
         }
 
         @media (min-width: 768px) {
           .chat-subtitle {
             font-size: 15px;
+            margin-bottom: 26px;
           }
-        }
-
-        /* Quick questions */
-        .quick-questions-container {
-          width: 100%;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 10px;
-          margin-bottom: 28px;
-        }
-
-        .quick-questions-label {
-          font-family: var(--font-mono);
-          font-size: 11px;
-          color: #8C7355;
-          letter-spacing: 0.8px;
-          font-weight: bold;
-          text-transform: uppercase;
-        }
-
-        .quick-questions-grid {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 10px;
-          justify-content: center;
-          width: 100%;
-        }
-
-        .quick-question-btn {
-          background: rgba(250, 246, 238, 0.05);
-          border: 1px solid rgba(232, 223, 208, 0.2);
-          border-radius: 24px;
-          padding: 8px 16px;
-          font-family: var(--font-mono);
-          font-size: 12px;
-          color: #EFEBE9;
-          cursor: pointer;
-          transition: all 0.2s ease;
-          text-align: left;
-        }
-
-        .quick-question-btn:hover {
-          background: rgba(141, 110, 99, 0.25);
-          border-color: #8D6E63;
-          color: #FAF6EE;
-          transform: translateY(-1px);
         }
 
         /* Big Input Line */
@@ -680,44 +669,62 @@ export default function InteractiveChatSection({ onGetQuote, onAccessProjects, o
           max-width: 820px;
           display: flex;
           align-items: center;
+          margin-top: 8px;
+        }
+
+        @media (min-width: 600px) {
+          .big-input-wrapper {
+            margin-top: 12px;
+          }
         }
 
         .big-chat-input {
           width: 100%;
           background: rgba(250, 246, 238, 0.08);
-          border: 2px solid rgba(141, 110, 99, 0.4);
-          border-radius: 36px;
-          padding: 18px 64px 18px 24px;
+          border: 1.5px solid rgba(141, 110, 99, 0.4);
+          border-radius: 28px;
+          padding: 13px 48px 13px 16px;
           font-family: var(--font-mono);
-          font-size: 14px;
+          font-size: 13px;
           color: #FAF6EE;
           outline: none;
           transition: border-color 0.25s, background 0.25s, box-shadow 0.25s;
           box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+          box-sizing: border-box;
+        }
+
+        @media (min-width: 600px) {
+          .big-chat-input {
+            border-radius: 32px;
+            padding: 16px 56px 16px 20px;
+            font-size: 14px;
+          }
         }
 
         @media (min-width: 768px) {
           .big-chat-input {
+            border: 2px solid rgba(141, 110, 99, 0.4);
+            border-radius: 36px;
             font-size: 15px;
-            padding: 20px 70px 20px 28px;
+            padding: 18px 68px 18px 24px;
           }
         }
 
         .big-chat-input::placeholder {
-          color: rgba(188, 170, 164, 0.6);
+          color: rgba(188, 170, 164, 0.55);
         }
 
         .big-chat-input:focus {
           border-color: #8D6E63;
           background: rgba(250, 246, 238, 0.12);
-          box-shadow: 0 0 0 4px rgba(141, 110, 99, 0.2), 0 8px 24px rgba(0, 0, 0, 0.35);
+          box-shadow: 0 0 0 3px rgba(141, 110, 99, 0.25), 0 8px 24px rgba(0, 0, 0, 0.35);
         }
 
         .big-send-btn {
           position: absolute;
-          right: 8px;
-          width: 44px;
-          height: 44px;
+          right: 6px;
+          width: 36px;
+          height: 36px;
           border-radius: 50%;
           background: linear-gradient(135deg, #8D6E63 0%, #6D4C41 100%);
           color: #FAF6EE;
@@ -727,7 +734,15 @@ export default function InteractiveChatSection({ onGetQuote, onAccessProjects, o
           justify-content: center;
           cursor: pointer;
           transition: transform 0.15s, opacity 0.2s, background 0.2s;
-          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        @media (min-width: 600px) {
+          .big-send-btn {
+            right: 8px;
+            width: 42px;
+            height: 42px;
+          }
         }
 
         .big-send-btn:disabled {
@@ -744,11 +759,21 @@ export default function InteractiveChatSection({ onGetQuote, onAccessProjects, o
         .scroll-hint-row {
           display: flex;
           align-items: center;
-          gap: 8px;
-          margin-top: 20px;
+          gap: 6px;
+          margin-top: 14px;
           font-family: var(--font-mono);
-          font-size: 11px;
+          font-size: 10px;
           color: rgba(188, 170, 164, 0.65);
+          flex-wrap: wrap;
+          justify-content: center;
+        }
+
+        @media (min-width: 600px) {
+          .scroll-hint-row {
+            gap: 8px;
+            margin-top: 18px;
+            font-size: 11px;
+          }
         }
 
         .scroll-hint-sep {
@@ -757,19 +782,27 @@ export default function InteractiveChatSection({ onGetQuote, onAccessProjects, o
 
         /* ─── ACTIVE CHAT WINDOW (APPLE iMESSAGE STYLE) ─── */
         .active-chat-window {
-          background: linear-gradient(180deg, rgba(35, 21, 19, 0.95) 0%, rgba(26, 14, 13, 0.98) 100%);
-          border: 1.5px solid rgba(232, 223, 208, 0.3);
-          border-radius: 20px;
+          background: linear-gradient(180deg, rgba(35, 21, 19, 0.96) 0%, rgba(26, 14, 13, 0.99) 100%);
+          border: 1.5px solid rgba(232, 223, 208, 0.28);
+          border-radius: 16px;
           max-width: 960px;
           width: 100%;
-          height: 540px;
+          height: clamp(380px, calc(100svh - 130px), 640px);
           display: flex;
           flex-direction: column;
-          box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+          box-shadow: 0 16px 48px rgba(0, 0, 0, 0.45);
           backdrop-filter: blur(16px);
           -webkit-backdrop-filter: blur(16px);
           overflow: hidden;
           animation: chatWindowExpand 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+          box-sizing: border-box;
+        }
+
+        @media (min-width: 600px) {
+          .active-chat-window {
+            border-radius: 20px;
+            height: clamp(440px, 70vh, 580px);
+          }
         }
 
         @keyframes chatWindowExpand {
@@ -787,62 +820,101 @@ export default function InteractiveChatSection({ onGetQuote, onAccessProjects, o
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 16px 20px;
+          padding: 10px 14px;
           border-bottom: 1px solid rgba(141, 110, 99, 0.2);
-          background: rgba(46, 28, 25, 0.6);
+          background: rgba(46, 28, 25, 0.65);
+          flex-shrink: 0;
+        }
+
+        @media (min-width: 600px) {
+          .active-chat-header {
+            padding: 14px 18px;
+          }
         }
 
         .chat-assistant-info {
           display: flex;
           align-items: center;
-          gap: 12px;
+          gap: 10px;
         }
 
         .chat-avatar-circle {
-          width: 36px;
-          height: 36px;
+          width: 32px;
+          height: 32px;
           border-radius: 50%;
           background: linear-gradient(135deg, #8D6E63 0%, #5D4037 100%);
           color: #FAF6EE;
           font-family: var(--font-header);
-          font-size: 13px;
+          font-size: 11px;
           font-weight: bold;
           display: flex;
           align-items: center;
           justify-content: center;
           border: 1px solid rgba(232, 223, 208, 0.3);
           box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+          flex-shrink: 0;
+        }
+
+        @media (min-width: 600px) {
+          .chat-avatar-circle {
+            width: 36px;
+            height: 36px;
+            font-size: 13px;
+          }
         }
 
         .chat-assistant-name {
           font-family: var(--font-header);
-          font-size: 14px;
+          font-size: 13px;
           color: #FAF6EE;
           margin: 0;
           font-weight: bold;
+          line-height: 1.2;
+        }
+
+        @media (min-width: 600px) {
+          .chat-assistant-name {
+            font-size: 14px;
+          }
         }
 
         .chat-assistant-status {
           font-family: var(--font-mono);
-          font-size: 11px;
+          font-size: 10px;
           color: #A5D6A7;
           display: flex;
           align-items: center;
-          gap: 5px;
+          gap: 4px;
+        }
+
+        @media (min-width: 600px) {
+          .chat-assistant-status {
+            font-size: 11px;
+            gap: 5px;
+          }
         }
 
         .chat-reset-btn {
           background: rgba(250, 246, 238, 0.06);
           border: 1px solid rgba(141, 110, 99, 0.3);
-          border-radius: 18px;
-          padding: 6px 14px;
+          border-radius: 16px;
+          padding: 5px 10px;
           font-family: var(--font-mono);
-          font-size: 11px;
+          font-size: 10px;
           color: #BCAAA4;
           cursor: pointer;
           display: flex;
           align-items: center;
           transition: all 0.2s;
+          white-space: nowrap;
+        }
+
+        @media (min-width: 600px) {
+          .chat-reset-btn {
+            padding: 6px 14px;
+            font-size: 11px;
+            border-radius: 18px;
+          }
         }
 
         .chat-reset-btn:hover {
@@ -854,18 +926,32 @@ export default function InteractiveChatSection({ onGetQuote, onAccessProjects, o
         /* Messages area */
         .active-messages-container {
           flex: 1;
-          padding: 20px;
+          padding: 14px 12px;
           overflow-y: auto;
+          -webkit-overflow-scrolling: touch;
           display: flex;
           flex-direction: column;
-          gap: 16px;
+          gap: 12px;
+        }
+
+        @media (min-width: 600px) {
+          .active-messages-container {
+            padding: 18px 16px;
+            gap: 14px;
+          }
         }
 
         .message-row {
           display: flex;
           align-items: flex-end;
-          gap: 10px;
+          gap: 8px;
           width: 100%;
+        }
+
+        @media (min-width: 600px) {
+          .message-row {
+            gap: 10px;
+          }
         }
 
         .message-user {
@@ -877,47 +963,76 @@ export default function InteractiveChatSection({ onGetQuote, onAccessProjects, o
         }
 
         .assistant-bubble-avatar {
-          width: 28px;
-          height: 28px;
+          width: 24px;
+          height: 24px;
           border-radius: 50%;
           background: #5D4037;
           color: #FAF6EE;
           font-family: var(--font-header);
-          font-size: 10px;
+          font-size: 9px;
           display: flex;
           align-items: center;
           justify-content: center;
           flex-shrink: 0;
-          margin-bottom: 4px;
+          margin-bottom: 2px;
+        }
+
+        @media (min-width: 600px) {
+          .assistant-bubble-avatar {
+            width: 28px;
+            height: 28px;
+            font-size: 10px;
+            margin-bottom: 4px;
+          }
         }
 
         .bubble-wrapper {
           display: flex;
           flex-direction: column;
-          max-width: 82%;
+          max-width: 88%;
         }
 
-        @media (min-width: 768px) {
+        @media (min-width: 600px) {
           .bubble-wrapper {
-            max-width: 70%;
+            max-width: 80%;
+          }
+        }
+
+        @media (min-width: 900px) {
+          .bubble-wrapper {
+            max-width: 72%;
           }
         }
 
         .chat-bubble {
-          padding: 12px 18px;
+          padding: 10px 14px;
           font-family: var(--font-mono);
-          font-size: 13px;
-          line-height: 1.55;
+          font-size: 12.5px;
+          line-height: 1.5;
           word-break: break-word;
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        @media (min-width: 600px) {
+          .chat-bubble {
+            padding: 12px 18px;
+            font-size: 13.5px;
+            line-height: 1.55;
+          }
         }
 
         /* User Bubble: Espresso / Warm Brown */
         .bubble-user {
           background: linear-gradient(135deg, #8D6E63 0%, #6D4C41 100%);
           color: #FAF6EE;
-          border-radius: 18px 18px 4px 18px;
+          border-radius: 16px 16px 4px 16px;
           align-self: flex-end;
+        }
+
+        @media (min-width: 600px) {
+          .bubble-user {
+            border-radius: 18px 18px 4px 18px;
+          }
         }
 
         /* Assistant Bubble: Warm Beige / Cream (Apple iMessage style) */
@@ -925,8 +1040,14 @@ export default function InteractiveChatSection({ onGetQuote, onAccessProjects, o
           background: #FAF6EE;
           color: #231513;
           border: 1px solid #E8DFD0;
-          border-radius: 18px 18px 18px 4px;
+          border-radius: 16px 16px 16px 4px;
           align-self: flex-start;
+        }
+
+        @media (min-width: 600px) {
+          .bubble-assistant {
+            border-radius: 18px 18px 18px 4px;
+          }
         }
 
         .bubble-paragraph {
@@ -934,7 +1055,13 @@ export default function InteractiveChatSection({ onGetQuote, onAccessProjects, o
         }
 
         .bubble-paragraph + .bubble-paragraph {
-          margin-top: 8px;
+          margin-top: 6px;
+        }
+
+        @media (min-width: 600px) {
+          .bubble-paragraph + .bubble-paragraph {
+            margin-top: 8px;
+          }
         }
 
         .chat-bubble-link {
@@ -952,17 +1079,24 @@ export default function InteractiveChatSection({ onGetQuote, onAccessProjects, o
         .chat-actions-row {
           display: flex;
           flex-wrap: wrap;
-          gap: 8px;
-          margin-top: 8px;
+          gap: 6px;
+          margin-top: 6px;
+        }
+
+        @media (min-width: 600px) {
+          .chat-actions-row {
+            gap: 8px;
+            margin-top: 8px;
+          }
         }
 
         .chat-action-pill {
           background: rgba(250, 246, 238, 0.1);
           border: 1px solid rgba(141, 110, 99, 0.4);
-          border-radius: 16px;
-          padding: 6px 12px;
+          border-radius: 14px;
+          padding: 5px 10px;
           font-family: var(--font-mono);
-          font-size: 11px;
+          font-size: 10.5px;
           color: #FAF6EE;
           cursor: pointer;
           text-decoration: none;
@@ -970,6 +1104,15 @@ export default function InteractiveChatSection({ onGetQuote, onAccessProjects, o
           align-items: center;
           gap: 4px;
           transition: background 0.2s, border-color 0.2s;
+          line-height: 1.3;
+        }
+
+        @media (min-width: 600px) {
+          .chat-action-pill {
+            padding: 6px 12px;
+            font-size: 11px;
+            border-radius: 16px;
+          }
         }
 
         .chat-action-pill:hover {
@@ -1002,17 +1145,31 @@ export default function InteractiveChatSection({ onGetQuote, onAccessProjects, o
         .bubble-typing {
           display: flex;
           align-items: center;
-          gap: 5px;
-          padding: 14px 18px;
+          gap: 4px;
+          padding: 10px 14px;
           width: fit-content;
         }
 
+        @media (min-width: 600px) {
+          .bubble-typing {
+            gap: 5px;
+            padding: 14px 18px;
+          }
+        }
+
         .typing-dot {
-          width: 7px;
-          height: 7px;
+          width: 6px;
+          height: 6px;
           background-color: #8D6E63;
           border-radius: 50%;
           animation: typingBounce 1.4s infinite ease-in-out both;
+        }
+
+        @media (min-width: 600px) {
+          .typing-dot {
+            width: 7px;
+            height: 7px;
+          }
         }
 
         .typing-dot:nth-child(1) { animation-delay: -0.32s; }
@@ -1027,23 +1184,40 @@ export default function InteractiveChatSection({ onGetQuote, onAccessProjects, o
         .active-chat-input-bar {
           display: flex;
           align-items: center;
-          padding: 12px 16px;
-          background: rgba(35, 21, 19, 0.9);
+          padding: 8px 10px;
+          background: rgba(35, 21, 19, 0.95);
           border-top: 1px solid rgba(141, 110, 99, 0.2);
-          gap: 10px;
+          gap: 8px;
+          flex-shrink: 0;
+        }
+
+        @media (min-width: 600px) {
+          .active-chat-input-bar {
+            padding: 12px 16px;
+            gap: 10px;
+          }
         }
 
         .active-chat-input {
           flex: 1;
           background: rgba(250, 246, 238, 0.08);
           border: 1.5px solid rgba(141, 110, 99, 0.3);
-          border-radius: 28px;
-          padding: 12px 20px;
+          border-radius: 24px;
+          padding: 10px 16px;
           font-family: var(--font-mono);
           font-size: 13px;
           color: #FAF6EE;
           outline: none;
           transition: border-color 0.2s, background 0.2s;
+          box-sizing: border-box;
+        }
+
+        @media (min-width: 600px) {
+          .active-chat-input {
+            border-radius: 28px;
+            padding: 12px 20px;
+            font-size: 13.5px;
+          }
         }
 
         .active-chat-input:focus {
@@ -1056,8 +1230,8 @@ export default function InteractiveChatSection({ onGetQuote, onAccessProjects, o
         }
 
         .active-send-btn {
-          width: 40px;
-          height: 40px;
+          width: 36px;
+          height: 36px;
           border-radius: 50%;
           background: linear-gradient(135deg, #8D6E63 0%, #6D4C41 100%);
           color: #FAF6EE;
@@ -1068,6 +1242,13 @@ export default function InteractiveChatSection({ onGetQuote, onAccessProjects, o
           cursor: pointer;
           flex-shrink: 0;
           transition: transform 0.15s, opacity 0.2s;
+        }
+
+        @media (min-width: 600px) {
+          .active-send-btn {
+            width: 40px;
+            height: 40px;
+          }
         }
 
         .active-send-btn:disabled {
@@ -1086,41 +1267,56 @@ export default function InteractiveChatSection({ onGetQuote, onAccessProjects, o
           align-items: center;
           justify-content: center;
           gap: 8px;
-          padding: 14px 20px;
+          padding: 10px 14px;
           background: rgba(35, 21, 19, 0.95);
           border-top: 1px solid rgba(141, 110, 99, 0.3);
           text-align: center;
+          flex-shrink: 0;
         }
 
         @media (min-width: 600px) {
           .active-chat-limit-bar {
             flex-direction: row;
             justify-content: space-between;
+            padding: 14px 20px;
           }
         }
 
         .limit-text {
           font-family: var(--font-mono);
-          font-size: 12px;
+          font-size: 11px;
           color: #BCAAA4;
+        }
+
+        @media (min-width: 600px) {
+          .limit-text {
+            font-size: 12px;
+          }
         }
 
         .limit-wa-btn {
           background: linear-gradient(135deg, #2E7D32 0%, #1B5E20 100%);
           border: 1px solid #81C784;
           border-radius: 20px;
-          padding: 8px 18px;
+          padding: 6px 14px;
           font-family: var(--font-mono);
-          font-size: 12px;
+          font-size: 11px;
           font-weight: bold;
           color: #FFFFFF;
           text-decoration: none;
           display: inline-flex;
           align-items: center;
-          gap: 6px;
+          gap: 5px;
           transition: transform 0.15s, box-shadow 0.2s;
           box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3);
           white-space: nowrap;
+        }
+
+        @media (min-width: 600px) {
+          .limit-wa-btn {
+            padding: 8px 18px;
+            font-size: 12px;
+          }
         }
 
         .limit-wa-btn:hover {

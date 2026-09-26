@@ -282,7 +282,7 @@ export default function HeroSection({ onAccessProjects, onContactMe, onGetQuote,
           justify-content: center;
           position: relative;
           box-sizing: border-box;
-          padding: 80px 20px 40px;
+          padding: 50px 12px 90px;
           transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
                       transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
                       filter 0.6s cubic-bezier(0.16, 1, 0.3, 1);
@@ -317,11 +317,11 @@ export default function HeroSection({ onAccessProjects, onContactMe, onGetQuote,
 
         /* Viewport Scroll Down Cue */
         .viewport-scroll-cue {
+          display: none;
           position: absolute;
           bottom: 24px;
           left: 50%;
           transform: translateX(-50%);
-          display: flex;
           flex-direction: column;
           align-items: center;
           gap: 4px;
@@ -333,6 +333,12 @@ export default function HeroSection({ onAccessProjects, onContactMe, onGetQuote,
           color: rgba(188, 170, 164, 0.7);
           transition: color 0.2s, transform 0.2s;
           z-index: 10;
+        }
+
+        @media (min-width: 1100px) {
+          .viewport-scroll-cue {
+            display: flex;
+          }
         }
 
         .viewport-scroll-cue:hover {

@@ -787,7 +787,7 @@ export default function InteractiveChatSection({ onGetQuote, onAccessProjects, o
           border-radius: 16px;
           max-width: 960px;
           width: 100%;
-          height: clamp(380px, calc(100svh - 130px), 640px);
+          height: clamp(340px, calc(100dvh - 180px), 540px);
           display: flex;
           flex-direction: column;
           box-shadow: 0 16px 48px rgba(0, 0, 0, 0.45);
@@ -796,12 +796,14 @@ export default function InteractiveChatSection({ onGetQuote, onAccessProjects, o
           overflow: hidden;
           animation: chatWindowExpand 0.35s cubic-bezier(0.16, 1, 0.3, 1);
           box-sizing: border-box;
+          margin-bottom: 8px;
         }
 
         @media (min-width: 600px) {
           .active-chat-window {
             border-radius: 20px;
-            height: clamp(440px, 70vh, 580px);
+            height: clamp(440px, 68vh, 580px);
+            margin-bottom: 0;
           }
         }
 
@@ -1183,12 +1185,17 @@ export default function InteractiveChatSection({ onGetQuote, onAccessProjects, o
         /* Active Bottom Input Bar */
         .active-chat-input-bar {
           display: flex;
+          flex-direction: row;
           align-items: center;
-          padding: 8px 10px;
-          background: rgba(35, 21, 19, 0.95);
-          border-top: 1px solid rgba(141, 110, 99, 0.2);
+          padding: 8px 12px;
+          background: rgba(35, 21, 19, 0.98);
+          border-top: 1px solid rgba(141, 110, 99, 0.25);
           gap: 8px;
           flex-shrink: 0;
+          width: 100%;
+          box-sizing: border-box;
+          position: relative;
+          z-index: 10;
         }
 
         @media (min-width: 600px) {
@@ -1199,11 +1206,13 @@ export default function InteractiveChatSection({ onGetQuote, onAccessProjects, o
         }
 
         .active-chat-input {
-          flex: 1;
+          flex: 1 1 0%;
+          min-width: 0;
+          width: 100%;
           background: rgba(250, 246, 238, 0.08);
           border: 1.5px solid rgba(141, 110, 99, 0.3);
           border-radius: 24px;
-          padding: 10px 16px;
+          padding: 10px 14px;
           font-family: var(--font-mono);
           font-size: 13px;
           color: #FAF6EE;
@@ -1232,6 +1241,8 @@ export default function InteractiveChatSection({ onGetQuote, onAccessProjects, o
         .active-send-btn {
           width: 36px;
           height: 36px;
+          min-width: 36px;
+          min-height: 36px;
           border-radius: 50%;
           background: linear-gradient(135deg, #8D6E63 0%, #6D4C41 100%);
           color: #FAF6EE;
@@ -1242,13 +1253,26 @@ export default function InteractiveChatSection({ onGetQuote, onAccessProjects, o
           cursor: pointer;
           flex-shrink: 0;
           transition: transform 0.15s, opacity 0.2s;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+          z-index: 11;
         }
 
         @media (min-width: 600px) {
           .active-send-btn {
             width: 40px;
             height: 40px;
+            min-width: 40px;
+            min-height: 40px;
           }
+        }
+
+        .active-send-btn:disabled {
+          opacity: 0.35;
+          cursor: not-allowed;
+        }
+
+        .active-send-btn:not(:disabled):hover {
+          transform: scale(1.06);
         }
 
         .active-send-btn:disabled {

@@ -16,7 +16,7 @@ export default function WorkArchiveSection({ projects = [], onProjectClick }) {
     if (!p.categories) return false;
     const cats = Array.isArray(p.categories) ? p.categories : [p.categories];
     if (cats.some((c) => typeof c === 'string' && c.toLowerCase().includes('saas'))) return true;
-    if (p.id === 'resume-editor' || p.id === 'gym-saas' || p.id === 'teledrive') return true;
+    if (p.id === 'resume-editor' || p.id === 'membership-saas' || p.id === 'gym-saas' || p.id === 'teledrive') return true;
     return false;
   };
 

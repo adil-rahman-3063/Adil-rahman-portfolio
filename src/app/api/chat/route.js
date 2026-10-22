@@ -106,13 +106,20 @@ async function saveLeadToGoogleSheets(lead) {
   try {
     const requirementText = `[AI Chat Lead] Type: ${lead.project_type || 'Unspecified'} | Budget: ${lead.budget_range || 'Unspecified'} | Timeline: ${lead.timeline || 'Unspecified'} | Details: ${lead.description || ''}`;
 
+    const contactVal = lead.contact || '';
+    const isEmail = contactVal.includes('@');
+    const isPhone = !isEmail && /\d/.test(contactVal);
+    const isInstagram = contactVal.startsWith('@');
+
     await fetch(GOOGLE_SHEETS_ENDPOINT, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         type: 'requirement',
         name: lead.name || 'Anonymous Client',
-        phone: lead.contact || '',
+        phone: isPhone ? contactVal : (lead.phone || ''),
+        email: isEmail ? contactVal : (lead.email || ''),
+        instagram: isInstagram ? contactVal : (lead.instagram || ''),
         requirement: requirementText,
       }),
     });

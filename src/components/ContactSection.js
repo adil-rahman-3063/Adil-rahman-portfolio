@@ -513,16 +513,22 @@ function ModalShell({ onClose, title, headerComment, children }) {
 
 // ─── Requirement Quote Form Modal ──────────────────────────────────────────────
 export function RequirementFormModal({ onClose, initialRequirement = '' }) {
-  const [name, setName]             = useState('');
-  const [phone, setPhone]           = useState('');
+  const [name, setName]               = useState('');
+  const [email, setEmail]             = useState('');
+  const [phone, setPhone]             = useState('');
+  const [instagram, setInstagram]     = useState('');
   const [requirement, setRequirement] = useState(initialRequirement);
-  const [loading, setLoading]       = useState(false);
-  const [success, setSuccess]       = useState(false);
-  const [errorMsg, setErrorMsg]     = useState(null);
+  const [loading, setLoading]         = useState(false);
+  const [success, setSuccess]         = useState(false);
+  const [errorMsg, setErrorMsg]       = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!name || !phone || !requirement) return;
+    if (!name.trim() || !requirement.trim()) return;
+    if (!email.trim() && !phone.trim() && !instagram.trim()) {
+      setErrorMsg('Please provide at least one contact method (Email, Phone/WhatsApp, or Instagram).');
+      return;
+    }
     setLoading(true);
     setErrorMsg(null);
     try {
@@ -532,7 +538,9 @@ export function RequirementFormModal({ onClose, initialRequirement = '' }) {
         body: JSON.stringify({
           type: 'requirement',
           name: name.trim(),
+          email: email.trim(),
           phone: phone.trim(),
+          instagram: instagram.trim(),
           requirement: requirement.trim(),
         }),
       });
@@ -559,7 +567,7 @@ export function RequirementFormModal({ onClose, initialRequirement = '' }) {
           {errorMsg && <div className="sheet-error">{errorMsg}</div>}
 
           <div className="sheet-form-group">
-            <label className="sheet-form-label">Your Name</label>
+            <label className="sheet-form-label">Your Name *</label>
             <input
               type="text" required value={name}
               onChange={(e) => setName(e.target.value)}
@@ -568,18 +576,40 @@ export function RequirementFormModal({ onClose, initialRequirement = '' }) {
           </div>
 
           <div className="sheet-form-group">
-            <label className="sheet-form-label">Phone / WhatsApp</label>
+            <label className="sheet-form-label">Email Address *</label>
             <input
-              type="tel" required value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              className="sheet-form-input" placeholder="e.g. +1 234 567 890"
+              type="email" required value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="sheet-form-input" placeholder="e.g. jane@example.com"
             />
           </div>
 
           <div className="sheet-form-group">
-            <label className="sheet-form-label">Project Requirements</label>
+            <label className="sheet-form-label">
+              Phone / WhatsApp <span style={{ opacity: 0.65, fontSize: '11px', textTransform: 'none' }}>(Optional)</span>
+            </label>
+            <input
+              type="tel" value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              className="sheet-form-input" placeholder="e.g. +91 9207114070 (if using WhatsApp)"
+            />
+          </div>
+
+          <div className="sheet-form-group">
+            <label className="sheet-form-label">
+              Instagram ID <span style={{ opacity: 0.65, fontSize: '11px', textTransform: 'none' }}>(Optional)</span>
+            </label>
+            <input
+              type="text" value={instagram}
+              onChange={(e) => setInstagram(e.target.value)}
+              className="sheet-form-input" placeholder="e.g. @username"
+            />
+          </div>
+
+          <div className="sheet-form-group">
+            <label className="sheet-form-label">Project Requirements *</label>
             <textarea
-              required rows={5} value={requirement}
+              required rows={4} value={requirement}
               onChange={(e) => setRequirement(e.target.value)}
               className="sheet-form-input"
               placeholder="Describe what you want to build (features, deadline, platforms, budget range)..."

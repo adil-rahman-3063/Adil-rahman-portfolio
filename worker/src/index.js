@@ -374,13 +374,20 @@ async function processChoice(choice, lastUserMessage, appsScriptUrl) {
         // Post to Google Apps Script
         const requirementText = `[AI Lead via Worker] Type: ${args.project_type || 'Unspecified'} | Budget: ${args.budget_range || 'Unspecified'} | Timeline: ${args.timeline || 'Unspecified'} | Details: ${args.description || ''}`;
 
+        const contactVal = args.contact || '';
+        const isEmail = contactVal.includes('@');
+        const isPhone = !isEmail && /\d/.test(contactVal);
+        const isInstagram = contactVal.startsWith('@');
+
         await fetch(appsScriptUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             type: 'requirement',
             name: args.name || 'Anonymous Client',
-            phone: args.contact || '',
+            phone: isPhone ? contactVal : (args.phone || ''),
+            email: isEmail ? contactVal : (args.email || ''),
+            instagram: isInstagram ? contactVal : (args.instagram || ''),
             requirement: requirementText,
           }),
         });

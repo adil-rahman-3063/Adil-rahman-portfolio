@@ -1,6 +1,7 @@
 export const WORKER_GATEWAY_URL = 'https://adil-portfolio-worker.adilrahman3063.workers.dev';
 export const reviewsApiUrl = `${WORKER_GATEWAY_URL}/api/reviews`;
 export const projectsApiUrl = `${WORKER_GATEWAY_URL}/api/projects?action=getProjects`;
+export const saasApiUrl = `${WORKER_GATEWAY_URL}/api/projects?action=getSaas`;
 
 export const allProjects = [
   {
@@ -140,5 +141,69 @@ export const allProjects = [
     links: [],
     categories: ['freelance'],
     order: '7',
+  },
+  {
+    id: 'resume-editor',
+    title: 'Resume Editor',
+    subtitle: 'Interactive Resume & ATS PDF Engine // Vanilla JS',
+    status: 'Featured // Active SaaS Tool',
+    tagline: 'Modern browser-based resume editor with live WYSIWYG editing, dynamic color theming, and dual PDF export engines.',
+    description: 'A client-side, zero-dependency resume builder featuring high-aesthetic designed PDF generation, parser-safe ATS-friendly PDF export with custom sequence ordering, 6 curated theme palettes, and instant localStorage persistence.',
+    features: [
+      'Dual PDF Export Modes: High-aesthetic two-column Design PDF with custom palette gradients and parser-safe single-column ATS PDF.',
+      'Custom ATS Section Ordering: Interactive sequence badges allowing users to customize section hierarchy for ATS parsing.',
+      'Dynamic Theme & Palette Customizer: Real-time sidebar and main document color customization with 6 curated presets and live CSS variable syncing.',
+      'In-Place WYSIWYG Editing: Direct inline editing, section and bullet point reordering, dynamic spacers, and floating selection formatting toolbar.',
+      'Privacy-First & Offline Storage: 100% client-side architecture with automatic localStorage persistence and reset capabilities.',
+    ],
+    tech: ['HTML5', 'CSS3', 'Vanilla JavaScript', 'Google Fonts', 'LocalStorage API', 'Print CSS'],
+    links: [
+      { text: 'GitHub Repository', url: 'https://github.com/adil-rahman-3063/Resume-Editor' },
+    ],
+    categories: ['saas', 'featured', 'web-Full-Stack'],
+    order: '8',
+  },
+  {
+    id: 'teledrive',
+    title: 'TeleDrive',
+    subtitle: 'Telegram-Backed Cloud Storage // Next.js',
+    status: 'Featured // Live SaaS Beta',
+    tagline: 'Self-hosted app that turns Telegram into effectively unlimited, private cloud storage for your photos and videos.',
+    description: 'A self-hosted, open-source web app that runs on localhost and uses your own Telegram account as a free, unlimited storage backend — giving it a polished modern interface for uploading, organizing, and streaming media as if it were on a local drive.',
+    features: [
+      'Drag-and-drop upload straight into your own Telegram channels.',
+      'Full-screen media viewer with native video streaming via instant-scrubbing HTTP Range requests.',
+      'Real-time upload progress over WebSockets.',
+      'Intelligent local caching for instant reloads of previously viewed files.',
+      'Collections with sub-collections for organizing large libraries.',
+      'Fully self-hosted — data never leaves your own Telegram account.',
+    ],
+    tech: ['Next.js', 'Node.js', 'Telegram Client API (MTProto)', 'WebSockets', 'Tailwind CSS'],
+    links: [
+      { text: 'Live Application', url: 'https://teledrive-web.pages.dev' },
+    ],
+    categories: ['saas', 'featured', 'web-Full-Stack'],
+    order: '9',
+  },
+  {
+    id: 'gym-saas',
+    title: 'Universal Gym Membership SaaS',
+    subtitle: 'Multi-Tenant B2B Gym Management & WhatsApp Billing // Next.js',
+    status: 'Featured // Live SaaS Platform',
+    tagline: 'Multi-tenant B2B fitness SaaS platform with Google Sheets member syncing, QR check-ins, and automated WhatsApp billing.',
+    description: 'A multi-tenant B2B platform designed for gym owners and fitness club administrators. Features complete tenant isolation with Supabase super admin governance, real-time Google Sheets member database syncing, mobile QR check-in engine, Meta WhatsApp Cloud API reminder campaigns, and direct UPI payment links.',
+    features: [
+      'Multi-Tenant Platform Governance: Super admin account management, subscription tracking, and tenant controls powered by Supabase.',
+      'Google Sheets Two-Way Member Sync: Zero-lockin member operations synchronizing directly with each gym\'s Google Sheet.',
+      'Instant Mobile Turnstile & QR Check-in: Real-time QR and phone check-in engine with live occupancy counting.',
+      'Automated WhatsApp Campaign Engine: Meta WhatsApp Cloud API integration dispatching payment reminders and renewal alerts.',
+      'Direct UPI & Gateway Billing: Dynamic UPI deep links (GPay, PhonePe, Paytm) and automated billing funnels embedded in reminders.',
+    ],
+    tech: ['Next.js', 'React', 'Supabase', 'Google Sheets API', 'Meta WhatsApp API', 'Tailwind CSS'],
+    links: [
+      { text: 'GitHub Details', url: 'https://github.com/adil-rahman-3063' },
+    ],
+    categories: ['saas', 'featured', 'web-Full-Stack'],
+    order: '10',
   },
 ];

@@ -12,15 +12,32 @@ const categories = [
 export default function WorkArchiveSection({ projects = [], onProjectClick }) {
   const [activeCategory, setActiveCategory] = useState('all');
 
-  // Filter personal projects (exclude freelance)
+  const isSaas = (p) => {
+    if (!p.categories) return false;
+    const cats = Array.isArray(p.categories) ? p.categories : [p.categories];
+    if (cats.some((c) => typeof c === 'string' && c.toLowerCase().includes('saas'))) return true;
+    if (p.id === 'resume-editor' || p.id === 'gym-saas' || p.id === 'teledrive') return true;
+    return false;
+  };
+
+  const isFreelance = (p) => {
+    if (!p.categories) return false;
+    const cats = Array.isArray(p.categories) ? p.categories : [p.categories];
+    return cats.some((c) => typeof c === 'string' && c.toLowerCase().includes('freelance'));
+  };
+
+  // Filter personal projects (exclude freelance and saas)
   const personalProjects = projects.filter((p) => {
-    if (p.categories.includes('freelance')) return false;
+    if (isFreelance(p) || isSaas(p)) return false;
     if (activeCategory === 'all') return true;
-    return p.categories.includes(activeCategory);
+    return p.categories.some((c) => typeof c === 'string' && c.toLowerCase().trim() === activeCategory.toLowerCase());
   });
 
+  // Filter SaaS projects
+  const saasProjects = projects.filter(isSaas);
+
   // Filter freelance projects
-  const freelanceProjects = projects.filter((p) => p.categories.includes('freelance'));
+  const freelanceProjects = projects.filter(isFreelance);
 
   return (
     <section id="work-archive" style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
@@ -84,7 +101,37 @@ export default function WorkArchiveSection({ projects = [], onProjectClick }) {
         ))}
       </div>
 
-      {/* SUBSECTION 2: FREELANCE PROJECTS */}
+      {/* SUBSECTION 2: SAAS PRODUCTS */}
+      {saasProjects.length > 0 && (
+        <>
+          <div className="archive-subsection-title">// SAAS PRODUCTS</div>
+          <div className="projects-grid" style={{ marginBottom: '48px' }}>
+            {saasProjects.map((project) => (
+              <div
+                key={project.id}
+                onClick={() => onProjectClick?.(project)}
+                className="project-card saas-card"
+              >
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+                  <div className="project-status-text" style={{ marginBottom: 0 }}>
+                    {project.status.toUpperCase()} // {project.subtitle.toUpperCase()}
+                  </div>
+                  <span className="saas-badge">SAAS</span>
+                </div>
+                <h3 className="project-card-title">{project.title}</h3>
+                <p className="project-card-desc">{project.tagline}</p>
+                {project.tech && project.tech.length > 0 && (
+                  <div className="project-card-tech-box">
+                    {project.tech.join('; ')}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      {/* SUBSECTION 3: FREELANCE PROJECTS */}
       <div className="archive-subsection-title">// FREELANCE PROJECTS</div>
 
       {/* Freelance Projects Grid */}
@@ -224,6 +271,29 @@ export default function WorkArchiveSection({ projects = [], onProjectClick }) {
           padding: 6px 12px;
           align-self: flex-start;
           line-height: 1.4;
+        }
+
+        .saas-card {
+          border-color: rgba(140, 115, 85, 0.45);
+          position: relative;
+        }
+        .saas-card:hover {
+          border-color: #8C7355;
+          box-shadow: 0 8px 24px rgba(140, 115, 85, 0.22);
+        }
+
+        .saas-badge {
+          font-family: var(--font-mono);
+          font-size: 9px;
+          font-weight: bold;
+          letter-spacing: 0.8px;
+          color: #FAF6EE;
+          background: rgba(140, 115, 85, 0.35);
+          border: 1px solid rgba(140, 115, 85, 0.65);
+          padding: 2px 7px;
+          border-radius: 4px;
+          white-space: nowrap;
+          text-transform: uppercase;
         }
       `}</style>
     </section>

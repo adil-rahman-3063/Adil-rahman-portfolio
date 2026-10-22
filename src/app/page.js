@@ -14,7 +14,7 @@ import LiveWorkspaceSection from '../components/LiveWorkspaceSection';
 import BlogSection from '../components/BlogSection';
 import ReviewsSection, { ReviewFormModal } from '../components/ReviewsSection';
 import ContactSection, { RequirementFormModal } from '../components/ContactSection';
-import { allProjects, projectsApiUrl } from '../data/projectsData';
+import { allProjects, projectsApiUrl, saasApiUrl } from '../data/projectsData';
 import { allBlogs } from '../data/blogData';
 import ProjectModal from '../components/ProjectModal';
 import BlogModal from '../components/BlogModal';
@@ -69,9 +69,45 @@ export default function Home() {
           }))
           .filter(p => p.id && p.title);
         
-        if (fetched.length > 0) {
-          setProjects(fetched);
-          localStorage.setItem('cached_projects', JSON.stringify(fetched));
+        // Also check if a dedicated SaaS endpoint or tab returns projects
+        let saasFetched = [];
+        try {
+          const saasRes = await fetch(saasApiUrl);
+          if (saasRes.ok) {
+            const saasDecoded = await saasRes.json();
+            const saasList = Array.isArray(saasDecoded) ? saasDecoded : (saasDecoded.data || []);
+            // Validate: only accept if it actually returned project items (not the reviews fallback)
+            if (saasList.length > 0 && saasList[0].title && !saasList[0].rating) {
+              saasFetched = saasList.map(p => ({
+                id: p.id || '',
+                title: p.title || '',
+                subtitle: p.subtitle || '',
+                status: p.status || '',
+                tagline: p.tagline || '',
+                description: p.description || '',
+                features: typeof p.features === 'string' ? p.features.split(';').map(s => s.trim()) : (p.features || []),
+                tech: typeof p.tech === 'string' ? p.tech.split(',').map(s => s.trim()) : (p.tech || []),
+                links: typeof p.link_texts === 'string' && typeof p.link_urls === 'string'
+                  ? p.link_texts.split('|').map((t, idx) => ({ text: t.trim(), url: p.link_urls.split('|')[idx]?.trim() || '' }))
+                  : (p.links || []),
+                categories: typeof p.categories === 'string'
+                  ? Array.from(new Set([...p.categories.split(',').map(s => s.trim()), 'saas']))
+                  : Array.from(new Set([...(p.categories || []), 'saas'])),
+                order: p.order !== undefined ? String(p.order) : '',
+              })).filter(p => p.id && p.title);
+            }
+          }
+        } catch (e) {
+          // Dedicated SaaS endpoint not configured yet; standard projects endpoint provides SaaS projects
+        }
+
+        const projectMap = new Map();
+        [...fetched, ...saasFetched].forEach(p => projectMap.set(p.id, p));
+        const combined = Array.from(projectMap.values());
+        
+        if (combined.length > 0) {
+          setProjects(combined);
+          localStorage.setItem('cached_projects', JSON.stringify(combined));
         }
       } catch (e) {
         console.error('Failed to load dynamic projects:', e);

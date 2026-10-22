@@ -13,6 +13,9 @@ export default function ProjectModal({ project, onClose }) {
     leadflow: 'adil-rahman-3063/LeadFlow_AI',
     viewpick: 'adil-rahman-3063/viewpick',
     telestore: 'adil-rahman-3063/telestore',
+    teledrive: 'adil-rahman-3063/teledrive',
+    'resume-editor': 'adil-rahman-3063/Resume-Editor',
+    sirr: 'adil-rahman-3063/Sirr',
     calert: 'Dayal-Joy/C-Alert',
     poshan: 'adil-rahman-3063/poshan_abhiyaan',
   };

@@ -471,7 +471,7 @@ export default {
       return handleChat(request, env);
     }
 
-    if (path === '/api/projects' || path === '/api/reviews' || path === '/api/requirements') {
+    if (path === '/api/projects' || path === '/api/saas' || path === '/api/reviews' || path === '/api/requirements') {
       return handleProxy(request, env);
     }
 

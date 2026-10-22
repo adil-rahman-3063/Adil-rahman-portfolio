@@ -31,7 +31,11 @@
 
 html {
   scroll-behavior: smooth;
-  scroll-snap-type: y proximity;
+}
+
+section[id],
+div[id] {
+  scroll-margin-top: 100px;
 }
 
 body {

@@ -157,6 +157,39 @@ export default function Home() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Handle smooth navigation when landing directly on a hash (e.g. #contact) or on layout shifts
+  useEffect(() => {
+    const handleHashNavigation = () => {
+      const hash = window.location.hash;
+      if (!hash) return;
+      const targetId = hash.replace('#', '');
+      const target = document.getElementById(targetId);
+      if (target) {
+        const elementPosition = target.getBoundingClientRect().top + window.scrollY;
+        const offsetPosition = elementPosition - 100; // Account for cozy navbar
+        window.scrollTo({
+          top: Math.max(0, offsetPosition),
+          behavior: 'smooth',
+        });
+      }
+    };
+
+    const t0 = setTimeout(handleHashNavigation, 100);
+    const t1 = setTimeout(handleHashNavigation, 400);
+    const t2 = setTimeout(handleHashNavigation, 900);
+    const t3 = setTimeout(handleHashNavigation, 1500);
+
+    window.addEventListener('hashchange', handleHashNavigation);
+
+    return () => {
+      clearTimeout(t0);
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+      window.removeEventListener('hashchange', handleHashNavigation);
+    };
+  }, [projects]);
+
   const handleOpenProject = (project) => {
     window.history.pushState(null, '', `?project=${project.id}`);
     setActiveModalProject(project);

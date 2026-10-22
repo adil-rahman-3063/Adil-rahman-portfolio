@@ -1,0 +1,11 @@
+name = "adil-portfolio-worker"
+main = "src/index.js"
+compatibility_date = "2024-09-23"
+
+# Public environment variables (non-secret defaults)
+[vars]
+MODEL_PRIMARY = "gpt-4.1-nano"
+APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx9kD2SMJtPkG9g4I-1nkL7FJvNgeHEMeaBhaMmjfAU74ughomLS95mpkGeu8zteGikfw/exec"
+
+# Secrets to set via `wrangler secret put <KEY>` or in Cloudflare Dashboard:
+# - OPENAI_API_KEY

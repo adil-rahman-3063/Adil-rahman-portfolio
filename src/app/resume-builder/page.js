@@ -97,6 +97,7 @@ export default function ResumeBuilderPage() {
           title="Free ATS Resume Builder by Adil Rahman"
           className="builder-iframe"
           allow="clipboard-write"
+          suppressHydrationWarning
         />
       </main>
 

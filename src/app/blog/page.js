@@ -43,15 +43,58 @@ export default function BlogIndexPage() {
           <span className="blog-tag">// ARTICLES & THOUGHTS</span>
           <h1 className="blog-title">Engineering Stories & Notes</h1>
           <p className="blog-excerpt">
-            Behind-the-scenes engineering write-ups, experiments, and technical deep-dives into mobile architectures, PWAs, and full-stack solutions.
+            Behind-the-scenes engineering write-ups, experiments, and technical deep-dives into mobile architectures, PWAs, full-stack Next.js systems, and hardware workarounds.
           </p>
+
+          <div className="blog-author-card">
+            <p className="blog-author-text">
+              Welcome to my digital workshop journal. I am <strong>Adil Rahman</strong>, a full-stack, Flutter, and Shopify developer. 
+              This publication documents real-world engineering hurdles, unexpected bugs, and practical architectural patterns 
+              discovered while building production web apps, mobile PWAs, and custom e-commerce stores for clients worldwide.
+            </p>
+          </div>
+
           <div className="blog-header-line" />
         </div>
       </header>
 
+      {/* ── Core Domains Section ── */}
+      <section className="blog-pillars-section">
+        <div className="blog-pillars-inner">
+          <h2 className="blog-section-subtitle">// CORE ENGINEERING PILLARS</h2>
+          <div className="blog-pillars-grid">
+            <div className="pillar-card">
+              <h3 className="pillar-title">Cross-Platform & PWAs</h3>
+              <p className="pillar-desc">
+                Building native-feeling experiences in the browser with Flutter Web, touch gesture tuning, local IndexedDB caching, and offline-first service workers.
+              </p>
+            </div>
+            <div className="pillar-card">
+              <h3 className="pillar-title">Full-Stack & Edge Logic</h3>
+              <p className="pillar-desc">
+                High-performance Next.js App Router applications, Cloudflare edge functions, Supabase relational stores, and low-latency API orchestrations.
+              </p>
+            </div>
+            <div className="pillar-card">
+              <h3 className="pillar-title">Hardware & Device APIs</h3>
+              <p className="pillar-desc">
+                Interfacing directly with mobile cameras, WebRTC hardware streams, payment protocol translators, and debugging low-level device driver quirks.
+              </p>
+            </div>
+            <div className="pillar-card">
+              <h3 className="pillar-title">E-Commerce Architecture</h3>
+              <p className="pillar-desc">
+                Custom Shopify Liquid theme optimization, headless storefront integrations, checkout conversion speed, and structured inventory sync.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ── Blog Posts List ── */}
       <main className="blog-main">
         <div className="blog-list-container">
+          <h2 className="blog-section-subtitle">// PUBLISHED ARTICLES & CASE STUDIES</h2>
           {allBlogs.map((post) => (
             <Link key={post.id} href={`/blog/${post.id}`} className="blog-card-link">
               <article className="blog-card">
@@ -60,10 +103,10 @@ export default function BlogIndexPage() {
                   <span className="blog-meta-sep">·</span>
                   <span className="blog-read-time">{post.readTime}</span>
                 </div>
-                <h2 className="blog-card-title">{post.title}</h2>
+                <h3 className="blog-card-title">{post.title}</h3>
                 <p className="blog-card-excerpt">{post.excerpt}</p>
                 <span className="blog-read-cta">
-                  Read Article →
+                  Read Full Article →
                 </span>
               </article>
             </Link>
@@ -71,15 +114,54 @@ export default function BlogIndexPage() {
         </div>
       </main>
 
+      {/* ── Practical Takeaways Section ── */}
+      <section className="blog-takeaways-section">
+        <div className="blog-takeaways-inner">
+          <h2 className="blog-section-subtitle">// PRACTICAL DEVELOPMENT PRINCIPLES</h2>
+          <div className="takeaways-list">
+            <div className="takeaway-item">
+              <span className="takeaway-bullet">01.</span>
+              <div>
+                <h3 className="takeaway-heading">Embrace Optimistic UI Updates</h3>
+                <p className="takeaway-text">
+                  Perceived performance always trumps server round-trip latency. By rendering state changes immediately on the client and resolving sync asynchronously in the background, web applications feel as responsive as compiled native software.
+                </p>
+              </div>
+            </div>
+            <div className="takeaway-item">
+              <span className="takeaway-bullet">02.</span>
+              <div>
+                <h3 className="takeaway-heading">Don&apos;t Assume Hardware Is Dead</h3>
+                <p className="takeaway-text">
+                  What manifests as a black screen or unresponsive hardware sensor is frequently a frozen low-level software driver. Direct, constraint-level WebRTC queries can trigger system-level reinitializations that revive stalled modules without physical repairs.
+                </p>
+              </div>
+            </div>
+            <div className="takeaway-item">
+              <span className="takeaway-bullet">03.</span>
+              <div>
+                <h3 className="takeaway-heading">Single-Codebase Velocity</h3>
+                <p className="takeaway-text">
+                  Consolidating mobile and web experiences onto unified architectures (like Flutter Web and responsive Next.js) eliminates duplicated feature work, speeds up client releases, and dramatically simplifies ongoing maintenance.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ── Footer CTA ── */}
       <div className="blog-footer-cta">
         <div className="blog-footer-cta-inner">
           <p className="blog-footer-label">// LOOKING FOR A DEVELOPER?</p>
           <h3 className="blog-footer-title">Let&apos;s Build Something Together</h3>
           <p className="blog-footer-desc">
-            Available for freelance full-stack, mobile (Flutter), Shopify storefronts, and MVP builds worldwide.
+            Available for freelance full-stack, cross-platform mobile apps (Flutter), custom Shopify storefronts, and MVP builds worldwide.
           </p>
-          <Link href="/#contact" className="blog-cta-btn">Get In Touch</Link>
+          <div className="blog-footer-links">
+            <Link href="/#contact" className="blog-cta-btn">Get In Touch</Link>
+            <Link href="/" className="blog-secondary-btn">View Portfolio</Link>
+          </div>
         </div>
       </div>
 
@@ -157,7 +239,26 @@ export default function BlogIndexPage() {
           font-size: 14px;
           line-height: 1.7;
           color: #BCAAA4;
-          margin: 0 0 32px;
+          margin: 0 0 24px;
+        }
+
+        .blog-author-card {
+          background: rgba(42, 21, 16, 0.45);
+          border: 1px solid rgba(141, 110, 99, 0.2);
+          border-radius: 8px;
+          padding: 18px 22px;
+          margin-bottom: 32px;
+        }
+
+        .blog-author-text {
+          font-size: 13px;
+          line-height: 1.7;
+          color: #D7CCC8;
+          margin: 0;
+        }
+
+        .blog-author-text strong {
+          color: #FAF6EE;
         }
 
         .blog-header-line {
@@ -166,8 +267,60 @@ export default function BlogIndexPage() {
           width: 100%;
         }
 
+        /* Pillars Section */
+        .blog-pillars-section {
+          padding: 16px 24px 36px;
+        }
+
+        .blog-pillars-inner {
+          max-width: 760px;
+          margin: 0 auto;
+        }
+
+        .blog-section-subtitle {
+          font-size: 12px;
+          color: #8D6E63;
+          letter-spacing: 1.5px;
+          font-weight: bold;
+          margin: 0 0 18px;
+        }
+
+        .blog-pillars-grid {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 16px;
+        }
+
+        @media (min-width: 650px) {
+          .blog-pillars-grid {
+            grid-template-columns: 1fr 1fr;
+          }
+        }
+
+        .pillar-card {
+          background: rgba(42, 21, 16, 0.35);
+          border: 1px solid rgba(141, 110, 99, 0.2);
+          border-radius: 8px;
+          padding: 20px;
+        }
+
+        .pillar-title {
+          font-size: 15px;
+          color: #FAF6EE;
+          margin: 0 0 8px;
+          font-weight: bold;
+        }
+
+        .pillar-desc {
+          font-size: 12px;
+          line-height: 1.6;
+          color: #BCAAA4;
+          margin: 0;
+        }
+
+        /* Main Blog List */
         .blog-main {
-          padding: 16px 24px 64px;
+          padding: 16px 24px 48px;
         }
 
         .blog-list-container {
@@ -175,7 +328,7 @@ export default function BlogIndexPage() {
           margin: 0 auto;
           display: flex;
           flex-direction: column;
-          gap: 24px;
+          gap: 20px;
         }
 
         .blog-card-link {
@@ -244,6 +397,54 @@ export default function BlogIndexPage() {
           transform: translateX(4px);
         }
 
+        /* Takeaways Section */
+        .blog-takeaways-section {
+          padding: 24px 24px 64px;
+        }
+
+        .blog-takeaways-inner {
+          max-width: 760px;
+          margin: 0 auto;
+        }
+
+        .takeaways-list {
+          display: flex;
+          flex-direction: column;
+          gap: 18px;
+        }
+
+        .takeaway-item {
+          display: flex;
+          gap: 16px;
+          align-items: flex-start;
+          background: rgba(42, 21, 16, 0.35);
+          border: 1px solid rgba(141, 110, 99, 0.2);
+          border-radius: 8px;
+          padding: 20px;
+        }
+
+        .takeaway-bullet {
+          font-size: 14px;
+          color: #8D6E63;
+          font-weight: bold;
+          margin-top: 2px;
+        }
+
+        .takeaway-heading {
+          font-size: 15px;
+          color: #FAF6EE;
+          margin: 0 0 6px;
+          font-weight: bold;
+        }
+
+        .takeaway-text {
+          font-size: 13px;
+          line-height: 1.65;
+          color: #BCAAA4;
+          margin: 0;
+        }
+
+        /* Footer CTA */
         .blog-footer-cta {
           border-top: 1px solid rgba(141, 110, 99, 0.15);
           padding: 56px 24px;
@@ -276,6 +477,14 @@ export default function BlogIndexPage() {
           margin: 0 0 28px;
         }
 
+        .blog-footer-links {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 14px;
+          flex-wrap: wrap;
+        }
+
         .blog-cta-btn {
           display: inline-block;
           background-color: #FAF6EE;
@@ -293,6 +502,24 @@ export default function BlogIndexPage() {
           background-color: #8D6E63;
           color: #FAF6EE;
           transform: translateY(-1px);
+        }
+
+        .blog-secondary-btn {
+          display: inline-block;
+          border: 1px solid rgba(141, 110, 99, 0.4);
+          color: #FAF6EE;
+          padding: 12px 24px;
+          border-radius: 4px;
+          text-decoration: none;
+          font-size: 12px;
+          font-weight: bold;
+          letter-spacing: 0.5px;
+          transition: background-color 0.2s, border-color 0.2s;
+        }
+
+        .blog-secondary-btn:hover {
+          border-color: #FAF6EE;
+          background: rgba(250, 246, 238, 0.08);
         }
 
         @media (max-width: 600px) {

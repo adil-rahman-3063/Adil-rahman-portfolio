@@ -1,5 +1,6 @@
 'use client';
 import React, { useState } from 'react';
+import Link from 'next/link';
 
 const categories = [
   { id: 'all', label: 'ALL' },
@@ -15,9 +16,7 @@ export default function WorkArchiveSection({ projects = [], onProjectClick }) {
   const isSaas = (p) => {
     if (!p.categories) return false;
     const cats = Array.isArray(p.categories) ? p.categories : [p.categories];
-    if (cats.some((c) => typeof c === 'string' && c.toLowerCase().includes('saas'))) return true;
-    if (p.id === 'resume-editor' || p.id === 'membership-saas' || p.id === 'gym-saas' || p.id === 'teledrive') return true;
-    return false;
+    return cats.some((c) => typeof c === 'string' && c.toLowerCase().includes('saas'));
   };
 
   const isFreelance = (p) => {
@@ -97,6 +96,16 @@ export default function WorkArchiveSection({ projects = [], onProjectClick }) {
                 {project.tech.join('; ')}
               </div>
             )}
+            <div className="card-action-bar">
+              <span className="card-action-quick">Quick View →</span>
+              <Link
+                href={`/saas/${project.id}`}
+                className="card-action-direct"
+                onClick={(e) => e.stopPropagation()}
+              >
+                Page ↗
+              </Link>
+            </div>
           </div>
         ))}
       </div>
@@ -104,7 +113,12 @@ export default function WorkArchiveSection({ projects = [], onProjectClick }) {
       {/* SUBSECTION 2: SAAS PRODUCTS */}
       {saasProjects.length > 0 && (
         <>
-          <div className="archive-subsection-title">// SAAS PRODUCTS</div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px', flexWrap: 'wrap', gap: '10px' }}>
+            <div className="archive-subsection-title" style={{ marginBottom: 0 }}>// SAAS PRODUCTS</div>
+            <Link href="/saas" className="view-all-saas-chip">
+              Explore All SaaS Directory →
+            </Link>
+          </div>
           <div className="projects-grid" style={{ marginBottom: '48px' }}>
             {saasProjects.map((project) => (
               <div
@@ -125,6 +139,16 @@ export default function WorkArchiveSection({ projects = [], onProjectClick }) {
                     {project.tech.join('; ')}
                   </div>
                 )}
+                <div className="card-action-bar">
+                  <span className="card-action-quick">Quick View →</span>
+                  <Link
+                    href={`/saas/${project.id}`}
+                    className="card-action-direct"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    Dedicated SaaS Page ↗
+                  </Link>
+                </div>
               </div>
             ))}
           </div>
@@ -294,6 +318,57 @@ export default function WorkArchiveSection({ projects = [], onProjectClick }) {
           border-radius: 4px;
           white-space: nowrap;
           text-transform: uppercase;
+        }
+
+        .view-all-saas-chip {
+          font-family: var(--font-mono);
+          font-size: 11px;
+          color: #8D6E63;
+          text-decoration: none;
+          font-weight: bold;
+          border: 1px solid rgba(141, 110, 99, 0.35);
+          padding: 4px 12px;
+          border-radius: 16px;
+          transition: all 0.2s;
+        }
+        .view-all-saas-chip:hover {
+          background-color: #8D6E63;
+          color: #FAF6EE;
+        }
+
+        .card-action-bar {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          width: 100%;
+          margin-top: 16px;
+          padding-top: 10px;
+          border-top: 1px dashed rgba(141, 110, 99, 0.2);
+        }
+
+        .card-action-quick {
+          font-family: var(--font-mono);
+          font-size: 11px;
+          color: #8D6E63;
+          font-weight: bold;
+          text-decoration: underline;
+        }
+
+        .card-action-direct {
+          font-family: var(--font-mono);
+          font-size: 11px;
+          color: #8C7355;
+          text-decoration: none;
+          font-weight: bold;
+          padding: 3px 9px;
+          background: rgba(141, 110, 99, 0.08);
+          border: 1px solid rgba(141, 110, 99, 0.25);
+          border-radius: 12px;
+          transition: all 0.2s;
+        }
+        .card-action-direct:hover {
+          background: #8D6E63;
+          color: #FAF6EE;
         }
       `}</style>
     </section>

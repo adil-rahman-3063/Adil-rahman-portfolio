@@ -1,5 +1,6 @@
 'use client';
 import React, { useEffect, useState, useRef } from 'react';
+import Link from 'next/link';
 import TechMarquee from './TechMarquee';
 import InteractiveChatSection from './InteractiveChatSection';
 
@@ -108,20 +109,23 @@ export default function HeroSection({ onAccessProjects, onContactMe, onGetQuote,
   const services = [
     {
       icon: '📱',
-      title: 'Mobile App Development',
-      desc: 'Custom iOS and Android apps built with Flutter for a flawless native experience.',
+      slug: 'flutter-developer',
+      title: 'Flutter & Mobile App Development',
+      desc: 'Cross-platform iOS and Android mobile apps engineered with Flutter, offline caching, and native performance.',
       quote: 'Mobile App Development',
     },
     {
       icon: '🌐',
-      title: 'Web Development',
-      desc: 'High-performance business websites and scalable web applications.',
+      slug: 'nextjs-developer',
+      title: 'Full-Stack Web & Next.js Systems',
+      desc: 'High-performance React/Next.js web applications, multi-tenant B2B SaaS platforms, and cloud edge APIs.',
       quote: 'Web Development',
     },
     {
       icon: '🏪',
-      title: 'E-Commerce Website Development',
-      desc: 'Custom or Shopify e-commerce stores designed to convert visitors into customers.',
+      slug: 'shopify-developer',
+      title: 'Shopify Storefront & Theme Engineering',
+      desc: 'Custom Liquid themes, headless e-commerce builds, and high-conversion storefronts designed to sell.',
       quote: 'E-Commerce Website Development',
     },
   ];
@@ -163,18 +167,14 @@ export default function HeroSection({ onAccessProjects, onContactMe, onGetQuote,
           </div>
 
           <div className="hero-text-block">
-            <span className="hero-greeting">Adil Rahman</span>
+            <span className="hero-greeting">Adil Rahman // Portfolio</span>
             <h1 className="hero-headline">
-              Your go-to developer
+              Freelance Full-Stack,
               <br />
-              for App, Web & E-Commerce
-              <br />
-              solutions
+              Flutter & Shopify Developer
             </h1>
             <p className="hero-description">
-              Bringing your ideas to life by building fast, modern applications,
-              business websites, and custom e-commerce stores that help startups
-              and businesses launch quickly.
+              Building high-performance mobile apps, scalable Next.js web applications, and custom Shopify storefronts for startups and businesses worldwide. Fast turnaround, production-tested architectures, and clean code.
             </p>
             <div className="hero-cta-buttons">
               <button onClick={onContactMe} className="hero-btn-primary">
@@ -243,12 +243,17 @@ export default function HeroSection({ onAccessProjects, onContactMe, onGetQuote,
                 <div className="service-icon">{s.icon}</div>
                 <h3 className="service-card-title">{s.title}</h3>
                 <p className="service-card-desc">{s.desc}</p>
-                <button
-                  onClick={() => onGetQuote?.(s.quote)}
-                  className="service-card-btn"
-                >
-                  Get a Quote
-                </button>
+                <div className="service-card-actions">
+                  <Link href={`/services/${s.slug}`} className="service-details-link">
+                    Deliverables & Tech →
+                  </Link>
+                  <button
+                    onClick={() => onGetQuote?.(s.quote)}
+                    className="service-card-btn"
+                  >
+                    Get a Quote
+                  </button>
+                </div>
               </div>
             ))}
           </div>
@@ -697,6 +702,30 @@ export default function HeroSection({ onAccessProjects, onContactMe, onGetQuote,
           line-height: 1.5;
           margin: 0 0 22px 0;
           flex-grow: 1;
+        }
+
+        .service-card-actions {
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          margin-top: auto;
+        }
+
+        .service-details-link {
+          font-family: var(--font-mono);
+          font-size: 11px;
+          color: #BCAAA4;
+          text-decoration: none;
+          text-align: center;
+          padding: 6px 0;
+          border-bottom: 1px dashed rgba(141, 110, 99, 0.4);
+          transition: color 0.2s, border-color 0.2s;
+        }
+
+        .service-details-link:hover {
+          color: #FAF6EE;
+          border-bottom-color: #FAF6EE;
         }
 
         .service-card-btn {

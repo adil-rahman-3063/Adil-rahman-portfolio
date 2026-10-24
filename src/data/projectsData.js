@@ -160,7 +160,7 @@ export const allProjects = [
     links: [
       { text: 'GitHub Repository', url: 'https://github.com/adil-rahman-3063/Resume-Editor' },
     ],
-    categories: ['saas', 'featured', 'web-Full-Stack'],
+    categories: ['personal', 'featured', 'web-Full-Stack'],
     order: '8',
   },
   {
@@ -182,7 +182,7 @@ export const allProjects = [
     links: [
       { text: 'Live Application', url: 'https://teledrive-web.pages.dev' },
     ],
-    categories: ['saas', 'featured', 'web-Full-Stack'],
+    categories: ['personal', 'open-source', 'featured', 'web-Full-Stack'],
     order: '9',
   },
   {

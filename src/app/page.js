@@ -1,5 +1,6 @@
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
 import ParallaxBackground from '../components/ParallaxBackground';
 import CozyNav from '../components/CozyNav';
 import ScrollReveal from '../components/ScrollReveal';
@@ -360,6 +361,21 @@ export default function Home() {
 
           {/* Footer */}
           <footer className="footer-section">
+            <nav className="footer-nav" aria-label="Footer quick navigation">
+              <Link href="/resume-builder" className="footer-link">Free Resume Builder</Link>
+              <span className="footer-sep">·</span>
+              <Link href="/services" className="footer-link">Services</Link>
+              <span className="footer-sep">·</span>
+              <Link href="/saas" className="footer-link">SaaS Products</Link>
+              <span className="footer-sep">·</span>
+              <Link href="/blog" className="footer-link">Engineering Blog</Link>
+              <span className="footer-sep">·</span>
+              <button type="button" onClick={() => scrollToSection(1)} className="footer-link-btn">About</button>
+              <span className="footer-sep">·</span>
+              <button type="button" onClick={() => scrollToSection(4)} className="footer-link-btn">Projects</button>
+              <span className="footer-sep">·</span>
+              <button type="button" onClick={() => scrollToSection(8)} className="footer-link-btn">Contact</button>
+            </nav>
             <p className="footer-copyright">© 2026 Adil Rahman | All Rights Reserved</p>
             <p className="footer-version">MADE AND DEPLOYED BY ME // PORTFOLIO v3.0.0</p>
           </footer>
@@ -447,7 +463,40 @@ export default function Home() {
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 6px;
+          gap: 12px;
+        }
+
+        .footer-nav {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 12px;
+          flex-wrap: wrap;
+          margin-bottom: 6px;
+        }
+
+        .footer-link,
+        .footer-link-btn {
+          font-family: var(--font-mono);
+          font-size: 12px;
+          color: #8D6E63;
+          text-decoration: none;
+          background: none;
+          border: none;
+          cursor: pointer;
+          padding: 0;
+          letter-spacing: 0.5px;
+          transition: color 0.2s;
+        }
+
+        .footer-link:hover,
+        .footer-link-btn:hover {
+          color: #FAF6EE;
+        }
+
+        .footer-sep {
+          color: rgba(141, 110, 99, 0.4);
+          font-size: 11px;
         }
 
         .footer-copyright {

@@ -14,11 +14,14 @@ export async function generateMetadata({ params }) {
   const { id } = await params;
   const post = allBlogs.find((p) => p.id === id);
   if (!post) return {};
+  const metaTitle = post.seoTitle || `${post.title} | Adil Rahman`;
   return {
-    title: post.title,
+    title: {
+      absolute: metaTitle,
+    },
     description: post.excerpt,
     openGraph: {
-      title: post.title,
+      title: metaTitle,
       description: post.excerpt,
       url: `${SITE_URL}/blog/${id}`,
       type: 'article',
@@ -27,7 +30,7 @@ export async function generateMetadata({ params }) {
     },
     twitter: {
       card: 'summary_large_image',
-      title: post.title,
+      title: metaTitle,
       description: post.excerpt,
       creator: '@adilrahmanms',
     },
@@ -65,7 +68,7 @@ function renderMarkdown(md) {
   for (const line of lines) {
     if (line.startsWith('# ')) {
       flushList();
-      elements.push(<h1 key={key++} className="blog-h1">{inlineRender(line.slice(2))}</h1>);
+      elements.push(<h2 key={key++} className="blog-h2">{inlineRender(line.slice(2))}</h2>);
     } else if (line.startsWith('## ')) {
       flushList();
       elements.push(<h2 key={key++} className="blog-h2">{inlineRender(line.slice(3))}</h2>);

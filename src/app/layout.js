@@ -18,11 +18,11 @@ const SITE_URL = "https://adilrahman.cc";
 export const metadata = {
   // ── Title & Description ──────────────────────────────────────────────────
   title: {
-    default: "Adil Rahman | Full-Stack, Flutter & Shopify Developer",
+    default: "Freelance Full-Stack, Flutter & Shopify Developer | Adil Rahman",
     template: "%s | Adil Rahman",
   },
   description:
-    "Hire Adil Rahman — expert full-stack, Flutter & Shopify developer. I build high-performance web apps, mobile apps, and Shopify stores. Available for freelance projects worldwide.",
+    "Hire Adil Rahman — 5.0★ verified full-stack, Flutter & Shopify developer. Fast 1-3 week MVP delivery, clean code & high-converting storefronts. Get a free quote.",
 
   // ── Keywords (long-tail & intent-driven) ─────────────────────────────────
   keywords: [
@@ -76,9 +76,9 @@ export const metadata = {
     locale: "en_US",
     url: SITE_URL,
     siteName: "Adil Rahman Portfolio",
-    title: "Adil Rahman | Full-Stack, Flutter & Shopify Developer",
+    title: "Freelance Full-Stack, Flutter & Shopify Developer | Adil Rahman",
     description:
-      "Hire Adil Rahman — expert full-stack, Flutter & Shopify developer. I build high-performance web apps, mobile apps, and Shopify stores. Available for freelance projects worldwide.",
+      "Hire Adil Rahman — 5.0★ verified full-stack, Flutter & Shopify developer. Fast 1-3 week MVP delivery, clean code & high-converting storefronts. Get a free quote.",
     images: [
       {
         url: "/assets/og-image.png",
@@ -92,54 +92,105 @@ export const metadata = {
   // ── Twitter / X Card ─────────────────────────────────────────────────────
   twitter: {
     card: "summary_large_image",
-    title: "Adil Rahman | Full-Stack, Flutter & Shopify Developer",
+    title: "Freelance Full-Stack, Flutter & Shopify Developer | Adil Rahman",
     description:
-      "Hire Adil Rahman — expert full-stack, Flutter & Shopify developer. Web apps, mobile apps, Shopify stores. Freelance projects worldwide.",
+      "Hire Adil Rahman — 5.0★ verified full-stack, Flutter & Shopify developer. 1-3 week MVP delivery. Fast turnaround & high-converting stores.",
     images: ["/assets/og-image.png"],
     creator: "@adilrahmanms",
   },
-
-  // ── Google Search Console verification ───────────────────────────────────
-  // TODO: Replace the placeholder below with your real token from
-  // Search Console → Add property → HTML tag method.
-  // verification: {
-  //   google: "YOUR_GOOGLE_VERIFICATION_TOKEN",
-  // },
 };
 
-// ── JSON-LD Structured Data (Person schema) ────────────────────────────────
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Person",
-  name: "Adil Rahman",
-  url: SITE_URL,
-  jobTitle: "Full-Stack Developer & Shopify Expert",
-  description:
-    "Freelance full-stack, Flutter & Shopify developer available for web apps, mobile apps, and e-commerce projects worldwide.",
-  knowsAbout: [
-    "Flutter",
-    "React",
-    "Next.js",
-    "Shopify",
-    "Web Development",
-    "Mobile App Development",
-    "E-commerce",
-  ],
-  // Add your social profile URLs here for Knowledge Panel eligibility:
-  sameAs: [
-    "https://github.com/adil-rahman-3063",
-    "https://x.com/adilrahmanms",
-    "https://www.linkedin.com/in/adil-rahiman-3815b5290/",
-    "https://www.instagram.com/adil__rahman_/",
-  ],
-  contactPoint: {
-    "@type": "ContactPoint",
-    contactType: "customer support",
-    email: "adilrahman3063@gmail.com",
+// ── JSON-LD Structured Data (Person, ProfessionalService & FAQPage) ─────────
+const structuredSchemas = [
+  {
+    "@context": "https://schema.org",
+    "@type": "ProfessionalService",
+    name: "Adil Rahman — Software Development & Shopify Solutions",
+    image: `${SITE_URL}/assets/og-image.png`,
+    url: SITE_URL,
     telephone: "+919207114070",
-    url: `${SITE_URL}/?hire=true`,
+    priceRange: "$$",
+    address: {
+      "@type": "PostalAddress",
+      addressCountry: "IN",
+    },
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: "5.0",
+      reviewCount: "8",
+      bestRating: "5",
+      worstRating: "1",
+    },
   },
-};
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: "Adil Rahman",
+    url: SITE_URL,
+    jobTitle: "Full-Stack Developer, Flutter Engineer & Shopify Expert",
+    description:
+      "Freelance full-stack, Flutter & Shopify developer building high-performance web apps, mobile apps, and custom e-commerce storefronts worldwide.",
+    knowsAbout: [
+      "Flutter Mobile App Development",
+      "React & Next.js Full-Stack Architecture",
+      "Shopify Custom Theme & Liquid Development",
+      "Progressive Web Apps (PWAs)",
+      "Supabase & PostgreSQL Cloud Databases",
+      "Cloudflare Edge Workers & APIs",
+    ],
+    sameAs: [
+      "https://github.com/adil-rahman-3063",
+      "https://x.com/adilrahmanms",
+      "https://www.linkedin.com/in/adil-rahiman-3815b5290/",
+      "https://www.instagram.com/adil__rahman_/",
+    ],
+    contactPoint: {
+      "@type": "ContactPoint",
+      contactType: "customer support",
+      email: "adilrahman3063@gmail.com",
+      telephone: "+919207114070",
+      url: `${SITE_URL}/?hire=true`,
+    },
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "How can I hire Adil Rahman for a freelance project?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "You can hire Adil Rahman directly through his portfolio by requesting a quote, emailing adilrahman3063@gmail.com, or contacting via WhatsApp at +91 9207114070. Typical turnarounds range from 1 to 3 weeks.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "What technologies does Adil Rahman specialize in?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Adil specializes in cross-platform mobile apps with Flutter (iOS & Android), full-stack web applications with Next.js and React, custom Shopify e-commerce theme engineering with Liquid, Supabase databases, and Cloudflare Workers.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "Does Adil Rahman build custom Shopify stores and themes?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Yes, Adil develops custom Shopify themes, builds custom Liquid sections, optimizes store speed, and creates tailored e-commerce checkout flows.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "How fast can an MVP or custom web application be delivered?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Most MVP projects, progressive web apps (PWAs), and marketing websites are developed and deployed within 1 to 3 weeks.",
+        },
+      },
+    ],
+  },
+];
 
 export default function RootLayout({ children }) {
   return (
@@ -154,10 +205,10 @@ export default function RootLayout({ children }) {
       </head>
       <body suppressHydrationWarning>
         {children}
-        {/* JSON-LD Structured Data for Google Knowledge Panel */}
+        {/* JSON-LD Structured Data for Google Knowledge Panel, Star Ratings & FAQs */}
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredSchemas) }}
         />
       </body>
     </html>

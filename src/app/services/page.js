@@ -116,12 +116,12 @@ export default function ServicesHubPage() {
                   <Link href={`/services/${service.slug}`} className="service-cta">
                     View Scope & Pricing Details →
                   </Link>
-                  <a
-                    href="mailto:contact@adilrahman.cc?subject=Inquiry regarding developer services"
+                  <Link
+                    href="/?hire=true"
                     className="service-hire-btn"
                   >
-                    Direct Hire
-                  </a>
+                    Get a Quote
+                  </Link>
                 </div>
               </article>
             ))}
@@ -158,12 +158,20 @@ export default function ServicesHubPage() {
           <p className="footer-desc">
             Available for selected freelance contracts, MVPs, and long-term architectural consulting.
           </p>
-          <a
-            href="mailto:contact@adilrahman.cc?subject=New Project Engagement"
-            className="footer-cta-btn"
-          >
-            Email: contact@adilrahman.cc
-          </a>
+          <div className="footer-cta-buttons">
+            <Link
+              href="/?hire=true"
+              className="footer-cta-btn"
+            >
+              Get a Project Quote →
+            </Link>
+            <Link
+              href="/#contact"
+              className="footer-secondary-btn"
+            >
+              Contact Form
+            </Link>
+          </div>
         </div>
       </footer>
 
@@ -476,6 +484,14 @@ export default function ServicesHubPage() {
           margin: 0 auto 28px;
         }
 
+        .footer-cta-buttons {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 16px;
+          flex-wrap: wrap;
+        }
+
         .footer-cta-btn {
           display: inline-block;
           background: #8D6E63;
@@ -491,10 +507,28 @@ export default function ServicesHubPage() {
           background: #735348;
         }
 
+        .footer-secondary-btn {
+          display: inline-block;
+          border: 1px solid rgba(141, 110, 99, 0.4);
+          color: #FAF6EE;
+          padding: 12px 24px;
+          border-radius: 6px;
+          font-size: 14px;
+          font-weight: bold;
+          text-decoration: none;
+          transition: all 0.2s ease;
+        }
+        .footer-secondary-btn:hover {
+          border-color: #FAF6EE;
+          background: rgba(250, 246, 238, 0.08);
+        }
+
         @media (max-width: 600px) {
           .service-card { padding: 22px; }
           .card-footer { flex-direction: column; align-items: flex-start; }
           .service-hire-btn { width: 100%; text-align: center; }
+          .footer-cta-buttons { flex-direction: column; }
+          .footer-cta-btn, .footer-secondary-btn { width: 100%; text-align: center; }
         }
       `}</style>
     </div>

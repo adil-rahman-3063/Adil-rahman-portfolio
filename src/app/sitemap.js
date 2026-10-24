@@ -29,13 +29,6 @@ export default function sitemap() {
     priority: 0.85,
   }));
 
-  const saaRoutes = allProjects.map((project) => ({
-    url: `${SITE_URL}/saa/${project.id}`,
-    lastModified: new Date(),
-    changeFrequency: 'monthly',
-    priority: 0.8,
-  }));
-
   const serviceRoutes = allServices.map((service) => ({
     url: `${SITE_URL}/services/${service.slug}`,
     lastModified: new Date(),
@@ -63,12 +56,6 @@ export default function sitemap() {
       priority: 0.95,
     },
     {
-      url: `${SITE_URL}/saa`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.85,
-    },
-    {
       url: `${SITE_URL}/resume-builder`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
@@ -82,7 +69,6 @@ export default function sitemap() {
     },
     ...serviceRoutes,
     ...saasRoutes,
-    ...saaRoutes,
     ...blogRoutes,
   ];
 }

@@ -18,11 +18,11 @@ const SITE_URL = "https://adilrahman.cc";
 export const metadata = {
   // ── Title & Description ──────────────────────────────────────────────────
   title: {
-    default: "Freelance Full-Stack, Flutter & Shopify Developer | Adil Rahman",
+    default: "Full-Stack, Flutter & Shopify Developer | Adil Rahman",
     template: "%s | Adil Rahman",
   },
   description:
-    "Hire Adil Rahman — 5.0★ verified full-stack, Flutter & Shopify developer. Fast 1-3 week MVP delivery, clean code & high-converting storefronts. Get a free quote.",
+    "Hire Adil Rahman — 5.0★ full-stack, Flutter & Shopify developer. Fast 1-3 week MVP delivery, clean code & high-converting storefronts. Get a quote today.",
 
   // ── Keywords (long-tail & intent-driven) ─────────────────────────────────
   keywords: [

@@ -4,7 +4,9 @@ import Link from 'next/link';
 const SITE_URL = 'https://adilrahman.cc';
 
 export const metadata = {
-  title: 'SaaS Products & Cloud Applications | Adil Rahman',
+  title: {
+    absolute: 'SaaS Products & Cloud Apps | Adil Rahman',
+  },
   description: 'Production-ready SaaS products, B2B membership management platforms, offline PWAs, and custom cloud apps built by Adil Rahman.',
   openGraph: {
     title: 'SaaS Products & Cloud Applications | Adil Rahman',
@@ -23,12 +25,61 @@ export const metadata = {
   },
 };
 
+function renderProjectCard(project, defaultBadge) {
+  const liveUrlLink = project.links?.find((l) => l.url?.startsWith('http') && !l.url?.includes('github.com'));
+  const liveUrl = liveUrlLink ? liveUrlLink.url : null;
+
+  return (
+    <article key={project.id} className="saas-card-item">
+      <div className="saas-card-top">
+        <span className="saas-status-badge">{project.status}</span>
+        <span className="saas-category-badge">{defaultBadge}</span>
+      </div>
+
+      <h3 className="saas-card-name">
+        <Link href={`/saas/${project.id}`} className="saas-card-title-link">
+          {project.title}
+        </Link>
+      </h3>
+      <div className="saas-card-subtitle">{project.subtitle}</div>
+
+      <p className="saas-card-description">{project.tagline || project.description}</p>
+
+      {project.tech && project.tech.length > 0 && (
+        <div className="saas-card-tech">
+          {project.tech.map((t, i) => (
+            <span key={i} className="tech-pill">{t}</span>
+          ))}
+        </div>
+      )}
+
+      <div className="saas-card-actions">
+        <Link href={`/saas/${project.id}`} className="saas-detail-btn">
+          System Architecture & Specs →
+        </Link>
+        {liveUrl && (
+          <a href={liveUrl} target="_blank" rel="noreferrer" className="saas-live-btn">
+            Launch Live App ↗
+          </a>
+        )}
+      </div>
+    </article>
+  );
+}
+
 export default function SaasDirectoryPage() {
-  // Filter SaaS-oriented projects based purely on categories
-  const saasProjects = allProjects.filter((p) => {
-    const cats = Array.isArray(p.categories) ? p.categories : [p.categories || ''];
-    return cats.some((c) => typeof c === 'string' && c.toLowerCase().includes('saas'));
-  });
+  // Group all projects into clear architectural tiers
+  const cloudSaas = allProjects.filter((p) =>
+    ['membership-saas', 'teledrive', 'resume-editor', 'viewpick'].includes(p.id)
+  );
+
+  const mobileSystems = allProjects.filter((p) =>
+    ['zmr', 'calert', 'poshan', 'redparrot'].includes(p.id)
+  );
+
+  const enterprisePortals = allProjects.filter((p) =>
+    ['shopify', 'issaa_event'].includes(p.id)
+  );
 
   return (
     <div className="saas-directory-page">
@@ -46,17 +97,17 @@ export default function SaasDirectoryPage() {
       {/* ── Header ── */}
       <header className="saas-header">
         <div className="saas-header-inner">
-          <span className="saas-tag">// CLOUD SOFTWARE & SAAS PRODUCTS</span>
-          <h1 className="saas-title">Production SaaS Directory</h1>
+          <span className="saas-tag">// CLOUD SOFTWARE, MVPS & SAAS PLATFORMS</span>
+          <h1 className="saas-title">Production SaaS & Software Directory</h1>
           <p className="saas-excerpt">
-            Explore live, multi-tenant B2B platforms, privacy-first cloud tools, progressive web apps, and automated billing software engineered for scale and speed.
+            Explore live, multi-tenant B2B platforms, privacy-first cloud tools, progressive web apps, and automated billing software engineered for scale, responsiveness, and zero data lock-in.
           </p>
 
           <div className="saas-author-card">
             <p className="saas-author-text">
-              Every SaaS project here was designed and developed from scratch by <strong>Adil Rahman</strong>. 
-              Featuring decoupled multi-tenant architectures, Google Sheets two-way sync, Meta WhatsApp automation, 
-              and edge-accelerated Next.js workflows. Click into any application for full architecture breakdowns, live demos, and documentation.
+              Every software product here was architected, coded, and deployed from scratch by <strong>Adil Rahman</strong>. 
+              Featuring decoupled multi-tenant architectures, Google Sheets two-way sync, Meta WhatsApp Cloud API automation, 
+              Supabase edge data layers, and privacy-preserving client-side engines. Click into any application for comprehensive architectural specs, live URLs, and technical documentation.
             </p>
           </div>
 
@@ -64,53 +115,80 @@ export default function SaasDirectoryPage() {
         </div>
       </header>
 
-      {/* ── SaaS Cards Grid ── */}
+      {/* ── SaaS Directory Main Content ── */}
       <main className="saas-main">
         <div className="saas-grid-container">
-          <h2 className="saas-section-subtitle">// FEATURED SAAS APPLICATIONS</h2>
-          <div className="saas-cards-grid">
-            {saasProjects.map((project) => {
-              const liveUrlLink = project.links?.find((l) => l.url?.startsWith('http') && !l.url?.includes('github.com'));
-              const liveUrl = liveUrlLink ? liveUrlLink.url : null;
 
-              return (
-                <article key={project.id} className="saas-card-item">
-                  <div className="saas-card-top">
-                    <span className="saas-status-badge">{project.status}</span>
-                    <span className="saas-category-badge">B2B / SAAS</span>
-                  </div>
+          {/* Section 1: Flagship SaaS & Cloud Platforms */}
+          <section className="saas-tier-section">
+            <div className="tier-header">
+              <span className="tier-badge">TIER 01</span>
+              <h2 className="saas-section-subtitle">// CLOUD SAAS & B2B PLATFORMS</h2>
+              <p className="tier-desc">
+                Production-grade multi-tenant software, distributed cloud storage interfaces, and browser-based developer productivity tools.
+              </p>
+            </div>
+            <div className="saas-cards-grid">
+              {cloudSaas.map((project) => renderProjectCard(project, 'B2B / SAAS'))}
+            </div>
+          </section>
 
-                  <h3 className="saas-card-name">
-                    <Link href={`/saas/${project.id}`} className="saas-card-title-link">
-                      {project.title}
-                    </Link>
-                  </h3>
-                  <div className="saas-card-subtitle">{project.subtitle}</div>
+          {/* Section 2: Mobile Systems & AI-Powered PWAs */}
+          <section className="saas-tier-section">
+            <div className="tier-header">
+              <span className="tier-badge">TIER 02</span>
+              <h2 className="saas-section-subtitle">// MOBILE SYSTEMS & OFFLINE PWAS</h2>
+              <p className="tier-desc">
+                Cross-platform mobile applications, offline-first health trackers, on-device AI forensic engines, and educational schedulers.
+              </p>
+            </div>
+            <div className="saas-cards-grid">
+              {mobileSystems.map((project) => renderProjectCard(project, 'MOBILE / APP'))}
+            </div>
+          </section>
 
-                  <p className="saas-card-description">{project.tagline || project.description}</p>
+          {/* Section 3: Enterprise Client Portals & E-Commerce */}
+          <section className="saas-tier-section">
+            <div className="tier-header">
+              <span className="tier-badge">TIER 03</span>
+              <h2 className="saas-section-subtitle">// CLIENT PORTALS & BESPOKE COMMERCE</h2>
+              <p className="tier-desc">
+                High-converting custom Shopify storefronts, ticket verification portals with dynamic QR generation, and Google Sheets integrations.
+              </p>
+            </div>
+            <div className="saas-cards-grid">
+              {enterprisePortals.map((project) => renderProjectCard(project, 'ENTERPRISE / WEB'))}
+            </div>
+          </section>
 
-                  {project.tech && project.tech.length > 0 && (
-                    <div className="saas-card-tech">
-                      {project.tech.map((t, i) => (
-                        <span key={i} className="tech-pill">{t}</span>
-                      ))}
-                    </div>
-                  )}
+          {/* Engineering Philosophy Guide Section (Resolves Thin Content) */}
+          <section className="saas-philosophy-card">
+            <h2 className="phil-heading">// SAAS ARCHITECTURE & ENGINEERING STANDARDS</h2>
+            <div className="phil-grid">
+              <div className="phil-col">
+                <span className="phil-num">01</span>
+                <h3>Zero Lock-In Data Architecture</h3>
+                <p>
+                  Rather than forcing clients into proprietary database silos, platforms like AR Membership Manager and Poshan Abhiyaan sync bi-directionally with Google Sheets and Supabase. Clients retain full ownership of their member records and operational telemetry without vendor lock-in.
+                </p>
+              </div>
+              <div className="phil-col">
+                <span className="phil-num">02</span>
+                <h3>Edge Speed & Serverless Resilience</h3>
+                <p>
+                  Deploying on Cloudflare Workers and Next.js edge runtimes delivers sub-50ms API responses globally. Real-time WebSockets, MTProto Telegram streaming, and client-side encryption guarantee enterprise-tier security without bulky server maintenance overhead.
+                </p>
+              </div>
+              <div className="phil-col">
+                <span className="phil-num">03</span>
+                <h3>Automated Workflows & Low-Friction Ops</h3>
+                <p>
+                  Bespoke integrations with Meta WhatsApp Cloud API and UPI deep linking automate payment reminders, check-ins, and ticket verifications. Workflows run autonomously without human intervention, reducing administrative labor by over 80%.
+                </p>
+              </div>
+            </div>
+          </section>
 
-                  <div className="saas-card-actions">
-                    <Link href={`/saas/${project.id}`} className="saas-detail-btn">
-                      System Architecture & Specs →
-                    </Link>
-                    {liveUrl && (
-                      <a href={liveUrl} target="_blank" rel="noreferrer" className="saas-live-btn">
-                        Launch Live App ↗
-                      </a>
-                    )}
-                  </div>
-                </article>
-              );
-            })}
-          </div>
         </div>
       </main>
 
@@ -123,11 +201,11 @@ export default function SaasDirectoryPage() {
             Available for freelance full-stack software development, MVPs, cross-platform apps, and automated workflows.
           </p>
           <div className="footer-buttons">
-            <Link href="/#contact" className="btn-primary">
+            <Link href="/?hire=true" className="btn-primary">
               Discuss Your SaaS Project
             </Link>
-            <Link href="/blog" className="btn-secondary">
-              Read Engineering Blog
+            <Link href="/services" className="btn-secondary">
+              View Developer Services
             </Link>
           </div>
         </div>
@@ -242,12 +320,88 @@ export default function SaasDirectoryPage() {
           margin: 0 auto;
         }
 
+        .saas-tier-section {
+          margin-bottom: 56px;
+        }
+
+        .tier-header {
+          margin-bottom: 24px;
+        }
+
+        .tier-badge {
+          display: inline-block;
+          font-size: 10px;
+          letter-spacing: 1px;
+          font-weight: bold;
+          color: #8D6E63;
+          background: rgba(141, 110, 99, 0.15);
+          border: 1px solid rgba(141, 110, 99, 0.3);
+          padding: 2px 8px;
+          border-radius: 4px;
+          margin-bottom: 8px;
+        }
+
+        .tier-desc {
+          font-size: 13px;
+          color: #BCAAA4;
+          margin: 6px 0 0;
+          line-height: 1.6;
+        }
+
         .saas-section-subtitle {
-          font-size: 12px;
+          font-size: 15px;
+          color: #FAF6EE;
+          letter-spacing: 1px;
+          font-weight: bold;
+          margin: 4px 0 0;
+        }
+
+        .saas-philosophy-card {
+          background: rgba(35, 21, 19, 0.7);
+          border: 1px solid rgba(141, 110, 99, 0.25);
+          border-radius: 10px;
+          padding: 36px 32px;
+          margin: 60px 0 32px;
+        }
+
+        .phil-heading {
+          font-size: 13px;
           color: #8D6E63;
           letter-spacing: 1.5px;
           font-weight: bold;
-          margin: 0 0 24px;
+          margin: 0 0 28px;
+        }
+
+        .phil-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+          gap: 24px;
+        }
+
+        .phil-col {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .phil-num {
+          font-size: 16px;
+          color: #8D6E63;
+          font-weight: bold;
+          margin-bottom: 10px;
+        }
+
+        .phil-col h3 {
+          font-size: 14px;
+          color: #FAF6EE;
+          margin: 0 0 10px;
+          font-weight: bold;
+        }
+
+        .phil-col p {
+          font-size: 12px;
+          color: #BCAAA4;
+          line-height: 1.65;
+          margin: 0;
         }
 
         .saas-cards-grid {

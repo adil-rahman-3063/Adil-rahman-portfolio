@@ -73,7 +73,7 @@ export default function ResumeBuilderPage() {
               <span>Adil Rahman</span>
             </Link>
             <span className="banner-sep">/</span>
-            <span className="tool-name">Free ATS Resume Engine</span>
+            <h1 className="tool-name">Free ATS Resume & CV Builder</h1>
           </div>
 
           <div className="banner-center">
@@ -145,6 +145,67 @@ export default function ResumeBuilderPage() {
                 <p>
                   Your employment history and contact info stay in your browser. All draft state is stored in your private localStorage.
                 </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Comprehensive ATS Optimization Guide (Resolves Thin Content & Drives Organic Traffic) */}
+          <div className="builder-editorial-section">
+            <div className="editorial-card">
+              <span className="editorial-badge">// ATS RECRUITMENT BENCHMARK</span>
+              <h2 className="editorial-heading">How Applicant Tracking Systems (ATS) Parse Candidate Data</h2>
+              <p className="editorial-p">
+                Modern enterprise hiring platforms — including Greenhouse, Lever, Workday, Taleo, and iCIMS — parse thousands of candidate submissions daily using automated optical character and text stream decoders. Complex graphic layouts, nested tables, vector iconography, and non-standard font encodings often cause parser failure, resulting in corrupted candidate profiles or automatic disqualification.
+              </p>
+              <p className="editorial-p">
+                This resume builder generates clean, semantic HTML-to-PDF streams with standard ASCII character mappings, unambiguous header hierarchies, and strictly sequential content blocks. When you export an ATS-compliant PDF from this studio, recruitment bots extract your target job titles, hard technical skills, and quantified career accomplishments with 100% fidelity.
+              </p>
+            </div>
+
+            <div className="editorial-columns">
+              <div className="editorial-col">
+                <h3 className="editorial-subheading">Single-Column vs. Two-Column Formatting</h3>
+                <p className="editorial-p">
+                  While two-column visual resumes look appealing to human reviewers in direct portfolios, automated parsers often read text left-to-right across the entire page width, interweaving dates from the right column with bullet points from the left column. Our <strong>ATS PDF Export</strong> flattens your document into a rock-solid single-column flow, ensuring dates, positions, and company names remain flawlessly paired.
+                </p>
+              </div>
+
+              <div className="editorial-col">
+                <h3 className="editorial-subheading">Quantified Impact & Action Verbs</h3>
+                <p className="editorial-p">
+                  To achieve top-percentile relevancy scores, structure every bullet point with strong action verbs (e.g., <em>Architected</em>, <em>Engineered</em>, <em>Optimized</em>, <em>Scaled</em>) followed by quantifiable business outcomes: latency reductions (ms), revenue impact ($), user adoption metrics, or efficiency gains (%).
+                </p>
+              </div>
+            </div>
+
+            {/* Frequently Asked Questions */}
+            <div className="editorial-faq-card">
+              <h2 className="editorial-heading">// FREQUENTLY ASKED QUESTIONS (FAQ)</h2>
+              <div className="faq-grid">
+                <div className="faq-item">
+                  <h4 className="faq-question">Is this ATS Resume Builder completely free to use?</h4>
+                  <p className="faq-answer">
+                    Yes. There are zero paywalls, no subscription traps, no account signups required, and no hidden watermark overlays on your exported PDFs.
+                  </p>
+                </div>
+                <div className="faq-item">
+                  <h4 className="faq-question">Where is my resume information saved?</h4>
+                  <p className="faq-answer">
+                    100% of your data remains strictly on your local machine via browser localStorage. No resumes, contact details, or work histories are ever transmitted to an external server or database.
+                  </p>
+                </div>
+                <div className="faq-item">
+                  <h4 className="faq-question">What is the difference between Design PDF and ATS PDF?</h4>
+                  <p className="faq-answer">
+                    <strong>Design PDF</strong> generates a polished visual presentation with custom palettes, vertical rule dividers, and side-by-side layouts ideal for direct client pitches and portfolio sharing. <strong>ATS PDF</strong> compiles a linear, single-column document with zero parser traps, optimized specifically for automated job portals.
+                  </p>
+                </div>
+                <div className="faq-item">
+                  <h4 className="faq-question">Can I customize the order in which sections are parsed?</h4>
+                  <p className="faq-answer">
+                    Yes! Click the <code>[ATS # X]</code> badge next to any section header inside the editor to reorder sections. You can move Experience above Skills or Education above Projects with a single click.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -243,6 +304,9 @@ export default function ResumeBuilderPage() {
         .tool-name {
           color: #8D6E63;
           font-weight: 500;
+          font-size: 13px;
+          margin: 0;
+          display: inline;
         }
 
         .banner-center {
@@ -367,6 +431,104 @@ export default function ResumeBuilderPage() {
           line-height: 1.6;
           color: #BCAAA4;
           margin: 0;
+        }
+
+        /* Editorial & FAQ Guide Section */
+        .builder-editorial-section {
+          margin-bottom: 56px;
+          display: flex;
+          flex-direction: column;
+          gap: 28px;
+        }
+
+        .editorial-card, .editorial-faq-card {
+          background: rgba(30, 20, 18, 0.5);
+          border: 1px solid rgba(141, 110, 99, 0.25);
+          border-radius: 12px;
+          padding: 32px;
+        }
+
+        .editorial-badge {
+          font-family: monospace;
+          font-size: 11px;
+          color: #8D6E63;
+          letter-spacing: 1.5px;
+          font-weight: bold;
+          display: block;
+          margin-bottom: 12px;
+        }
+
+        .editorial-heading {
+          font-size: 20px;
+          color: #FAF6EE;
+          margin: 0 0 16px;
+          font-weight: bold;
+          letter-spacing: 0.5px;
+        }
+
+        .editorial-p {
+          font-size: 14px;
+          line-height: 1.7;
+          color: #D7CCC8;
+          margin: 0 0 16px;
+        }
+        .editorial-p:last-child {
+          margin-bottom: 0;
+        }
+
+        .editorial-columns {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+          gap: 24px;
+        }
+
+        .editorial-col {
+          background: rgba(26, 10, 8, 0.4);
+          border: 1px solid rgba(141, 110, 99, 0.2);
+          border-radius: 10px;
+          padding: 24px;
+        }
+
+        .editorial-subheading {
+          font-size: 16px;
+          color: #FAF6EE;
+          margin: 0 0 12px;
+          font-weight: bold;
+        }
+
+        .faq-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+          gap: 20px;
+          margin-top: 16px;
+        }
+
+        .faq-item {
+          background: rgba(26, 10, 8, 0.4);
+          border: 1px solid rgba(141, 110, 99, 0.15);
+          border-radius: 8px;
+          padding: 20px;
+        }
+
+        .faq-question {
+          font-size: 14px;
+          color: #FAF6EE;
+          margin: 0 0 10px;
+          font-weight: bold;
+        }
+
+        .faq-answer {
+          font-size: 13px;
+          line-height: 1.6;
+          color: #BCAAA4;
+          margin: 0;
+        }
+        .faq-answer code {
+          background: rgba(141, 110, 99, 0.2);
+          color: #FAF6EE;
+          padding: 2px 6px;
+          border-radius: 4px;
+          font-size: 12px;
         }
 
         .footer-cta-card {

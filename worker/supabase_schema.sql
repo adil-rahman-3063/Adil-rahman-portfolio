@@ -61,20 +61,148 @@ CREATE TABLE IF NOT EXISTS public.requirements (
 );
 
 -- ==============================================================================
--- 2. DISABLE ROW LEVEL SECURITY (RLS) FOR FULL PUBLIC ACCESS
+-- 2. ROW LEVEL SECURITY (RLS) POLICIES
+--    - Reviews: Read & Write access for all (public can view & submit)
+--    - Projects & SaaS: Public read, WRITE restricted to authenticated admin (you)
+--    - Requirements: Public insert (quotes/leads), READ/WRITE restricted to you
 -- ==============================================================================
-ALTER TABLE public.projects DISABLE ROW LEVEL SECURITY;
-ALTER TABLE public.saas DISABLE ROW LEVEL SECURITY;
-ALTER TABLE public.reviews DISABLE ROW LEVEL SECURITY;
-ALTER TABLE public.requirements DISABLE ROW LEVEL SECURITY;
 
--- Grants full permissions to anon and authenticated roles
-GRANT ALL ON TABLE public.projects TO anon, authenticated, service_role;
-GRANT ALL ON TABLE public.saas TO anon, authenticated, service_role;
-GRANT ALL ON TABLE public.reviews TO anon, authenticated, service_role;
-GRANT ALL ON TABLE public.requirements TO anon, authenticated, service_role;
+-- Enable RLS on all tables
+ALTER TABLE public.projects ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.saas ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.reviews ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.requirements ENABLE ROW LEVEL SECURITY;
 
-GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated, service_role;
+-- Clean existing policies if re-running
+DROP POLICY IF EXISTS "Public can view projects" ON public.projects;
+DROP POLICY IF EXISTS "Only authenticated user can insert projects" ON public.projects;
+DROP POLICY IF EXISTS "Only authenticated user can update projects" ON public.projects;
+DROP POLICY IF EXISTS "Only authenticated user can delete projects" ON public.projects;
+DROP POLICY IF EXISTS "Service role full access projects" ON public.projects;
+
+DROP POLICY IF EXISTS "Public can view saas" ON public.saas;
+DROP POLICY IF EXISTS "Only authenticated user can insert saas" ON public.saas;
+DROP POLICY IF EXISTS "Only authenticated user can update saas" ON public.saas;
+DROP POLICY IF EXISTS "Only authenticated user can delete saas" ON public.saas;
+DROP POLICY IF EXISTS "Service role full access saas" ON public.saas;
+
+DROP POLICY IF EXISTS "Public can view approved reviews" ON public.reviews;
+DROP POLICY IF EXISTS "Public can submit reviews" ON public.reviews;
+DROP POLICY IF EXISTS "Only authenticated user can update reviews" ON public.reviews;
+DROP POLICY IF EXISTS "Only authenticated user can delete reviews" ON public.reviews;
+DROP POLICY IF EXISTS "Service role full access reviews" ON public.reviews;
+
+DROP POLICY IF EXISTS "Public can submit requirements" ON public.requirements;
+DROP POLICY IF EXISTS "Only authenticated user can view requirements" ON public.requirements;
+DROP POLICY IF EXISTS "Only authenticated user can modify requirements" ON public.requirements;
+DROP POLICY IF EXISTS "Service role full access requirements" ON public.requirements;
+
+-- ─── PROJECTS POLICIES ────────────────────────────────────────────────────────
+-- Everyone can view projects
+CREATE POLICY "Public can view projects"
+  ON public.projects FOR SELECT
+  USING (true);
+
+-- Only logged in user can insert, update, delete
+CREATE POLICY "Only authenticated user can insert projects"
+  ON public.projects FOR INSERT
+  TO authenticated
+  WITH CHECK (true);
+
+CREATE POLICY "Only authenticated user can update projects"
+  ON public.projects FOR UPDATE
+  TO authenticated
+  USING (true)
+  WITH CHECK (true);
+
+CREATE POLICY "Only authenticated user can delete projects"
+  ON public.projects FOR DELETE
+  TO authenticated
+  USING (true);
+
+CREATE POLICY "Service role full access projects"
+  ON public.projects FOR ALL
+  TO service_role
+  USING (true);
+
+-- ─── SAAS POLICIES ────────────────────────────────────────────────────────────
+-- Everyone can view saas
+CREATE POLICY "Public can view saas"
+  ON public.saas FOR SELECT
+  USING (true);
+
+-- Only logged in user can write
+CREATE POLICY "Only authenticated user can insert saas"
+  ON public.saas FOR INSERT
+  TO authenticated
+  WITH CHECK (true);
+
+CREATE POLICY "Only authenticated user can update saas"
+  ON public.saas FOR UPDATE
+  TO authenticated
+  USING (true)
+  WITH CHECK (true);
+
+CREATE POLICY "Only authenticated user can delete saas"
+  ON public.saas FOR DELETE
+  TO authenticated
+  USING (true);
+
+CREATE POLICY "Service role full access saas"
+  ON public.saas FOR ALL
+  TO service_role
+  USING (true);
+
+-- ─── REVIEWS POLICIES (Read & Write for Public) ───────────────────────────────
+-- Public can view approved reviews; Logged-in admin can view all reviews
+CREATE POLICY "Public can view approved reviews"
+  ON public.reviews FOR SELECT
+  USING (approved = true OR auth.role() = 'authenticated');
+
+-- Public can write (submit) reviews
+CREATE POLICY "Public can submit reviews"
+  ON public.reviews FOR INSERT
+  WITH CHECK (true);
+
+-- Only logged in admin can approve, edit, or delete reviews
+CREATE POLICY "Only authenticated user can update reviews"
+  ON public.reviews FOR UPDATE
+  TO authenticated
+  USING (true)
+  WITH CHECK (true);
+
+CREATE POLICY "Only authenticated user can delete reviews"
+  ON public.reviews FOR DELETE
+  TO authenticated
+  USING (true);
+
+CREATE POLICY "Service role full access reviews"
+  ON public.reviews FOR ALL
+  TO service_role
+  USING (true);
+
+-- ─── REQUIREMENTS POLICIES (Inquiries & AI Leads) ─────────────────────────────
+-- Public can submit quote requests
+CREATE POLICY "Public can submit requirements"
+  ON public.requirements FOR INSERT
+  WITH CHECK (true);
+
+-- Only logged in admin can view client inquiries & private contact info
+CREATE POLICY "Only authenticated user can view requirements"
+  ON public.requirements FOR SELECT
+  TO authenticated
+  USING (true);
+
+-- Only logged in admin can delete or edit inquiries
+CREATE POLICY "Only authenticated user can modify requirements"
+  ON public.requirements FOR ALL
+  TO authenticated
+  USING (true);
+
+CREATE POLICY "Service role full access requirements"
+  ON public.requirements FOR ALL
+  TO service_role
+  USING (true);
 
 -- Helpful indexes for query performance
 CREATE INDEX IF NOT EXISTS idx_projects_order ON public.projects ("order");

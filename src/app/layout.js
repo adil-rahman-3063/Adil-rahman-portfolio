@@ -203,6 +203,27 @@ export default function RootLayout({ children }) {
           as="image"
           href="/assets/Filipino_Freelance_Graphic_Designer_Instagram_Post-removebg-preview.png"
         />
+
+        {/* Instant Subdomain Router for admin.adilrahman.cc */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var host = window.location.hostname.toLowerCase();
+                  var path = window.location.pathname;
+                  if (host.indexOf('admin.') === 0) {
+                    if (path === '/' || path === '') {
+                      window.location.replace('/admin');
+                    } else if (path.indexOf('/admin') !== 0 && path.indexOf('/api') !== 0) {
+                      window.location.replace('/admin' + path);
+                    }
+                  }
+                } catch(e) {}
+              })();
+            `,
+          }}
+        />
       </head>
       <body suppressHydrationWarning>
         {/* Google Analytics (gtag.js) */}

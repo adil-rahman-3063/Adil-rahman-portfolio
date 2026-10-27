@@ -44,6 +44,13 @@ export default function Home() {
     useRef(null), // Contact
   ];
 
+  // Redirect admin subdomain to /admin
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.location.hostname.toLowerCase().startsWith('admin.')) {
+      window.location.replace('/admin');
+    }
+  }, []);
+
   // Fetch projects from Google Sheets Apps Script on mount
   useEffect(() => {
     const fetchProjects = async (retries = 3, delay = 500) => {

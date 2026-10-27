@@ -105,8 +105,8 @@ const TOOLS = [
   },
 ];
 
-// Helper to post lead to Google Apps Script backend
-async function saveLeadToGoogleSheets(lead) {
+// Helper to post lead to Supabase (with Google Sheets fallback)
+async function saveLeadToBackend(lead) {
   try {
     const requirementText = `[AI Chat Lead] Type: ${lead.project_type || 'Unspecified'} | Budget: ${lead.budget_range || 'Unspecified'} | Timeline: ${lead.timeline || 'Unspecified'} | Details: ${lead.description || ''}`;
 
@@ -114,21 +114,50 @@ async function saveLeadToGoogleSheets(lead) {
     const isEmail = contactVal.includes('@');
     const isPhone = !isEmail && /\d/.test(contactVal);
     const isInstagram = contactVal.startsWith('@');
+    const clientEmail = isEmail ? contactVal : (lead.email || '');
+    const clientPhone = isPhone ? contactVal : (lead.phone || '');
+    const clientInstagram = isInstagram ? contactVal : (lead.instagram || '');
 
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
+
+    // 1. Direct Supabase insertion if configured
+    if (supabaseUrl && supabaseKey) {
+      const cleanUrl = supabaseUrl.replace(/\/+$/, '');
+      await fetch(`${cleanUrl}/rest/v1/requirements`, {
+        method: 'POST',
+        headers: {
+          apikey: supabaseKey,
+          Authorization: `Bearer ${supabaseKey}`,
+          'Content-Type': 'application/json',
+          Prefer: 'return=representation',
+        },
+        body: JSON.stringify({
+          name: lead.name || 'Anonymous Client',
+          email: clientEmail,
+          phone: clientPhone,
+          instagram: clientInstagram,
+          requirement: requirementText,
+        }),
+      });
+      return;
+    }
+
+    // 2. Fallback to Google Sheets
     await fetch(GOOGLE_SHEETS_ENDPOINT, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         type: 'requirement',
         name: lead.name || 'Anonymous Client',
-        phone: isPhone ? contactVal : (lead.phone || ''),
-        email: isEmail ? contactVal : (lead.email || ''),
-        instagram: isInstagram ? contactVal : (lead.instagram || ''),
+        phone: clientPhone,
+        email: clientEmail,
+        instagram: clientInstagram,
         requirement: requirementText,
       }),
     });
   } catch (e) {
-    console.error('Failed to submit lead to Google Sheets:', e);
+    console.error('Failed to submit lead to backend:', e);
   }
 }
 
@@ -431,7 +460,7 @@ async function handleChoiceResponse(choice, lastUserMessage) {
     if (submitCall) {
       try {
         const args = JSON.parse(submitCall.function.arguments || '{}');
-        await saveLeadToGoogleSheets(args);
+        await saveLeadToBackend(args);
 
         const waText = encodeURIComponent(
           `Hi Adil, I'm ${args.name || 'a client'}. I'm interested in building a ${args.project_type || 'project'}: ${args.description || ''}`

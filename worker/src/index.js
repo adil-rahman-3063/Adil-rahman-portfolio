@@ -1,9 +1,18 @@
 /**
  * Cloudflare Worker Backend for Adil Rahman Portfolio (adilrahman.cc)
+ * Powered by Supabase PostgreSQL Database & OpenAI
+ * 
  * Handles:
  * 1. AI Chat Completions with OpenAI (Model & Key secured in Worker environment)
- * 2. Automated tool-calling lead capture (submit_requirement)
- * 3. Secure proxy to Google Apps Script (Projects, Reviews, Requirements)
+ * 2. Automated tool-calling lead capture (submit_requirement -> saved directly to Supabase)
+ * 3. Portfolio API Gateway backed by Supabase:
+ *    - GET  /api/projects      -> Fetch active projects from Supabase 'projects' table
+ *    - GET  /api/saas          -> Fetch dedicated SaaS products from Supabase 'saas' table
+ *    - GET  /api/reviews       -> Fetch approved client reviews from Supabase 'reviews' table
+ *    - POST /api/reviews       -> Submit new client review to Supabase
+ *    - POST /api/requirements  -> Submit quote requirement/lead to Supabase
+ * 4. Google Apps Script Bridge:
+ *    - Dispatches instant email notification triggers to Apps Script for mailing Adil
  */
 
 const SYSTEM_PROMPT = `You are the AI assistant on Adil Rahman's freelance developer portfolio site (adilrahman.cc).
@@ -115,7 +124,7 @@ function corsHeaders() {
   return {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization, apikey',
   };
 }
 
@@ -129,7 +138,36 @@ function jsonResponse(data, status = 200) {
   });
 }
 
-// Fallback logic when no API key is provided
+// ─── SUPABASE REST HELPER (POSTGREST) ───────────────────────────────────────────
+async function supabaseQuery(endpoint, env, options = {}) {
+  const supabaseUrl = env.SUPABASE_URL;
+  const supabaseKey = env.SUPABASE_SERVICE_ROLE_KEY || env.SUPABASE_ANON_KEY;
+
+  if (!supabaseUrl || !supabaseKey) {
+    throw new Error('Supabase credentials (SUPABASE_URL and SUPABASE_ANON_KEY / SUPABASE_SERVICE_ROLE_KEY) are not configured.');
+  }
+
+  const cleanUrl = supabaseUrl.replace(/\/+$/, '');
+  const targetUrl = `${cleanUrl}/rest/v1/${endpoint}`;
+
+  const headers = {
+    apikey: supabaseKey,
+    Authorization: `Bearer ${supabaseKey}`,
+    'Content-Type': 'application/json',
+    Prefer: options.prefer || 'return=representation',
+    ...(options.headers || {}),
+  };
+
+  const response = await fetch(targetUrl, {
+    method: options.method || 'GET',
+    headers,
+    body: options.body ? JSON.stringify(options.body) : undefined,
+  });
+
+  return response;
+}
+
+// Fallback logic when no AI key is provided
 function getFallbackResponse(message) {
   const lower = message.toLowerCase().trim();
 
@@ -260,7 +298,7 @@ function getFallbackResponse(message) {
   return "I'm Adil's assistant. He builds mobile apps (Flutter), websites & web apps (Next.js/React), custom e-commerce & Shopify stores, and workflow automations. What can he build for you?";
 }
 
-// Handler for AI Chat
+// ─── AI CHAT HANDLER ───────────────────────────────────────────────────────────
 async function handleChat(request, env) {
   try {
     const { messages } = await request.json();
@@ -271,7 +309,6 @@ async function handleChat(request, env) {
     const lastUserMessage = messages[messages.length - 1]?.content || '';
     const apiKey = env.OPENAI_API_KEY;
     const model = env.MODEL_PRIMARY || 'gpt-4.1-nano';
-    const appsScriptUrl = env.APPS_SCRIPT_URL || 'https://script.google.com/macros/s/AKfycbx9kD2SMJtPkG9g4I-1nkL7FJvNgeHEMeaBhaMmjfAU74ughomLS95mpkGeu8zteGikfw/exec';
 
     if (!apiKey) {
       const fallback = getFallbackResponse(lastUserMessage);
@@ -289,7 +326,6 @@ async function handleChat(request, env) {
       if (!selectedModel.includes('/')) {
         selectedModel = selectedModel.startsWith('gpt-') ? `openai/${selectedModel}` : 'openai/gpt-4o-mini';
       }
-      // If user specified gpt-4.1-nano which isn't on OpenRouter, use openai/gpt-4o-mini
       if (selectedModel.includes('gpt-4.1-nano')) {
         selectedModel = 'openai/gpt-4o-mini';
       }
@@ -348,7 +384,7 @@ async function handleChat(request, env) {
 
         if (fallbackRes.ok) {
           const data = await fallbackRes.json();
-          return await processChoice(data.choices?.[0], lastUserMessage, appsScriptUrl);
+          return await processChoice(data.choices?.[0], lastUserMessage, env);
         }
       }
 
@@ -357,13 +393,13 @@ async function handleChat(request, env) {
     }
 
     const data = await openaiRes.json();
-    return await processChoice(data.choices?.[0], lastUserMessage, appsScriptUrl);
+    return await processChoice(data.choices?.[0], lastUserMessage, env);
   } catch (err) {
     return jsonResponse({ error: 'Internal chat error: ' + err.toString() }, 500);
   }
 }
 
-async function processChoice(choice, lastUserMessage, appsScriptUrl) {
+async function processChoice(choice, lastUserMessage, env) {
   if (!choice) {
     return jsonResponse({ reply: getFallbackResponse(lastUserMessage) });
   }
@@ -375,7 +411,6 @@ async function processChoice(choice, lastUserMessage, appsScriptUrl) {
       try {
         const args = JSON.parse(submitCall.function.arguments || '{}');
 
-        // Post to Google Apps Script
         const requirementText = `[AI Lead via Worker] Type: ${args.project_type || 'Unspecified'} | Budget: ${args.budget_range || 'Unspecified'} | Timeline: ${args.timeline || 'Unspecified'} | Details: ${args.description || ''}`;
 
         const clientEmail = args.email || (args.contact && args.contact.includes('@') ? args.contact : '');
@@ -383,18 +418,39 @@ async function processChoice(choice, lastUserMessage, appsScriptUrl) {
         const clientInsta = args.instagram || (args.contact && args.contact.startsWith('@') ? args.contact : '');
         const primaryContact = clientEmail || clientPhone || clientInsta || args.contact || 'your email/phone';
 
-        await fetch(appsScriptUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            type: 'requirement',
-            name: args.name || 'Anonymous Client',
-            phone: clientPhone,
-            email: clientEmail,
-            instagram: clientInsta,
-            requirement: requirementText,
-          }),
-        });
+        // 1. Direct Insert into Supabase 'requirements' table
+        if (env.SUPABASE_URL && (env.SUPABASE_ANON_KEY || env.SUPABASE_SERVICE_ROLE_KEY)) {
+          try {
+            await supabaseQuery('requirements', env, {
+              method: 'POST',
+              body: {
+                name: args.name || 'Anonymous Client',
+                email: clientEmail,
+                phone: clientPhone,
+                instagram: clientInsta,
+                requirement: requirementText,
+              },
+            });
+          } catch (dbErr) {
+            console.error('Failed to save AI lead into Supabase:', dbErr);
+          }
+        }
+
+        // 2. Dispatch to Google Apps Script for instant email alert if configured
+        if (env.APPS_SCRIPT_URL) {
+          fetch(env.APPS_SCRIPT_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'requirement',
+              name: args.name || 'Anonymous Client',
+              phone: clientPhone,
+              email: clientEmail,
+              instagram: clientInsta,
+              requirement: requirementText,
+            }),
+          }).catch((e) => console.error('Failed to notify Apps Script:', e));
+        }
 
         const waText = encodeURIComponent(
           `Hi Adil, I'm ${args.name || 'a client'}. I'm interested in building a ${args.project_type || 'project'}: ${args.description || ''}`
@@ -417,9 +473,190 @@ async function processChoice(choice, lastUserMessage, appsScriptUrl) {
   return jsonResponse({ reply });
 }
 
-// Proxy to Google Apps Script for Projects, Reviews, Requirements
-async function handleProxy(request, env) {
-  const appsScriptUrl = env.APPS_SCRIPT_URL || 'https://script.google.com/macros/s/AKfycbx9kD2SMJtPkG9g4I-1nkL7FJvNgeHEMeaBhaMmjfAU74ughomLS95mpkGeu8zteGikfw/exec';
+// ─── PROJECTS & SAAS HANDLER (SUPABASE) ────────────────────────────────────────
+async function handleProjects(request, env) {
+  const url = new URL(request.url);
+  const action = url.searchParams.get('action') || '';
+
+  // Fallback to Apps Script if Supabase is not configured yet
+  if (!env.SUPABASE_URL || (!env.SUPABASE_ANON_KEY && !env.SUPABASE_SERVICE_ROLE_KEY)) {
+    if (env.APPS_SCRIPT_URL) return handleLegacyProxy(request, env);
+    return jsonResponse({ error: 'Supabase credentials not configured in Worker' }, 500);
+  }
+
+  try {
+    if (action === 'getSaas' || url.pathname === '/api/saas') {
+      // First try dedicated saas table
+      const saasRes = await supabaseQuery('saas?select=*&order=order.asc.nullslast', env);
+      if (saasRes.ok) {
+        const saasData = await saasRes.json();
+        if (Array.isArray(saasData) && saasData.length > 0) {
+          return jsonResponse(saasData);
+        }
+      }
+
+      // Fallback: search projects table for saas category
+      const projRes = await supabaseQuery('projects?categories=ilike.*saas*&select=*&order=order.asc.nullslast', env);
+      if (projRes.ok) {
+        const data = await projRes.json();
+        return jsonResponse(data);
+      }
+      return jsonResponse([]);
+    }
+
+    // Default: getProjects
+    const res = await supabaseQuery('projects?select=*&order=order.asc.nullslast', env);
+    if (!res.ok) {
+      const err = await res.text();
+      return jsonResponse({ error: 'Supabase projects query failed: ' + err }, res.status);
+    }
+    const data = await res.json();
+    return jsonResponse(data);
+  } catch (err) {
+    return jsonResponse({ error: err.toString() }, 500);
+  }
+}
+
+// ─── REVIEWS & REQUIREMENTS HANDLER (SUPABASE) ─────────────────────────────────
+async function handleReviews(request, env) {
+  if (request.method === 'GET') {
+    if (!env.SUPABASE_URL || (!env.SUPABASE_ANON_KEY && !env.SUPABASE_SERVICE_ROLE_KEY)) {
+      if (env.APPS_SCRIPT_URL) return handleLegacyProxy(request, env);
+      return jsonResponse([]);
+    }
+
+    try {
+      const res = await supabaseQuery('reviews?approved=eq.true&order=created_at.desc&select=*', env);
+      if (!res.ok) {
+        const err = await res.text();
+        return jsonResponse({ error: 'Supabase reviews query failed: ' + err }, res.status);
+      }
+      const data = await res.json();
+      const formatted = (Array.isArray(data) ? data : []).map((r) => ({
+        name: r.name || '',
+        role: r.role || '',
+        rating: Number(r.rating) || 5,
+        review: r.review || '',
+        timestamp: r.created_at || '',
+        project: r.project ? String(r.project) : '',
+      }));
+      return jsonResponse(formatted);
+    } catch (err) {
+      return jsonResponse({ error: err.toString() }, 500);
+    }
+  }
+
+  if (request.method === 'POST') {
+    let postData;
+    try {
+      postData = await request.json();
+    } catch {
+      return jsonResponse({ status: 'error', message: 'Invalid JSON body' }, 400);
+    }
+
+    // Check if this is a Project Requirement submission
+    if (postData.type === 'requirement' || ((postData.phone || postData.email || postData.instagram) && postData.requirement)) {
+      const name = (postData.name || '').trim();
+      const phone = (postData.phone || '').trim();
+      const email = (postData.email || '').trim();
+      const instagram = (postData.instagram || '').trim();
+      const requirement = (postData.requirement || '').trim();
+
+      if (!name || (!phone && !email && !instagram) || !requirement) {
+        return jsonResponse(
+          { status: 'error', message: 'Name, contact detail (email, phone, or Instagram), and requirements are required.' },
+          400
+        );
+      }
+
+      if (!env.SUPABASE_URL || (!env.SUPABASE_ANON_KEY && !env.SUPABASE_SERVICE_ROLE_KEY)) {
+        if (env.APPS_SCRIPT_URL) return handleLegacyProxy(request, env);
+        return jsonResponse({ status: 'error', message: 'Supabase credentials not configured' }, 500);
+      }
+
+      const res = await supabaseQuery('requirements', env, {
+        method: 'POST',
+        body: {
+          name,
+          phone,
+          email,
+          instagram,
+          requirement,
+        },
+      });
+
+      if (!res.ok) {
+        const err = await res.text();
+        return jsonResponse({ status: 'error', message: 'Supabase insert failed: ' + err }, res.status);
+      }
+
+      // Dispatch alert to Google Apps Script for instant email notification
+      if (env.APPS_SCRIPT_URL) {
+        fetch(env.APPS_SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(postData),
+        }).catch((e) => console.error('Failed to notify Apps Script:', e));
+      }
+
+      return jsonResponse({ status: 'success', message: 'Requirement submitted successfully.' });
+    }
+
+    // Review submission flow
+    const name = (postData.name || '').trim();
+    const role = (postData.role || '').trim();
+    const rating = Number(postData.rating) || 5;
+    const review = (postData.review || '').trim();
+    const project = postData.project ? String(postData.project).trim() : '';
+
+    if (!name || !review) {
+      return jsonResponse({ status: 'error', message: 'Name and review text are required.' }, 400);
+    }
+
+    if (!env.SUPABASE_URL || (!env.SUPABASE_ANON_KEY && !env.SUPABASE_SERVICE_ROLE_KEY)) {
+      if (env.APPS_SCRIPT_URL) return handleLegacyProxy(request, env);
+      return jsonResponse({ status: 'error', message: 'Supabase credentials not configured' }, 500);
+    }
+
+    const res = await supabaseQuery('reviews', env, {
+      method: 'POST',
+      body: {
+        name,
+        role,
+        rating,
+        review,
+        project,
+        approved: true,
+      },
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      return jsonResponse({ status: 'error', message: 'Supabase insert failed: ' + err }, res.status);
+    }
+
+    // Dispatch alert to Google Apps Script for instant email notification
+    if (env.APPS_SCRIPT_URL) {
+      fetch(env.APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(postData),
+      }).catch((e) => console.error('Failed to notify Apps Script:', e));
+    }
+
+    return jsonResponse({ status: 'success', message: 'Review submitted successfully.' });
+  }
+
+  return jsonResponse({ error: 'Method not allowed' }, 405);
+}
+
+// Legacy fallback proxy to Google Apps Script (in case Supabase is temporarily absent)
+async function handleLegacyProxy(request, env) {
+  const appsScriptUrl = env.APPS_SCRIPT_URL;
+  if (!appsScriptUrl) {
+    return jsonResponse({ error: 'Neither Supabase nor Apps Script URL is configured' }, 500);
+  }
+
   const url = new URL(request.url);
 
   if (request.method === 'GET') {
@@ -456,6 +693,7 @@ async function handleProxy(request, env) {
   return jsonResponse({ error: 'Method not allowed' }, 405);
 }
 
+// ─── WORKER FETCH ROUTER ───────────────────────────────────────────────────────
 export default {
   async fetch(request, env, ctx) {
     // Handle CORS preflight
@@ -472,9 +710,11 @@ export default {
     if (path === '/' || path === '/health') {
       return jsonResponse({
         status: 'online',
-        service: 'Adil Rahman Portfolio Cloudflare Gateway',
-        version: '1.0.0',
+        service: 'Adil Rahman Portfolio Cloudflare Gateway (Supabase Backend)',
+        version: '2.0.0',
         model: env.MODEL_PRIMARY || 'gpt-4.1-nano',
+        supabaseConfigured: Boolean(env.SUPABASE_URL && (env.SUPABASE_ANON_KEY || env.SUPABASE_SERVICE_ROLE_KEY)),
+        appsScriptMailerConfigured: Boolean(env.APPS_SCRIPT_URL),
       });
     }
 
@@ -482,8 +722,12 @@ export default {
       return handleChat(request, env);
     }
 
-    if (path === '/api/projects' || path === '/api/saas' || path === '/api/reviews' || path === '/api/requirements') {
-      return handleProxy(request, env);
+    if (path === '/api/projects' || path === '/api/saas') {
+      return handleProjects(request, env);
+    }
+
+    if (path === '/api/reviews' || path === '/api/requirements') {
+      return handleReviews(request, env);
     }
 
     return jsonResponse({ error: 'Not Found' }, 404);

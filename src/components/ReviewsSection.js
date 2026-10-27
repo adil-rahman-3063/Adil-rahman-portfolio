@@ -9,7 +9,21 @@ const defaultReviews = [
     role: 'CEO',
     rating: 5,
     review: 'I had a great experience working with Adil Rehman on the T2 Autohaus website. From the beginning, he understood the vision of creating a professional automotive brand and delivered a clean, modern Shopify store that reflects our business well. He was responsive, patient with revisions, and always willing to implement changes until everything matched what we wanted. The website is well-structured, easy to navigate, and provides a solid foundation for our growing business. I appreciate his professionalism, communication, and commitment throughout the project. I would confidently recommend Adil Rehman to anyone looking for a reliable Shopify website developer. Thank you, Adil, for helping bring the T2 Autohaus vision to life. I wish you continued success.',
-    project: '6',
+    project: 'shopify',
+  },
+  {
+    name: 'Mohamed Musthafa',
+    role: 'Retired Teacher (Govt)',
+    rating: 5,
+    review: 'Wonderful Excellent',
+    project: 'issaa',
+  },
+  {
+    name: 'Basil',
+    role: 'Merchant navy',
+    rating: 5,
+    review: 'A huge congratulations and heartfelt thanks for creating the registration app for our Alumni Program!\n\nThe effort you put into developing this app, along with your innovative ideas and smooth implementation, made the entire registration process seamless and impressive. It’s truly commendable to see someone of your age take such initiative and execute it so brilliantly.\n\nKeep shining, keep innovating, and continue setting the bar high! Wishing you all the best for your future endeavors.',
+    project: 'issaa',
   }
 ];
 
@@ -96,7 +110,7 @@ export default function ReviewsSection({ projects = allProjects, onProjectClick 
         <div className="reviews-grid">
           {reviews.map((r, idx) => {
             const matchedProject = (projects || []).find(
-              (p) => (r.project && String(p.order) === String(r.project)) || (r.project && p.id === String(r.project))
+              (p) => (r.project && p.id === String(r.project)) || (r.project && String(p.order) === String(r.project))
             );
 
             return (
@@ -800,7 +814,7 @@ export function ReviewFormModal({ projects = allProjects, onClose }) {
             >
               <option value="" style={{ background: '#231513', color: '#EFEBE9' }}>-- Select Project --</option>
               {(projects || []).map((p) => (
-                <option key={p.id} value={p.order || p.id} style={{ background: '#231513', color: '#EFEBE9' }}>
+                <option key={p.id} value={p.id} style={{ background: '#231513', color: '#EFEBE9' }}>
                   {p.title} {p.subtitle ? `(${p.subtitle})` : ''}
                 </option>
               ))}

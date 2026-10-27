@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { supabase } from '../../lib/supabaseClient';
 
@@ -13,24 +13,31 @@ export default function AdminPage() {
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState(null);
   const [loginLoading, setLoginLoading] = useState(false);
-  const [isSignUp, setIsSignUp] = useState(false);
-  const [authMessage, setAuthMessage] = useState(null);
 
-  // Dashboard state
-  const [activeTab, setActiveTab] = useState('requirements'); // 'requirements' | 'reviews' | 'projects'
+  // Navigation tab: 'overview' | 'requirements' | 'projects' | 'reviews'
+  const [activeTab, setActiveTab] = useState('overview');
+
+  // Database records
   const [requirements, setRequirements] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [projects, setProjects] = useState([]);
   const [dataLoading, setDataLoading] = useState(false);
   const [actionMsg, setActionMsg] = useState(null);
 
-  // New review form
-  const [showAddReview, setShowAddReview] = useState(false);
-  const [newReview, setNewReview] = useState({ name: '', role: '', rating: 5, review: '', project: 'shopify' });
+  // Search queries
+  const [reqSearch, setReqSearch] = useState('');
+  const [projSearch, setProjSearch] = useState('');
+  const [reviewFilter, setReviewFilter] = useState('all'); // 'all' | 'approved' | 'pending'
 
-  // New project form
+  // Modals & Editing states
   const [showAddProject, setShowAddProject] = useState(false);
-  const [newProject, setNewProject] = useState({
+  const [editingProject, setEditingProject] = useState(null);
+
+  const [showAddReview, setShowAddReview] = useState(false);
+  const [editingReview, setEditingReview] = useState(null);
+
+  // Form templates
+  const initialProjectForm = {
     id: '',
     title: '',
     subtitle: '',
@@ -39,13 +46,24 @@ export default function AdminPage() {
     description: '',
     features: '',
     tech: '',
-    link_texts: '',
+    link_texts: 'Live Application',
     link_urls: '',
     categories: 'featured, web-Full-Stack',
     order: 1,
-  });
+  };
+  const [projectForm, setProjectForm] = useState(initialProjectForm);
 
-  // Check auth on mount
+  const initialReviewForm = {
+    name: '',
+    role: '',
+    rating: 5,
+    review: '',
+    project: 'shopify',
+    approved: true,
+  };
+  const [reviewForm, setReviewForm] = useState(initialReviewForm);
+
+  // Check auth session on mount
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
@@ -60,53 +78,42 @@ export default function AdminPage() {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Fetch data when logged in or tab changes
+  // Fetch all tables when logged in
   useEffect(() => {
     if (session) {
-      fetchDashboardData();
+      fetchAllData();
     }
-  }, [session, activeTab]);
+  }, [session]);
 
-  const fetchDashboardData = async () => {
+  const fetchAllData = async () => {
     setDataLoading(true);
     setActionMsg(null);
     try {
-      if (activeTab === 'requirements') {
-        const { data, error } = await supabase
-          .from('requirements')
-          .select('*')
-          .order('created_at', { ascending: false });
-        if (!error && data) setRequirements(data);
-      } else if (activeTab === 'reviews') {
-        const { data, error } = await supabase
-          .from('reviews')
-          .select('*')
-          .order('created_at', { ascending: false });
-        if (!error && data) setReviews(data);
-      } else if (activeTab === 'projects') {
-        const { data, error } = await supabase
-          .from('projects')
-          .select('*')
-          .order('order', { ascending: true });
-        if (!error && data) setProjects(data);
-      }
+      const [reqRes, revRes, projRes] = await Promise.all([
+        supabase.from('requirements').select('*').order('created_at', { ascending: false }),
+        supabase.from('reviews').select('*').order('created_at', { ascending: false }),
+        supabase.from('projects').select('*').order('order', { ascending: true }),
+      ]);
+
+      if (reqRes.data) setRequirements(reqRes.data);
+      if (revRes.data) setReviews(revRes.data);
+      if (projRes.data) setProjects(projRes.data);
     } catch (err) {
-      console.error('Fetch error:', err);
+      console.error('Data fetch error:', err);
     } finally {
       setDataLoading(false);
     }
   };
 
-  const handleAuth = async (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setLoginError(null);
     setLoginLoading(true);
-
     try {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
     } catch (err) {
-      setLoginError(err.message || 'Invalid credentials or login failed');
+      setLoginError(err.message || 'Invalid email or password');
     } finally {
       setLoginLoading(false);
     }
@@ -116,108 +123,228 @@ export default function AdminPage() {
     await supabase.auth.signOut();
   };
 
-  // Reviews actions
-  const toggleReviewApproval = async (id, currentVal) => {
+  const notify = (msg) => {
+    setActionMsg(msg);
+    setTimeout(() => setActionMsg(null), 4000);
+  };
+
+  // ─── PROJECT CRUD ─────────────────────────────────────────────────────────────
+  const openEditProject = (proj) => {
+    setEditingProject(proj);
+    setProjectForm({
+      id: proj.id,
+      title: proj.title || '',
+      subtitle: proj.subtitle || '',
+      status: proj.status || '',
+      tagline: proj.tagline || '',
+      description: proj.description || '',
+      features: proj.features || '',
+      tech: proj.tech || '',
+      link_texts: proj.link_texts || '',
+      link_urls: proj.link_urls || '',
+      categories: proj.categories || '',
+      order: proj.order !== undefined ? proj.order : 0,
+    });
+    setShowAddProject(true);
+  };
+
+  const handleSaveProject = async (e) => {
+    e.preventDefault();
+    if (!projectForm.id.trim() || !projectForm.title.trim()) {
+      alert('Project ID and Title are required.');
+      return;
+    }
+
+    const payload = {
+      id: projectForm.id.trim().toLowerCase(),
+      title: projectForm.title.trim(),
+      subtitle: projectForm.subtitle.trim(),
+      status: projectForm.status.trim(),
+      tagline: projectForm.tagline.trim(),
+      description: projectForm.description.trim(),
+      features: projectForm.features.trim(),
+      tech: projectForm.tech.trim(),
+      link_texts: projectForm.link_texts.trim(),
+      link_urls: projectForm.link_urls.trim(),
+      categories: projectForm.categories.trim(),
+      order: Number(projectForm.order) || 0,
+    };
+
+    if (editingProject) {
+      // UPDATE
+      const { error } = await supabase
+        .from('projects')
+        .update(payload)
+        .eq('id', editingProject.id);
+
+      if (error) {
+        alert('Update failed: ' + error.message);
+        return;
+      }
+
+      // Also update saas table if exists
+      if (payload.categories.toLowerCase().includes('saas')) {
+        await supabase.from('saas').upsert([payload]);
+      } else {
+        await supabase.from('saas').delete().eq('id', payload.id);
+      }
+
+      setProjects(projects.map((p) => (p.id === editingProject.id ? { ...p, ...payload } : p)));
+      notify(`Project "${payload.title}" updated successfully!`);
+    } else {
+      // INSERT NEW
+      const { error, data } = await supabase.from('projects').insert([payload]).select();
+      if (error) {
+        alert('Creation failed: ' + error.message);
+        return;
+      }
+      if (payload.categories.toLowerCase().includes('saas')) {
+        await supabase.from('saas').upsert([payload]);
+      }
+      setProjects([...projects, data[0]]);
+      notify(`Project "${payload.title}" added to Supabase!`);
+    }
+
+    setShowAddProject(false);
+    setEditingProject(null);
+    setProjectForm(initialProjectForm);
+  };
+
+  const handleDeleteProject = async (id, title) => {
+    if (!confirm(`Are you sure you want to permanently delete "${title || id}"?`)) return;
+    const { error } = await supabase.from('projects').delete().eq('id', id);
+    if (!error) {
+      await supabase.from('saas').delete().eq('id', id);
+      setProjects(projects.filter((p) => p.id !== id));
+      notify(`Project "${id}" deleted.`);
+    } else {
+      alert('Delete failed: ' + error.message);
+    }
+  };
+
+  // ─── REVIEW CRUD ──────────────────────────────────────────────────────────────
+  const openEditReview = (rev) => {
+    setEditingReview(rev);
+    setReviewForm({
+      name: rev.name || '',
+      role: rev.role || '',
+      rating: Number(rev.rating) || 5,
+      review: rev.review || '',
+      project: rev.project || '',
+      approved: Boolean(rev.approved),
+    });
+    setShowAddReview(true);
+  };
+
+  const handleSaveReview = async (e) => {
+    e.preventDefault();
+    if (!reviewForm.name.trim() || !reviewForm.review.trim()) {
+      alert('Reviewer Name and Review text are required.');
+      return;
+    }
+
+    const payload = {
+      name: reviewForm.name.trim(),
+      role: reviewForm.role.trim(),
+      rating: Number(reviewForm.rating) || 5,
+      review: reviewForm.review.trim(),
+      project: reviewForm.project.trim(),
+      approved: Boolean(reviewForm.approved),
+    };
+
+    if (editingReview) {
+      // UPDATE
+      const { error } = await supabase.from('reviews').update(payload).eq('id', editingReview.id);
+      if (error) {
+        alert('Update failed: ' + error.message);
+        return;
+      }
+      setReviews(reviews.map((r) => (r.id === editingReview.id ? { ...r, ...payload } : r)));
+      notify(`Review from "${payload.name}" updated!`);
+    } else {
+      // INSERT NEW
+      const { data, error } = await supabase.from('reviews').insert([payload]).select();
+      if (error) {
+        alert('Insert failed: ' + error.message);
+        return;
+      }
+      setReviews([data[0], ...reviews]);
+      notify(`Verified review added!`);
+    }
+
+    setShowAddReview(false);
+    setEditingReview(null);
+    setReviewForm(initialReviewForm);
+  };
+
+  const toggleApproval = async (id, currentVal) => {
     const { error } = await supabase
       .from('reviews')
       .update({ approved: !currentVal })
       .eq('id', id);
     if (!error) {
       setReviews(reviews.map((r) => (r.id === id ? { ...r, approved: !currentVal } : r)));
-      setActionMsg('Review status updated!');
+      notify(!currentVal ? 'Review approved for public display!' : 'Review hidden from public.');
     }
   };
 
-  const deleteReview = async (id) => {
-    if (!confirm('Are you sure you want to delete this review?')) return;
+  const handleDeleteReview = async (id, name) => {
+    if (!confirm(`Delete review from "${name}"?`)) return;
     const { error } = await supabase.from('reviews').delete().eq('id', id);
     if (!error) {
       setReviews(reviews.filter((r) => r.id !== id));
-      setActionMsg('Review deleted.');
+      notify('Review deleted.');
     }
   };
 
-  const handleCreateReview = async (e) => {
-    e.preventDefault();
-    const { data, error } = await supabase.from('reviews').insert([
-      {
-        name: newReview.name,
-        role: newReview.role,
-        rating: Number(newReview.rating) || 5,
-        review: newReview.review,
-        project: newReview.project,
-        approved: true,
-      },
-    ]).select();
-
-    if (!error && data) {
-      setReviews([data[0], ...reviews]);
-      setShowAddReview(false);
-      setNewReview({ name: '', role: '', rating: 5, review: '', project: 'shopify' });
-      setActionMsg('New review added successfully!');
-    } else {
-      alert('Failed to add review: ' + (error?.message || 'Unknown error'));
-    }
-  };
-
-  // Requirements actions
-  const deleteRequirement = async (id) => {
-    if (!confirm('Delete this client requirement lead?')) return;
+  // ─── REQUIREMENT / INQUIRY CRUD ───────────────────────────────────────────────
+  const handleDeleteRequirement = async (id, name) => {
+    if (!confirm(`Delete inquiry #${id} from "${name}"?`)) return;
     const { error } = await supabase.from('requirements').delete().eq('id', id);
     if (!error) {
       setRequirements(requirements.filter((r) => r.id !== id));
-      setActionMsg('Requirement lead deleted.');
+      notify(`Inquiry #${id} deleted.`);
     }
   };
 
-  // Projects actions
-  const deleteProject = async (id) => {
-    if (!confirm(`Delete project "${id}" permanently?`)) return;
-    const { error } = await supabase.from('projects').delete().eq('id', id);
-    if (!error) {
-      setProjects(projects.filter((p) => p.id !== id));
-      setActionMsg('Project deleted.');
-    }
-  };
+  // Filtered queries
+  const filteredRequirements = useMemo(() => {
+    if (!reqSearch.trim()) return requirements;
+    const q = reqSearch.toLowerCase();
+    return requirements.filter(
+      (r) =>
+        (r.name || '').toLowerCase().includes(q) ||
+        (r.email || '').toLowerCase().includes(q) ||
+        (r.phone || '').toLowerCase().includes(q) ||
+        (r.instagram || '').toLowerCase().includes(q) ||
+        (r.requirement || '').toLowerCase().includes(q)
+    );
+  }, [requirements, reqSearch]);
 
-  const handleCreateProject = async (e) => {
-    e.preventDefault();
-    if (!newProject.id.trim() || !newProject.title.trim()) {
-      alert('ID and Title are required.');
-      return;
-    }
+  const filteredProjects = useMemo(() => {
+    if (!projSearch.trim()) return projects;
+    const q = projSearch.toLowerCase();
+    return projects.filter(
+      (p) =>
+        (p.id || '').toLowerCase().includes(q) ||
+        (p.title || '').toLowerCase().includes(q) ||
+        (p.tech || '').toLowerCase().includes(q) ||
+        (p.categories || '').toLowerCase().includes(q)
+    );
+  }, [projects, projSearch]);
 
-    const { data, error } = await supabase.from('projects').insert([
-      {
-        id: newProject.id.trim().toLowerCase(),
-        title: newProject.title.trim(),
-        subtitle: newProject.subtitle.trim(),
-        status: newProject.status.trim(),
-        tagline: newProject.tagline.trim(),
-        description: newProject.description.trim(),
-        features: newProject.features.trim(),
-        tech: newProject.tech.trim(),
-        link_texts: newProject.link_texts.trim(),
-        link_urls: newProject.link_urls.trim(),
-        categories: newProject.categories.trim(),
-        order: Number(newProject.order) || 0,
-      },
-    ]).select();
+  const filteredReviews = useMemo(() => {
+    if (reviewFilter === 'approved') return reviews.filter((r) => r.approved);
+    if (reviewFilter === 'pending') return reviews.filter((r) => !r.approved);
+    return reviews;
+  }, [reviews, reviewFilter]);
 
-    if (!error && data) {
-      setProjects([...projects, data[0]]);
-      setShowAddProject(false);
-      setActionMsg('Project created successfully!');
-    } else {
-      alert('Failed to create project: ' + (error?.message || 'Unknown error'));
-    }
-  };
-
+  // Loading screen
   if (authLoading) {
     return (
       <div className="admin-loading-screen">
-        <div className="admin-terminal-loader">
-          <span className="cursor-blink">&gt;</span> AUTHENTICATING ACCESS...
+        <div className="terminal-box">
+          <span className="blink">&gt;</span> CONNECTING TO SUPABASE GATEWAY...
         </div>
       </div>
     );
@@ -228,17 +355,14 @@ export default function AdminPage() {
     return (
       <div className="admin-login-wrapper">
         <div className="admin-login-card">
-          <div className="login-header">
-            <div className="login-badge">// ADMIN ACCESS GATEWAY</div>
-            <h1 className="login-title">admin.adilrahman.cc</h1>
-            <p className="login-desc">Sign in with your Supabase credentials to manage inquiries, reviews, and portfolio projects.</p>
-          </div>
+          <div className="login-badge">// ADMIN CONTROL PORTAL</div>
+          <h1 className="login-title">admin.adilrahman.cc</h1>
+          <p className="login-desc">Sign in with your Supabase account to manage client inquiries, portfolio projects, and reviews.</p>
 
-          {loginError && <div className="admin-alert-error">{loginError}</div>}
-          {authMessage && <div className="admin-alert-success">{authMessage}</div>}
+          {loginError && <div className="alert-error">{loginError}</div>}
 
-          <form onSubmit={handleAuth} className="admin-form">
-            <div className="admin-input-group">
+          <form onSubmit={handleLogin} className="login-form">
+            <div className="form-group">
               <label>ADMIN EMAIL</label>
               <input
                 type="email"
@@ -246,11 +370,11 @@ export default function AdminPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="adilrahman3063@gmail.com"
-                className="admin-input"
+                className="styled-input"
               />
             </div>
 
-            <div className="admin-input-group">
+            <div className="form-group">
               <label>PASSWORD</label>
               <input
                 type="password"
@@ -258,127 +382,236 @@ export default function AdminPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••••••"
-                className="admin-input"
+                className="styled-input"
               />
             </div>
 
-            <button type="submit" disabled={loginLoading} className="admin-primary-btn">
-              {loginLoading ? 'AUTHENTICATING...' : 'LOGIN TO ADMIN CONSOLE'}
+            <button type="submit" disabled={loginLoading} className="gold-btn full-width">
+              {loginLoading ? 'AUTHENTICATING...' : 'ACCESS DASHBOARD'}
             </button>
           </form>
 
           <div className="login-footer">
-            <div className="public-return-link">
-              <Link href="https://adilrahman.cc">← Return to public portfolio (adilrahman.cc)</Link>
-            </div>
+            <Link href="https://adilrahman.cc" className="back-link">
+              ← Return to Public Portfolio (adilrahman.cc)
+            </Link>
           </div>
         </div>
       </div>
     );
   }
 
-  // ─── LOGGED IN DASHBOARD ──────────────────────────────────────────────────────
+  // ─── DASHBOARD INTERFACE ──────────────────────────────────────────────────────
   return (
-    <div className="admin-dashboard-wrapper">
-      {/* Top Navigation */}
-      <header className="admin-header">
-        <div className="admin-header-brand">
-          <span className="admin-status-indicator">●</span>
-          <span className="admin-header-title">ADMIN CONSOLE</span>
-          <span className="admin-domain-chip">admin.adilrahman.cc</span>
+    <div className="admin-container">
+      {/* Top Navbar */}
+      <header className="navbar">
+        <div className="nav-left">
+          <span className="dot-active">●</span>
+          <span className="nav-title">ADIL RAHMAN // ADMIN</span>
+          <span className="subdomain-badge">admin.adilrahman.cc</span>
         </div>
 
-        <div className="admin-header-user">
-          <span className="admin-user-email">{session.user.email}</span>
-          <Link href="https://adilrahman.cc" target="_blank" className="admin-view-site-btn">
-            View Live Site ↗
+        <div className="nav-right">
+          <span className="user-email">{session.user.email}</span>
+          <Link href="https://adilrahman.cc" target="_blank" className="nav-link-btn">
+            Live Site ↗
           </Link>
-          <button onClick={handleSignOut} className="admin-logout-btn">
+          <button onClick={handleSignOut} className="logout-btn">
             Sign Out
           </button>
         </div>
       </header>
 
-      {/* Main Container */}
-      <main className="admin-main">
-        {actionMsg && <div className="admin-toast-banner">{actionMsg}</div>}
+      {/* Main Body */}
+      <main className="main-content">
+        {actionMsg && <div className="toast-notification">✓ {actionMsg}</div>}
 
-        {/* Tab Navigation */}
-        <nav className="admin-tab-nav">
+        {/* Tab Selector */}
+        <div className="tabs-header">
           <button
-            className={`admin-tab-btn ${activeTab === 'requirements' ? 'active' : ''}`}
+            className={`tab-item ${activeTab === 'overview' ? 'active' : ''}`}
+            onClick={() => setActiveTab('overview')}
+          >
+            📊 Activity Overview
+          </button>
+          <button
+            className={`tab-item ${activeTab === 'requirements' ? 'active' : ''}`}
             onClick={() => setActiveTab('requirements')}
           >
             📋 Inquiries &amp; Leads ({requirements.length})
           </button>
           <button
-            className={`admin-tab-btn ${activeTab === 'reviews' ? 'active' : ''}`}
-            onClick={() => setActiveTab('reviews')}
-          >
-            ⭐ Reviews ({reviews.length})
-          </button>
-          <button
-            className={`admin-tab-btn ${activeTab === 'projects' ? 'active' : ''}`}
+            className={`tab-item ${activeTab === 'projects' ? 'active' : ''}`}
             onClick={() => setActiveTab('projects')}
           >
             🚀 Projects ({projects.length})
           </button>
-        </nav>
+          <button
+            className={`tab-item ${activeTab === 'reviews' ? 'active' : ''}`}
+            onClick={() => setActiveTab('reviews')}
+          >
+            ⭐ Reviews ({reviews.length})
+          </button>
+        </div>
 
-        {/* Tab 1: Requirements / Quotes */}
-        {activeTab === 'requirements' && (
-          <section className="admin-section">
-            <div className="section-toolbar">
-              <div>
-                <h2>Client Requirements &amp; Quotes</h2>
-                <p>Leads captured via the Request a Quote form and AI Chat assistant.</p>
+        {/* ─── TAB 1: OVERVIEW & HOMEPAGE ACTIVITY ───────────────────────────── */}
+        {activeTab === 'overview' && (
+          <div className="overview-section">
+            {/* KPI Cards */}
+            <div className="kpi-grid">
+              <div className="kpi-card highlight" onClick={() => setActiveTab('requirements')}>
+                <div className="kpi-label">TOTAL CLIENT INQUIRIES</div>
+                <div className="kpi-val">{requirements.length}</div>
+                <div className="kpi-sub">From Quote Form &amp; AI Chat</div>
               </div>
-              <button onClick={fetchDashboardData} className="admin-refresh-btn">
-                ↻ Refresh
-              </button>
+
+              <div className="kpi-card" onClick={() => setActiveTab('reviews')}>
+                <div className="kpi-label">VERIFIED REVIEWS</div>
+                <div className="kpi-val">{reviews.length}</div>
+                <div className="kpi-sub">
+                  {reviews.filter((r) => r.approved).length} Approved / {reviews.filter((r) => !r.approved).length} Pending
+                </div>
+              </div>
+
+              <div className="kpi-card" onClick={() => setActiveTab('projects')}>
+                <div className="kpi-label">PORTFOLIO PROJECTS</div>
+                <div className="kpi-val">{projects.length}</div>
+                <div className="kpi-sub">Active in Supabase</div>
+              </div>
+
+              <div className="kpi-card">
+                <div className="kpi-label">SYSTEM GATEWAY</div>
+                <div className="kpi-val status-green">ONLINE</div>
+                <div className="kpi-sub">Supabase PostgREST + Edge</div>
+              </div>
+            </div>
+
+            {/* Recent Inquiries Alert Box */}
+            <div className="panel-box">
+              <div className="panel-header">
+                <div>
+                  <h3 className="panel-title">⚡ Latest Client Inquiries (Recent 5)</h3>
+                  <p className="panel-desc">Real-time quote submissions and AI tool captures sent through the homepage.</p>
+                </div>
+                <button onClick={fetchAllData} className="refresh-btn">
+                  ↻ Refresh Now
+                </button>
+              </div>
+
+              {requirements.length === 0 ? (
+                <div className="empty-panel">No client inquiries received yet.</div>
+              ) : (
+                <div className="recent-inquiries-stream">
+                  {requirements.slice(0, 5).map((req) => {
+                    const cleanPhone = (req.phone || '').replace(/[^\d+]/g, '');
+                    const waLink = cleanPhone ? `https://wa.me/${cleanPhone.replace('+', '')}` : null;
+
+                    return (
+                      <div key={req.id} className="stream-item">
+                        <div className="stream-header">
+                          <span className="client-badge">Client #{req.id}</span>
+                          <span className="stream-name">{req.name}</span>
+                          <span className="stream-date">{new Date(req.created_at).toLocaleString()}</span>
+                        </div>
+
+                        <div className="stream-contacts">
+                          {req.email && (
+                            <span className="contact-tag">
+                              ✉ <a href={`mailto:${req.email}`}>{req.email}</a>
+                            </span>
+                          )}
+                          {req.phone && (
+                            <span className="contact-tag">
+                              📞 {req.phone}
+                              {waLink && (
+                                <a href={waLink} target="_blank" rel="noreferrer" className="wa-btn">
+                                  WhatsApp ↗
+                                </a>
+                              )}
+                            </span>
+                          )}
+                          {req.instagram && <span className="contact-tag">📷 {req.instagram}</span>}
+                        </div>
+
+                        <p className="stream-text">{req.requirement}</p>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ─── TAB 2: INQUIRIES & LEADS ───────────────────────────────────────── */}
+        {activeTab === 'requirements' && (
+          <div className="requirements-section">
+            <div className="section-bar">
+              <div className="bar-info">
+                <h2>Client Requirements &amp; Quotes</h2>
+                <p>Every lead submitted through the portfolio quote sheet or AI assistant.</p>
+              </div>
+
+              <div className="bar-actions">
+                <input
+                  type="text"
+                  placeholder="Search by name, email, details..."
+                  value={reqSearch}
+                  onChange={(e) => setReqSearch(e.target.value)}
+                  className="search-input"
+                />
+                <button onClick={fetchAllData} className="refresh-btn">
+                  ↻ Refresh
+                </button>
+              </div>
             </div>
 
             {dataLoading ? (
-              <div className="admin-data-loader">Loading records from Supabase...</div>
-            ) : requirements.length === 0 ? (
-              <div className="admin-empty-state">No inquiries received yet.</div>
+              <div className="data-loader">Loading records from Supabase...</div>
+            ) : filteredRequirements.length === 0 ? (
+              <div className="empty-panel">No inquiries matching your query.</div>
             ) : (
-              <div className="requirements-list">
-                {requirements.map((req) => {
+              <div className="cards-stack">
+                {filteredRequirements.map((req) => {
                   const cleanPhone = (req.phone || '').replace(/[^\d+]/g, '');
                   const waLink = cleanPhone ? `https://wa.me/${cleanPhone.replace('+', '')}` : null;
 
                   return (
-                    <div key={req.id} className="admin-card requirement-card">
-                      <div className="card-top-bar">
-                        <div className="card-client-meta">
-                          <span className="client-id-badge">#{req.id}</span>
-                          <span className="client-name">{req.name}</span>
-                          <span className="client-date">{new Date(req.created_at).toLocaleString()}</span>
+                    <div key={req.id} className="data-card">
+                      <div className="card-top">
+                        <div className="card-identity">
+                          <span className="lead-tag">INQUIRY #{req.id}</span>
+                          <span className="lead-name">{req.name}</span>
+                          <span className="lead-time">{new Date(req.created_at).toLocaleString()}</span>
                         </div>
-                        <button onClick={() => deleteRequirement(req.id)} className="admin-delete-btn" title="Delete lead">
+                        <button
+                          onClick={() => handleDeleteRequirement(req.id, req.name)}
+                          className="danger-btn"
+                          title="Delete Lead"
+                        >
                           Delete
                         </button>
                       </div>
 
-                      <div className="client-contacts-grid">
+                      <div className="contacts-row">
                         {req.email && (
-                          <div className="contact-chip">
+                          <div className="contact-pill">
                             <strong>Email:</strong> <a href={`mailto:${req.email}`}>{req.email}</a>
                           </div>
                         )}
                         {req.phone && (
-                          <div className="contact-chip">
-                            <strong>Phone/WA:</strong> <span>{req.phone}</span>
+                          <div className="contact-pill">
+                            <strong>Phone:</strong> <span>{req.phone}</span>
                             {waLink && (
-                              <a href={waLink} target="_blank" rel="noreferrer" className="wa-direct-btn">
+                              <a href={waLink} target="_blank" rel="noreferrer" className="wa-btn">
                                 Open WhatsApp ↗
                               </a>
                             )}
                           </div>
                         )}
                         {req.instagram && (
-                          <div className="contact-chip">
+                          <div className="contact-pill">
                             <strong>Instagram:</strong>{' '}
                             <a href={`https://instagram.com/${req.instagram.replace('@', '')}`} target="_blank" rel="noreferrer">
                               {req.instagram}
@@ -387,239 +620,251 @@ export default function AdminPage() {
                         )}
                       </div>
 
-                      <div className="requirement-body">
-                        <div className="body-label">REQUIREMENT DETAILS:</div>
-                        <p className="body-text">{req.requirement}</p>
+                      <div className="req-box">
+                        <div className="req-label">// REQUIREMENT DETAILS:</div>
+                        <div className="req-content">{req.requirement}</div>
                       </div>
                     </div>
                   );
                 })}
               </div>
             )}
-          </section>
+          </div>
         )}
 
-        {/* Tab 2: Reviews */}
-        {activeTab === 'reviews' && (
-          <section className="admin-section">
-            <div className="section-toolbar">
-              <div>
-                <h2>Verified Reviews &amp; Testimonials</h2>
-                <p>Public reviews appear on the site when "Approved" is toggled on.</p>
-              </div>
-              <div className="toolbar-actions">
-                <button onClick={() => setShowAddReview(!showAddReview)} className="admin-action-btn">
-                  {showAddReview ? 'Cancel' : '+ Add Review'}
-                </button>
-                <button onClick={fetchDashboardData} className="admin-refresh-btn">
-                  ↻ Refresh
-                </button>
-              </div>
-            </div>
-
-            {showAddReview && (
-              <form onSubmit={handleCreateReview} className="admin-inline-form">
-                <h3>Add New Verified Review</h3>
-                <div className="form-row">
-                  <input
-                    type="text"
-                    required
-                    placeholder="Client Name"
-                    value={newReview.name}
-                    onChange={(e) => setNewReview({ ...newReview, name: e.target.value })}
-                  />
-                  <input
-                    type="text"
-                    placeholder="Role / Title (e.g. CEO, Merchant Navy)"
-                    value={newReview.role}
-                    onChange={(e) => setNewReview({ ...newReview, role: e.target.value })}
-                  />
-                  <select
-                    value={newReview.rating}
-                    onChange={(e) => setNewReview({ ...newReview, rating: Number(e.target.value) })}
-                  >
-                    <option value={5}>5 Stars ★★★★★</option>
-                    <option value={4}>4 Stars ★★★★☆</option>
-                    <option value={3}>3 Stars ★★★☆☆</option>
-                  </select>
-                  <input
-                    type="text"
-                    placeholder="Linked Project ID (e.g. shopify, issaa)"
-                    value={newReview.project}
-                    onChange={(e) => setNewReview({ ...newReview, project: e.target.value })}
-                  />
-                </div>
-                <textarea
-                  required
-                  rows={3}
-                  placeholder="Review content..."
-                  value={newReview.review}
-                  onChange={(e) => setNewReview({ ...newReview, review: e.target.value })}
-                />
-                <button type="submit" className="admin-primary-btn form-submit">
-                  Save Review
-                </button>
-              </form>
-            )}
-
-            {dataLoading ? (
-              <div className="admin-data-loader">Loading reviews...</div>
-            ) : reviews.length === 0 ? (
-              <div className="admin-empty-state">No reviews in database.</div>
-            ) : (
-              <div className="reviews-admin-grid">
-                {reviews.map((rev) => (
-                  <div key={rev.id} className="admin-card review-admin-card">
-                    <div className="card-top-bar">
-                      <div>
-                        <span className="client-name">{rev.name}</span>
-                        <span className="client-role">({rev.role || 'Client'})</span>
-                        <div className="star-rating">{'★'.repeat(rev.rating || 5)}</div>
-                      </div>
-                      <div className="review-ctrl-btns">
-                        <button
-                          onClick={() => toggleReviewApproval(rev.id, rev.approved)}
-                          className={`approval-toggle-btn ${rev.approved ? 'approved' : 'pending'}`}
-                        >
-                          {rev.approved ? '✓ Approved' : '⏳ Pending'}
-                        </button>
-                        <button onClick={() => deleteReview(rev.id)} className="admin-delete-btn">
-                          Delete
-                        </button>
-                      </div>
-                    </div>
-
-                    <p className="admin-review-text">"{rev.review}"</p>
-
-                    <div className="review-admin-footer">
-                      <span className="meta-project">
-                        Linked Project: <strong>{rev.project || 'None'}</strong>
-                      </span>
-                      <span className="meta-date">{new Date(rev.created_at).toLocaleDateString()}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </section>
-        )}
-
-        {/* Tab 3: Projects */}
+        {/* ─── TAB 3: PROJECTS (ADD, EDIT, TABLE) ──────────────────────────────── */}
         {activeTab === 'projects' && (
-          <section className="admin-section">
-            <div className="section-toolbar">
-              <div>
-                <h2>Portfolio Projects</h2>
-                <p>All projects stored in Supabase with descriptions, tech tags, and categories.</p>
+          <div className="projects-section">
+            <div className="section-bar">
+              <div className="bar-info">
+                <h2>Portfolio Projects Database</h2>
+                <p>Manage, add, and update values in your projects table. Changes reflect on the live site.</p>
               </div>
-              <div className="toolbar-actions">
-                <button onClick={() => setShowAddProject(!showAddProject)} className="admin-action-btn">
-                  {showAddProject ? 'Cancel' : '+ Add Project'}
+
+              <div className="bar-actions">
+                <input
+                  type="text"
+                  placeholder="Filter projects by title, tech..."
+                  value={projSearch}
+                  onChange={(e) => setProjSearch(e.target.value)}
+                  className="search-input"
+                />
+                <button
+                  onClick={() => {
+                    setEditingProject(null);
+                    setProjectForm(initialProjectForm);
+                    setShowAddProject(true);
+                  }}
+                  className="gold-btn"
+                >
+                  + Add Project
                 </button>
-                <button onClick={fetchDashboardData} className="admin-refresh-btn">
+                <button onClick={fetchAllData} className="refresh-btn">
                   ↻ Refresh
                 </button>
               </div>
             </div>
 
+            {/* Project Edit / Create Modal */}
             {showAddProject && (
-              <form onSubmit={handleCreateProject} className="admin-inline-form">
-                <h3>Add New Project</h3>
-                <div className="form-row">
-                  <input
-                    type="text"
-                    required
-                    placeholder="Unique ID (e.g. zmr, viewpick)"
-                    value={newProject.id}
-                    onChange={(e) => setNewProject({ ...newProject, id: e.target.value })}
-                  />
-                  <input
-                    type="text"
-                    required
-                    placeholder="Title (e.g. ZMR Music)"
-                    value={newProject.title}
-                    onChange={(e) => setNewProject({ ...newProject, title: e.target.value })}
-                  />
-                  <input
-                    type="text"
-                    placeholder="Subtitle (e.g. Flutter Mobile Client)"
-                    value={newProject.subtitle}
-                    onChange={(e) => setNewProject({ ...newProject, subtitle: e.target.value })}
-                  />
-                  <input
-                    type="number"
-                    placeholder="Order (e.g. 1)"
-                    value={newProject.order}
-                    onChange={(e) => setNewProject({ ...newProject, order: Number(e.target.value) })}
-                  />
+              <div className="modal-backdrop">
+                <div className="modal-window wide">
+                  <div className="modal-header">
+                    <h3>{editingProject ? `Edit Project: ${editingProject.title}` : 'Add New Project'}</h3>
+                    <button onClick={() => setShowAddProject(false)} className="close-btn">✕</button>
+                  </div>
+
+                  <form onSubmit={handleSaveProject} className="modal-form">
+                    <div className="grid-2">
+                      <div className="form-group">
+                        <label>UNIQUE ID (lowercase, no spaces) *</label>
+                        <input
+                          type="text"
+                          required
+                          disabled={!!editingProject}
+                          value={projectForm.id}
+                          onChange={(e) => setProjectForm({ ...projectForm, id: e.target.value })}
+                          placeholder="e.g. zmr, viewpick, new-saas"
+                          className="styled-input"
+                        />
+                      </div>
+
+                      <div className="form-group">
+                        <label>PROJECT TITLE *</label>
+                        <input
+                          type="text"
+                          required
+                          value={projectForm.title}
+                          onChange={(e) => setProjectForm({ ...projectForm, title: e.target.value })}
+                          placeholder="e.g. ZMR Music"
+                          className="styled-input"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid-3">
+                      <div className="form-group">
+                        <label>SUBTITLE</label>
+                        <input
+                          type="text"
+                          value={projectForm.subtitle}
+                          onChange={(e) => setProjectForm({ ...projectForm, subtitle: e.target.value })}
+                          placeholder="e.g. Flutter Mobile Client"
+                          className="styled-input"
+                        />
+                      </div>
+
+                      <div className="form-group">
+                        <label>STATUS</label>
+                        <input
+                          type="text"
+                          value={projectForm.status}
+                          onChange={(e) => setProjectForm({ ...projectForm, status: e.target.value })}
+                          placeholder="Featured // Complete"
+                          className="styled-input"
+                        />
+                      </div>
+
+                      <div className="form-group">
+                        <label>DISPLAY ORDER</label>
+                        <input
+                          type="number"
+                          value={projectForm.order}
+                          onChange={(e) => setProjectForm({ ...projectForm, order: Number(e.target.value) })}
+                          placeholder="1"
+                          className="styled-input"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="form-group">
+                      <label>CATEGORIES (comma-separated: featured, web-Full-Stack, mobile, saas, personal, freelance)</label>
+                      <input
+                        type="text"
+                        value={projectForm.categories}
+                        onChange={(e) => setProjectForm({ ...projectForm, categories: e.target.value })}
+                        placeholder="featured, web-Full-Stack, personal"
+                        className="styled-input"
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label>TECH STACK (comma-separated)</label>
+                      <input
+                        type="text"
+                        value={projectForm.tech}
+                        onChange={(e) => setProjectForm({ ...projectForm, tech: e.target.value })}
+                        placeholder="Flutter, Riverpod, Supabase, Cloudflare Workers"
+                        className="styled-input"
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label>ONE-LINE TAGLINE</label>
+                      <input
+                        type="text"
+                        value={projectForm.tagline}
+                        onChange={(e) => setProjectForm({ ...projectForm, tagline: e.target.value })}
+                        placeholder="High-performance client focused on sleek background audio."
+                        className="styled-input"
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label>DESCRIPTION (FULL OVERVIEW)</label>
+                      <textarea
+                        rows={3}
+                        value={projectForm.description}
+                        onChange={(e) => setProjectForm({ ...projectForm, description: e.target.value })}
+                        placeholder="Detailed project summary..."
+                        className="styled-input"
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label>FEATURES (separate each bullet with a semicolon ; )</label>
+                      <textarea
+                        rows={3}
+                        value={projectForm.features}
+                        onChange={(e) => setProjectForm({ ...projectForm, features: e.target.value })}
+                        placeholder="Feature one; Feature two; Feature three..."
+                        className="styled-input"
+                      />
+                    </div>
+
+                    <div className="grid-2">
+                      <div className="form-group">
+                        <label>LINK TEXT(S) (e.g. Live Site or GitHub Repository)</label>
+                        <input
+                          type="text"
+                          value={projectForm.link_texts}
+                          onChange={(e) => setProjectForm({ ...projectForm, link_texts: e.target.value })}
+                          placeholder="Live Application"
+                          className="styled-input"
+                        />
+                      </div>
+
+                      <div className="form-group">
+                        <label>LINK URL(S)</label>
+                        <input
+                          type="text"
+                          value={projectForm.link_urls}
+                          onChange={(e) => setProjectForm({ ...projectForm, link_urls: e.target.value })}
+                          placeholder="https://..."
+                          className="styled-input"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="modal-actions">
+                      <button type="button" onClick={() => setShowAddProject(false)} className="cancel-btn">
+                        Cancel
+                      </button>
+                      <button type="submit" className="gold-btn">
+                        {editingProject ? 'Save Changes' : 'Create Project'}
+                      </button>
+                    </div>
+                  </form>
                 </div>
-                <div className="form-row">
-                  <input
-                    type="text"
-                    placeholder="Status (e.g. Featured // Complete)"
-                    value={newProject.status}
-                    onChange={(e) => setNewProject({ ...newProject, status: e.target.value })}
-                  />
-                  <input
-                    type="text"
-                    placeholder="Categories (e.g. featured, mobile, personal, saas)"
-                    value={newProject.categories}
-                    onChange={(e) => setNewProject({ ...newProject, categories: e.target.value })}
-                  />
-                  <input
-                    type="text"
-                    placeholder="Tech (comma-separated: Flutter, Supabase, Node)"
-                    value={newProject.tech}
-                    onChange={(e) => setNewProject({ ...newProject, tech: e.target.value })}
-                  />
-                </div>
-                <textarea
-                  rows={2}
-                  placeholder="Short tagline..."
-                  value={newProject.tagline}
-                  onChange={(e) => setNewProject({ ...newProject, tagline: e.target.value })}
-                />
-                <textarea
-                  rows={3}
-                  placeholder="Detailed description..."
-                  value={newProject.description}
-                  onChange={(e) => setNewProject({ ...newProject, description: e.target.value })}
-                />
-                <button type="submit" className="admin-primary-btn form-submit">
-                  Save Project to Supabase
-                </button>
-              </form>
+              </div>
             )}
 
+            {/* Projects Table */}
             {dataLoading ? (
-              <div className="admin-data-loader">Loading projects...</div>
-            ) : projects.length === 0 ? (
-              <div className="admin-empty-state">No projects in database.</div>
+              <div className="data-loader">Loading projects...</div>
+            ) : filteredProjects.length === 0 ? (
+              <div className="empty-panel">No projects found.</div>
             ) : (
-              <div className="projects-admin-table-wrap">
-                <table className="admin-table">
+              <div className="table-wrapper">
+                <table className="custom-table">
                   <thead>
                     <tr>
-                      <th>Order</th>
-                      <th>ID</th>
-                      <th>Title</th>
+                      <th style={{ width: '60px' }}>Order</th>
+                      <th style={{ width: '110px' }}>ID</th>
+                      <th>Title &amp; Subtitle</th>
                       <th>Status</th>
                       <th>Categories</th>
-                      <th>Tech</th>
-                      <th>Actions</th>
+                      <th>Tech Stack</th>
+                      <th style={{ width: '130px', textAlign: 'center' }}>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {projects.map((proj) => (
+                    {filteredProjects.map((proj) => (
                       <tr key={proj.id}>
-                        <td>{proj.order}</td>
+                        <td className="bold-gold">{proj.order}</td>
                         <td><code>{proj.id}</code></td>
-                        <td><strong>{proj.title}</strong></td>
-                        <td><span className="status-tag">{proj.status}</span></td>
-                        <td>{proj.categories}</td>
-                        <td className="tech-cell">{proj.tech}</td>
                         <td>
-                          <button onClick={() => deleteProject(proj.id)} className="admin-delete-btn">
+                          <div className="table-title">{proj.title}</div>
+                          {proj.subtitle && <div className="table-subtitle">{proj.subtitle}</div>}
+                        </td>
+                        <td><span className="badge-status">{proj.status}</span></td>
+                        <td><span className="category-text">{proj.categories}</span></td>
+                        <td className="tech-cell">{proj.tech}</td>
+                        <td className="actions-cell">
+                          <button onClick={() => openEditProject(proj)} className="edit-btn">
+                            Edit
+                          </button>
+                          <button onClick={() => handleDeleteProject(proj.id, proj.title)} className="danger-btn">
                             Delete
                           </button>
                         </td>
@@ -629,7 +874,193 @@ export default function AdminPage() {
                 </table>
               </div>
             )}
-          </section>
+          </div>
+        )}
+
+        {/* ─── TAB 4: REVIEWS (ADD, EDIT, APPROVAL) ───────────────────────────── */}
+        {activeTab === 'reviews' && (
+          <div className="reviews-section">
+            <div className="section-bar">
+              <div className="bar-info">
+                <h2>Client Testimonials &amp; Reviews</h2>
+                <p>Toggle approval to display on the live site, edit review content, or add new testimonials.</p>
+              </div>
+
+              <div className="bar-actions">
+                <select
+                  value={reviewFilter}
+                  onChange={(e) => setReviewFilter(e.target.value)}
+                  className="filter-select"
+                >
+                  <option value="all">All Reviews ({reviews.length})</option>
+                  <option value="approved">Approved Only</option>
+                  <option value="pending">Pending Only</option>
+                </select>
+
+                <button
+                  onClick={() => {
+                    setEditingReview(null);
+                    setReviewForm(initialReviewForm);
+                    setShowAddReview(true);
+                  }}
+                  className="gold-btn"
+                >
+                  + Add Review
+                </button>
+                <button onClick={fetchAllData} className="refresh-btn">
+                  ↻ Refresh
+                </button>
+              </div>
+            </div>
+
+            {/* Review Edit / Create Modal */}
+            {showAddReview && (
+              <div className="modal-backdrop">
+                <div className="modal-window">
+                  <div className="modal-header">
+                    <h3>{editingReview ? `Edit Review from ${editingReview.name}` : 'Add Verified Review'}</h3>
+                    <button onClick={() => setShowAddReview(false)} className="close-btn">✕</button>
+                  </div>
+
+                  <form onSubmit={handleSaveReview} className="modal-form">
+                    <div className="grid-2">
+                      <div className="form-group">
+                        <label>CLIENT NAME *</label>
+                        <input
+                          type="text"
+                          required
+                          value={reviewForm.name}
+                          onChange={(e) => setReviewForm({ ...reviewForm, name: e.target.value })}
+                          placeholder="e.g. Aslam Bin Kader"
+                          className="styled-input"
+                        />
+                      </div>
+
+                      <div className="form-group">
+                        <label>ROLE / COMPANY</label>
+                        <input
+                          type="text"
+                          value={reviewForm.role}
+                          onChange={(e) => setReviewForm({ ...reviewForm, role: e.target.value })}
+                          placeholder="e.g. CEO at T2 Autohaus"
+                          className="styled-input"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid-2">
+                      <div className="form-group">
+                        <label>RATING</label>
+                        <select
+                          value={reviewForm.rating}
+                          onChange={(e) => setReviewForm({ ...reviewForm, rating: Number(e.target.value) })}
+                          className="styled-input"
+                        >
+                          <option value={5}>5 Stars ★★★★★</option>
+                          <option value={4}>4 Stars ★★★★☆</option>
+                          <option value={3}>3 Stars ★★★☆☆</option>
+                        </select>
+                      </div>
+
+                      <div className="form-group">
+                        <label>LINKED PROJECT ID</label>
+                        <select
+                          value={reviewForm.project}
+                          onChange={(e) => setReviewForm({ ...reviewForm, project: e.target.value })}
+                          className="styled-input"
+                        >
+                          <option value="">-- None / General --</option>
+                          {projects.map((p) => (
+                            <option key={p.id} value={p.id}>
+                              {p.title} ({p.id})
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="form-group">
+                      <label>REVIEW TEXT *</label>
+                      <textarea
+                        rows={4}
+                        required
+                        value={reviewForm.review}
+                        onChange={(e) => setReviewForm({ ...reviewForm, review: e.target.value })}
+                        placeholder="Write client testimonial here..."
+                        className="styled-input"
+                      />
+                    </div>
+
+                    <div className="form-group checkbox-group">
+                      <label>
+                        <input
+                          type="checkbox"
+                          checked={reviewForm.approved}
+                          onChange={(e) => setReviewForm({ ...reviewForm, approved: e.target.checked })}
+                        />
+                        <span>Approved for live website display</span>
+                      </label>
+                    </div>
+
+                    <div className="modal-actions">
+                      <button type="button" onClick={() => setShowAddReview(false)} className="cancel-btn">
+                        Cancel
+                      </button>
+                      <button type="submit" className="gold-btn">
+                        {editingReview ? 'Save Changes' : 'Add Review'}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
+
+            {/* Reviews Grid */}
+            {dataLoading ? (
+              <div className="data-loader">Loading reviews...</div>
+            ) : filteredReviews.length === 0 ? (
+              <div className="empty-panel">No reviews matching the filter.</div>
+            ) : (
+              <div className="reviews-grid">
+                {filteredReviews.map((rev) => (
+                  <div key={rev.id} className="review-box">
+                    <div className="review-top">
+                      <div>
+                        <div className="rev-name">{rev.name}</div>
+                        <div className="rev-role">{rev.role || 'Client'}</div>
+                        <div className="stars">{'★'.repeat(rev.rating || 5)}</div>
+                      </div>
+
+                      <div className="rev-status-controls">
+                        <button
+                          onClick={() => toggleApproval(rev.id, rev.approved)}
+                          className={`status-btn ${rev.approved ? 'live' : 'hidden'}`}
+                        >
+                          {rev.approved ? '✓ Approved' : '⏳ Pending'}
+                        </button>
+                      </div>
+                    </div>
+
+                    <p className="rev-quote">"{rev.review}"</p>
+
+                    <div className="rev-bottom">
+                      <span className="project-tag">
+                        Project: <strong>{rev.project || 'General'}</strong>
+                      </span>
+                      <div className="rev-actions">
+                        <button onClick={() => openEditReview(rev)} className="edit-btn">
+                          Edit
+                        </button>
+                        <button onClick={() => handleDeleteReview(rev.id, rev.name)} className="danger-btn">
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         )}
       </main>
 
@@ -637,7 +1068,7 @@ export default function AdminPage() {
         .admin-loading-screen,
         .admin-login-wrapper {
           min-height: 100vh;
-          background: #0d0706;
+          background: #0c0706;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -646,14 +1077,14 @@ export default function AdminPage() {
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
 
-        .admin-terminal-loader {
+        .terminal-box {
           font-family: monospace;
           color: #d4a373;
-          letter-spacing: 0.1em;
           font-size: 1.1rem;
+          letter-spacing: 0.1em;
         }
 
-        .cursor-blink {
+        .blink {
           animation: blink 1s infinite;
         }
 
@@ -663,18 +1094,18 @@ export default function AdminPage() {
 
         .admin-login-card {
           width: 100%;
-          max-width: 440px;
+          max-width: 420px;
           background: #180e0c;
           border: 1px solid rgba(212, 163, 115, 0.2);
           border-radius: 8px;
-          padding: 36px 32px;
-          box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+          padding: 36px 30px;
+          box-shadow: 0 20px 48px rgba(0, 0, 0, 0.7);
         }
 
         .login-badge {
           font-family: monospace;
-          font-size: 0.75rem;
           color: #d4a373;
+          font-size: 0.75rem;
           letter-spacing: 0.15em;
           margin-bottom: 8px;
         }
@@ -687,76 +1118,71 @@ export default function AdminPage() {
         }
 
         .login-desc {
-          font-size: 0.88rem;
           color: #a89f91;
+          font-size: 0.88rem;
           margin-bottom: 24px;
           line-height: 1.5;
         }
 
-        .admin-form {
+        .login-form {
           display: flex;
           flex-direction: column;
           gap: 16px;
         }
 
-        .admin-input-group label {
+        .form-group label {
           display: block;
           font-family: monospace;
-          font-size: 0.75rem;
           color: #d4a373;
-          letter-spacing: 0.1em;
+          font-size: 0.72rem;
+          letter-spacing: 0.08em;
           margin-bottom: 6px;
         }
 
-        .admin-input {
+        .styled-input {
           width: 100%;
           background: #231513;
           border: 1px solid rgba(212, 163, 115, 0.2);
           border-radius: 6px;
-          padding: 12px 14px;
+          padding: 10px 14px;
           color: #fff;
-          font-size: 0.95rem;
+          font-size: 0.92rem;
           outline: none;
           box-sizing: border-box;
           transition: border-color 0.2s;
         }
 
-        .admin-input:focus {
+        .styled-input:focus {
           border-color: #d4a373;
         }
 
-        .admin-primary-btn {
+        .gold-btn {
           background: #d4a373;
           color: #180e0c;
           font-weight: 700;
           border: none;
           border-radius: 6px;
-          padding: 12px 20px;
+          padding: 10px 18px;
           cursor: pointer;
-          font-size: 0.9rem;
-          letter-spacing: 0.05em;
+          font-size: 0.88rem;
+          letter-spacing: 0.04em;
           transition: opacity 0.2s;
         }
 
-        .admin-primary-btn:hover:not(:disabled) {
+        .gold-btn:hover:not(:disabled) {
           opacity: 0.9;
         }
 
-        .admin-alert-error {
-          background: rgba(220, 53, 69, 0.15);
-          border: 1px solid #dc3545;
-          color: #ff8585;
-          padding: 10px 14px;
-          border-radius: 6px;
-          font-size: 0.85rem;
-          margin-bottom: 16px;
+        .gold-btn.full-width {
+          width: 100%;
+          padding: 12px;
         }
 
-        .admin-alert-success {
-          background: rgba(40, 167, 69, 0.15);
-          border: 1px solid #28a745;
-          color: #75e68d;
-          padding: 10px 14px;
+        .alert-error {
+          background: rgba(220, 53, 69, 0.2);
+          border: 1px solid #dc3545;
+          color: #ff8585;
+          padding: 10px 12px;
           border-radius: 6px;
           font-size: 0.85rem;
           margin-bottom: 16px;
@@ -764,63 +1190,55 @@ export default function AdminPage() {
 
         .login-footer {
           margin-top: 24px;
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
           text-align: center;
         }
 
-        .toggle-signup-btn {
-          background: transparent;
-          border: none;
+        .back-link {
           color: #a89f91;
           font-size: 0.82rem;
-          cursor: pointer;
-          text-decoration: underline;
-        }
-
-        .public-return-link a {
-          color: #d4a373;
           text-decoration: none;
-          font-size: 0.85rem;
         }
 
-        /* Dashboard View */
-        .admin-dashboard-wrapper {
+        .back-link:hover {
+          color: #d4a373;
+        }
+
+        /* ─── DASHBOARD SHELL ─── */
+        .admin-container {
           min-height: 100vh;
           background: #0d0706;
           color: #efebe9;
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
 
-        .admin-header {
+        .navbar {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          padding: 16px 28px;
+          padding: 14px 28px;
           background: #180e0c;
           border-bottom: 1px solid rgba(212, 163, 115, 0.2);
         }
 
-        .admin-header-brand {
+        .nav-left {
           display: flex;
           align-items: center;
-          gap: 10px;
+          gap: 12px;
         }
 
-        .admin-status-indicator {
+        .dot-active {
           color: #28a745;
           font-size: 0.9rem;
         }
 
-        .admin-header-title {
+        .nav-title {
           font-family: monospace;
           font-weight: 700;
           letter-spacing: 0.1em;
           color: #fff;
         }
 
-        .admin-domain-chip {
+        .subdomain-badge {
           background: rgba(212, 163, 115, 0.15);
           border: 1px solid rgba(212, 163, 115, 0.3);
           color: #d4a373;
@@ -830,106 +1248,284 @@ export default function AdminPage() {
           font-family: monospace;
         }
 
-        .admin-header-user {
+        .nav-right {
           display: flex;
           align-items: center;
-          gap: 16px;
+          gap: 14px;
         }
 
-        .admin-user-email {
+        .user-email {
           color: #a89f91;
           font-size: 0.85rem;
           font-family: monospace;
         }
 
-        .admin-view-site-btn {
+        .nav-link-btn {
           color: #d4a373;
           text-decoration: none;
-          font-size: 0.85rem;
+          font-size: 0.82rem;
           padding: 6px 12px;
           border: 1px solid rgba(212, 163, 115, 0.3);
           border-radius: 4px;
         }
 
-        .admin-logout-btn {
+        .logout-btn {
           background: transparent;
           border: 1px solid rgba(220, 53, 69, 0.4);
           color: #ff8585;
           padding: 6px 12px;
           border-radius: 4px;
           cursor: pointer;
-          font-size: 0.85rem;
+          font-size: 0.82rem;
         }
 
-        .admin-main {
+        .main-content {
           max-width: 1200px;
           margin: 0 auto;
           padding: 28px 24px;
         }
 
-        .admin-toast-banner {
+        .toast-notification {
           background: rgba(40, 167, 69, 0.2);
           border: 1px solid #28a745;
-          color: #a3f7b5;
+          color: #92f7a9;
           padding: 10px 16px;
           border-radius: 6px;
           margin-bottom: 20px;
           font-size: 0.9rem;
         }
 
-        .admin-tab-nav {
+        .tabs-header {
           display: flex;
           gap: 10px;
           margin-bottom: 24px;
           border-bottom: 1px solid rgba(212, 163, 115, 0.15);
           padding-bottom: 8px;
+          overflow-x: auto;
         }
 
-        .admin-tab-btn {
+        .tab-item {
           background: transparent;
           border: none;
           color: #a89f91;
           font-weight: 600;
-          font-size: 0.95rem;
+          font-size: 0.92rem;
           padding: 10px 18px;
           border-radius: 6px;
           cursor: pointer;
+          white-space: nowrap;
           transition: all 0.2s;
         }
 
-        .admin-tab-btn.active {
+        .tab-item.active {
           background: #231513;
           color: #d4a373;
           border: 1px solid rgba(212, 163, 115, 0.3);
         }
 
-        .section-toolbar {
+        /* ─── OVERVIEW SECTION ─── */
+        .kpi-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+          gap: 16px;
+          margin-bottom: 28px;
+        }
+
+        .kpi-card {
+          background: #180e0c;
+          border: 1px solid rgba(212, 163, 115, 0.15);
+          border-radius: 8px;
+          padding: 20px;
+          cursor: pointer;
+          transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .kpi-card:hover {
+          transform: translateY(-2px);
+          border-color: #d4a373;
+        }
+
+        .kpi-card.highlight {
+          border-color: rgba(212, 163, 115, 0.4);
+          background: linear-gradient(145deg, #201311, #180e0c);
+        }
+
+        .kpi-label {
+          font-family: monospace;
+          color: #d4a373;
+          font-size: 0.72rem;
+          letter-spacing: 0.1em;
+          margin-bottom: 8px;
+        }
+
+        .kpi-val {
+          font-size: 2.2rem;
+          font-weight: 700;
+          color: #fff;
+          margin-bottom: 4px;
+        }
+
+        .kpi-val.status-green {
+          color: #28a745;
+          font-size: 1.8rem;
+        }
+
+        .kpi-sub {
+          font-size: 0.8rem;
+          color: #8c8273;
+        }
+
+        .panel-box {
+          background: #180e0c;
+          border: 1px solid rgba(212, 163, 115, 0.15);
+          border-radius: 8px;
+          padding: 24px;
+        }
+
+        .panel-header {
           display: flex;
           justify-content: space-between;
           align-items: center;
           margin-bottom: 20px;
         }
 
-        .section-toolbar h2 {
+        .panel-title {
+          margin: 0 0 4px 0;
+          font-size: 1.25rem;
+          color: #fff;
+        }
+
+        .panel-desc {
+          margin: 0;
+          color: #8c8273;
+          font-size: 0.85rem;
+        }
+
+        .recent-inquiries-stream {
+          display: flex;
+          flex-direction: column;
+          gap: 14px;
+        }
+
+        .stream-item {
+          background: #231513;
+          border-left: 3px solid #d4a373;
+          border-radius: 0 6px 6px 0;
+          padding: 14px 18px;
+        }
+
+        .stream-header {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          margin-bottom: 8px;
+        }
+
+        .client-badge {
+          background: #120a08;
+          color: #d4a373;
+          font-family: monospace;
+          padding: 2px 6px;
+          border-radius: 4px;
+          font-size: 0.75rem;
+        }
+
+        .stream-name {
+          font-weight: 700;
+          color: #fff;
+          font-size: 0.95rem;
+        }
+
+        .stream-date {
+          color: #8c8273;
+          font-size: 0.78rem;
+          margin-left: auto;
+        }
+
+        .stream-contacts {
+          display: flex;
+          gap: 12px;
+          flex-wrap: wrap;
+          margin-bottom: 8px;
+        }
+
+        .contact-tag {
+          font-size: 0.82rem;
+          color: #efebe9;
+        }
+
+        .contact-tag a {
+          color: #d4a373;
+          text-decoration: none;
+        }
+
+        .wa-btn {
+          background: rgba(37, 211, 102, 0.2);
+          color: #25d366 !important;
+          padding: 2px 6px;
+          border-radius: 3px;
+          font-size: 0.75rem;
+          margin-left: 6px;
+        }
+
+        .stream-text {
+          margin: 0;
+          color: #d1c7bc;
+          font-size: 0.88rem;
+          line-height: 1.4;
+        }
+
+        /* ─── SECTION HEADERS & ACTIONS ─── */
+        .section-bar {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 20px;
+          flex-wrap: wrap;
+          gap: 12px;
+        }
+
+        .bar-info h2 {
           margin: 0 0 4px 0;
           font-size: 1.4rem;
           color: #fff;
         }
 
-        .section-toolbar p {
+        .bar-info p {
           margin: 0;
           color: #8c8273;
-          font-size: 0.88rem;
+          font-size: 0.86rem;
         }
 
-        .toolbar-actions {
+        .bar-actions {
           display: flex;
           gap: 10px;
+          align-items: center;
         }
 
-        .admin-action-btn,
-        .admin-refresh-btn {
-          background: #231513;
+        .search-input {
+          background: #180e0c;
+          border: 1px solid rgba(212, 163, 115, 0.25);
+          border-radius: 6px;
+          padding: 8px 12px;
+          color: #fff;
+          font-size: 0.85rem;
+          width: 240px;
+          outline: none;
+        }
+
+        .filter-select {
+          background: #180e0c;
+          border: 1px solid rgba(212, 163, 115, 0.25);
+          border-radius: 6px;
+          padding: 8px 12px;
+          color: #fff;
+          font-size: 0.85rem;
+          outline: none;
+        }
+
+        .refresh-btn {
+          background: #180e0c;
           border: 1px solid rgba(212, 163, 115, 0.3);
           color: #d4a373;
           padding: 8px 14px;
@@ -938,55 +1534,70 @@ export default function AdminPage() {
           font-size: 0.85rem;
         }
 
-        .admin-card {
+        .data-loader,
+        .empty-panel {
+          padding: 36px;
+          text-align: center;
+          color: #8c8273;
+          background: #180e0c;
+          border-radius: 8px;
+        }
+
+        /* ─── CARDS STACK (REQUIREMENTS) ─── */
+        .cards-stack {
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+        }
+
+        .data-card {
           background: #180e0c;
           border: 1px solid rgba(212, 163, 115, 0.15);
           border-radius: 8px;
           padding: 20px;
-          margin-bottom: 16px;
         }
 
-        .card-top-bar {
+        .card-top {
           display: flex;
           justify-content: space-between;
-          align-items: flex-start;
+          align-items: center;
           margin-bottom: 12px;
         }
 
-        .card-client-meta {
+        .card-identity {
           display: flex;
           align-items: center;
           gap: 10px;
         }
 
-        .client-id-badge {
+        .lead-tag {
           background: #231513;
           color: #d4a373;
           font-family: monospace;
+          font-size: 0.75rem;
           padding: 2px 6px;
           border-radius: 4px;
-          font-size: 0.75rem;
         }
 
-        .client-name {
+        .lead-name {
           font-weight: 700;
           font-size: 1.05rem;
           color: #fff;
         }
 
-        .client-date {
+        .lead-time {
           color: #8c8273;
           font-size: 0.8rem;
         }
 
-        .client-contacts-grid {
+        .contacts-row {
           display: flex;
-          flex-wrap: wrap;
           gap: 10px;
+          flex-wrap: wrap;
           margin-bottom: 14px;
         }
 
-        .contact-chip {
+        .contact-pill {
           background: #231513;
           padding: 6px 10px;
           border-radius: 4px;
@@ -996,28 +1607,19 @@ export default function AdminPage() {
           gap: 6px;
         }
 
-        .contact-chip a {
+        .contact-pill a {
           color: #d4a373;
           text-decoration: none;
         }
 
-        .wa-direct-btn {
-          background: rgba(37, 211, 102, 0.2);
-          color: #25d366 !important;
-          padding: 2px 6px;
-          border-radius: 3px;
-          font-size: 0.75rem;
-          margin-left: 4px;
-        }
-
-        .requirement-body {
+        .req-box {
           background: #120a08;
           border-left: 3px solid #d4a373;
           padding: 12px 14px;
           border-radius: 0 6px 6px 0;
         }
 
-        .body-label {
+        .req-label {
           font-family: monospace;
           font-size: 0.7rem;
           color: #d4a373;
@@ -1025,142 +1627,58 @@ export default function AdminPage() {
           letter-spacing: 0.05em;
         }
 
-        .body-text {
-          margin: 0;
+        .req-content {
           color: #efebe9;
           font-size: 0.92rem;
           line-height: 1.5;
           white-space: pre-wrap;
         }
 
-        .admin-delete-btn {
-          background: transparent;
-          border: 1px solid rgba(220, 53, 69, 0.3);
-          color: #ff8585;
-          padding: 4px 10px;
-          border-radius: 4px;
-          cursor: pointer;
-          font-size: 0.78rem;
-        }
-
-        .approval-toggle-btn {
-          border: none;
-          padding: 4px 10px;
-          border-radius: 4px;
-          font-size: 0.8rem;
-          cursor: pointer;
-          font-weight: 600;
-        }
-
-        .approval-toggle-btn.approved {
-          background: rgba(40, 167, 69, 0.2);
-          color: #75e68d;
-        }
-
-        .approval-toggle-btn.pending {
-          background: rgba(255, 193, 7, 0.2);
-          color: #ffc107;
-        }
-
-        .reviews-admin-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-          gap: 16px;
-        }
-
-        .star-rating {
-          color: #d4a373;
-          font-size: 0.9rem;
-          margin-top: 2px;
-        }
-
-        .admin-review-text {
-          color: #d1c7bc;
-          font-size: 0.9rem;
-          line-height: 1.5;
-          margin: 10px 0 14px 0;
-        }
-
-        .review-admin-footer {
-          display: flex;
-          justify-content: space-between;
-          font-size: 0.8rem;
-          color: #8c8273;
-          border-top: 1px solid rgba(212, 163, 115, 0.1);
-          padding-top: 8px;
-        }
-
-        .admin-inline-form {
-          background: #180e0c;
-          border: 1px solid #d4a373;
-          border-radius: 8px;
-          padding: 20px;
-          margin-bottom: 24px;
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
-        }
-
-        .admin-inline-form h3 {
-          margin: 0 0 8px 0;
-          color: #d4a373;
-          font-size: 1.1rem;
-        }
-
-        .form-row {
-          display: flex;
-          gap: 10px;
-          flex-wrap: wrap;
-        }
-
-        .form-row input,
-        .form-row select,
-        .admin-inline-form textarea {
-          flex: 1;
-          min-width: 180px;
-          background: #231513;
-          border: 1px solid rgba(212, 163, 115, 0.2);
-          border-radius: 6px;
-          padding: 10px 12px;
-          color: #fff;
-          font-size: 0.88rem;
-          outline: none;
-        }
-
-        .form-submit {
-          align-self: flex-start;
-          margin-top: 4px;
-        }
-
-        .projects-admin-table-wrap {
+        /* ─── PROJECTS TABLE & ACTIONS ─── */
+        .table-wrapper {
           overflow-x: auto;
           background: #180e0c;
           border: 1px solid rgba(212, 163, 115, 0.15);
           border-radius: 8px;
         }
 
-        .admin-table {
+        .custom-table {
           width: 100%;
           border-collapse: collapse;
           text-align: left;
           font-size: 0.88rem;
         }
 
-        .admin-table th,
-        .admin-table td {
+        .custom-table th,
+        .custom-table td {
           padding: 12px 14px;
           border-bottom: 1px solid rgba(212, 163, 115, 0.1);
         }
 
-        .admin-table th {
+        .custom-table th {
           background: #231513;
           color: #d4a373;
           font-family: monospace;
-          font-size: 0.78rem;
-          letter-spacing: 0.05em;
+          font-size: 0.76rem;
+          letter-spacing: 0.06em;
         }
 
-        .status-tag {
+        .bold-gold {
+          color: #d4a373;
+          font-weight: 700;
+        }
+
+        .table-title {
+          font-weight: 700;
+          color: #fff;
+        }
+
+        .table-subtitle {
+          color: #8c8273;
+          font-size: 0.78rem;
+        }
+
+        .badge-status {
           background: rgba(212, 163, 115, 0.15);
           color: #d4a373;
           padding: 2px 6px;
@@ -1168,12 +1686,244 @@ export default function AdminPage() {
           font-size: 0.75rem;
         }
 
+        .category-text {
+          color: #a89f91;
+          font-size: 0.8rem;
+        }
+
         .tech-cell {
-          max-width: 250px;
+          max-width: 220px;
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
           color: #a89f91;
+        }
+
+        .actions-cell {
+          display: flex;
+          gap: 6px;
+          justify-content: center;
+        }
+
+        .edit-btn {
+          background: #231513;
+          border: 1px solid rgba(212, 163, 115, 0.4);
+          color: #d4a373;
+          padding: 4px 10px;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 0.78rem;
+        }
+
+        .danger-btn {
+          background: transparent;
+          border: 1px solid rgba(220, 53, 69, 0.4);
+          color: #ff8585;
+          padding: 4px 10px;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 0.78rem;
+        }
+
+        /* ─── REVIEWS GRID ─── */
+        .reviews-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+          gap: 16px;
+        }
+
+        .review-box {
+          background: #180e0c;
+          border: 1px solid rgba(212, 163, 115, 0.15);
+          border-radius: 8px;
+          padding: 20px;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+        }
+
+        .review-top {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          margin-bottom: 12px;
+        }
+
+        .rev-name {
+          font-weight: 700;
+          color: #fff;
+          font-size: 1rem;
+        }
+
+        .rev-role {
+          color: #8c8273;
+          font-size: 0.8rem;
+        }
+
+        .stars {
+          color: #d4a373;
+          font-size: 0.85rem;
+          margin-top: 2px;
+        }
+
+        .status-btn {
+          border: none;
+          padding: 4px 10px;
+          border-radius: 4px;
+          font-size: 0.78rem;
+          cursor: pointer;
+          font-weight: 600;
+        }
+
+        .status-btn.live {
+          background: rgba(40, 167, 69, 0.2);
+          color: #75e68d;
+        }
+
+        .status-btn.hidden {
+          background: rgba(255, 193, 7, 0.2);
+          color: #ffc107;
+        }
+
+        .rev-quote {
+          color: #d1c7bc;
+          font-size: 0.9rem;
+          line-height: 1.5;
+          margin: 0 0 16px 0;
+          flex-grow: 1;
+        }
+
+        .rev-bottom {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          border-top: 1px solid rgba(212, 163, 115, 0.1);
+          padding-top: 10px;
+        }
+
+        .project-tag {
+          font-size: 0.78rem;
+          color: #8c8273;
+        }
+
+        .rev-actions {
+          display: flex;
+          gap: 6px;
+        }
+
+        /* ─── MODAL DIALOGS ─── */
+        .modal-backdrop {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0, 0, 0, 0.8);
+          backdrop-filter: blur(4px);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 20px;
+          z-index: 999;
+        }
+
+        .modal-window {
+          background: #180e0c;
+          border: 1px solid #d4a373;
+          border-radius: 8px;
+          padding: 28px;
+          width: 100%;
+          max-width: 550px;
+          max-height: 90vh;
+          overflow-y: auto;
+          box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+        }
+
+        .modal-window.wide {
+          max-width: 760px;
+        }
+
+        .modal-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 20px;
+        }
+
+        .modal-header h3 {
+          margin: 0;
+          color: #fff;
+          font-size: 1.25rem;
+        }
+
+        .close-btn {
+          background: transparent;
+          border: none;
+          color: #8c8273;
+          font-size: 1.2rem;
+          cursor: pointer;
+        }
+
+        .modal-form {
+          display: flex;
+          flex-direction: column;
+          gap: 14px;
+        }
+
+        .grid-2 {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 12px;
+        }
+
+        .grid-3 {
+          display: grid;
+          grid-template-columns: 1fr 1fr 1fr;
+          gap: 12px;
+        }
+
+        .checkbox-group label {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          cursor: pointer;
+          color: #efebe9;
+          font-size: 0.9rem;
+        }
+
+        .modal-actions {
+          display: flex;
+          justify-content: flex-end;
+          gap: 10px;
+          margin-top: 12px;
+        }
+
+        .cancel-btn {
+          background: transparent;
+          border: 1px solid rgba(212, 163, 115, 0.3);
+          color: #a89f91;
+          padding: 10px 16px;
+          border-radius: 6px;
+          cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+          .grid-2,
+          .grid-3 {
+            grid-template-columns: 1fr;
+          }
+          .navbar {
+            flex-direction: column;
+            gap: 10px;
+            align-items: flex-start;
+          }
+          .nav-right {
+            width: 100%;
+            justify-content: space-between;
+          }
+          .search-input {
+            width: 100%;
+          }
         }
       `}</style>
     </div>

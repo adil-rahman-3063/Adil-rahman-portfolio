@@ -150,11 +150,16 @@ async function supabaseQuery(endpoint, env, options = {}) {
   const cleanUrl = supabaseUrl.replace(/\/+$/, '');
   const targetUrl = `${cleanUrl}/rest/v1/${endpoint}`;
 
+  // For anonymous inserts to tables with private SELECT (like requirements), Prefer must be return=minimal
+  const defaultPrefer = options.method === 'POST' && endpoint.startsWith('requirements')
+    ? 'return=minimal'
+    : 'return=representation';
+
   const headers = {
     apikey: supabaseKey,
     Authorization: `Bearer ${supabaseKey}`,
     'Content-Type': 'application/json',
-    Prefer: options.prefer || 'return=representation',
+    Prefer: options.prefer || defaultPrefer,
     ...(options.headers || {}),
   };
 

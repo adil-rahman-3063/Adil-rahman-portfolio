@@ -1,12 +1,12 @@
 -- ==============================================================================
--- SUPABASE POSTGRESQL SCHEMA FOR ADIL RAHMAN PORTFOLIO (adilrahman.cc)
+-- SUPABASE POSTGRESQL SCHEMA & DATA FOR ADIL RAHMAN PORTFOLIO
+-- (Row Level Security Disabled for Full Open Public Read/Write Access)
 -- ==============================================================================
--- Run this complete script in the Supabase SQL Editor (Dashboard -> SQL Editor -> New Query).
--- It will create tables, enable Row Level Security (RLS), configure access policies,
--- and seed your initial portfolio projects and verified reviews.
+-- Paste this script into Supabase SQL Editor:
+-- https://supabase.com/dashboard/project/vtkhqhaagczyzckpglhn/sql
 -- ==============================================================================
 
--- 1. PROJECTS TABLE
+-- 1. DROP EXISTING CONSTRAINTS / POLICIES IF ANY AND PREPARE TABLES
 CREATE TABLE IF NOT EXISTS public.projects (
   id TEXT PRIMARY KEY,
   title TEXT NOT NULL,
@@ -23,7 +23,6 @@ CREATE TABLE IF NOT EXISTS public.projects (
   created_at TIMESTAMPTZ DEFAULT TIMEZONE('utc'::text, NOW())
 );
 
--- 2. SAAS PRODUCTS TABLE (Dedicated table or SaaS filter)
 CREATE TABLE IF NOT EXISTS public.saas (
   id TEXT PRIMARY KEY,
   title TEXT NOT NULL,
@@ -40,7 +39,6 @@ CREATE TABLE IF NOT EXISTS public.saas (
   created_at TIMESTAMPTZ DEFAULT TIMEZONE('utc'::text, NOW())
 );
 
--- 3. REVIEWS TABLE (Client testimonials)
 CREATE TABLE IF NOT EXISTS public.reviews (
   id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   name TEXT NOT NULL,
@@ -52,7 +50,6 @@ CREATE TABLE IF NOT EXISTS public.reviews (
   created_at TIMESTAMPTZ DEFAULT TIMEZONE('utc'::text, NOW())
 );
 
--- 4. REQUIREMENTS TABLE (Client inquiries & AI chat quote requests)
 CREATE TABLE IF NOT EXISTS public.requirements (
   id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   name TEXT NOT NULL,
@@ -64,76 +61,31 @@ CREATE TABLE IF NOT EXISTS public.requirements (
 );
 
 -- ==============================================================================
--- ROW LEVEL SECURITY (RLS) POLICIES
+-- 2. DISABLE ROW LEVEL SECURITY (RLS) FOR FULL PUBLIC ACCESS
 -- ==============================================================================
+ALTER TABLE public.projects DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.saas DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.reviews DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.requirements DISABLE ROW LEVEL SECURITY;
 
--- Projects RLS
-ALTER TABLE public.projects ENABLE ROW LEVEL SECURITY;
+-- Grants full permissions to anon and authenticated roles
+GRANT ALL ON TABLE public.projects TO anon, authenticated, service_role;
+GRANT ALL ON TABLE public.saas TO anon, authenticated, service_role;
+GRANT ALL ON TABLE public.reviews TO anon, authenticated, service_role;
+GRANT ALL ON TABLE public.requirements TO anon, authenticated, service_role;
 
-DROP POLICY IF EXISTS "Allow public read access on projects" ON public.projects;
-CREATE POLICY "Allow public read access on projects"
-  ON public.projects FOR SELECT
-  USING (true);
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated, service_role;
 
-DROP POLICY IF EXISTS "Allow service role full access on projects" ON public.projects;
-CREATE POLICY "Allow service role full access on projects"
-  ON public.projects FOR ALL
-  USING (auth.role() = 'service_role');
-
--- SaaS RLS
-ALTER TABLE public.saas ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "Allow public read access on saas" ON public.saas;
-CREATE POLICY "Allow public read access on saas"
-  ON public.saas FOR SELECT
-  USING (true);
-
-DROP POLICY IF EXISTS "Allow service role full access on saas" ON public.saas;
-CREATE POLICY "Allow service role full access on saas"
-  ON public.saas FOR ALL
-  USING (auth.role() = 'service_role');
-
--- Reviews RLS
-ALTER TABLE public.reviews ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "Allow public read access on approved reviews" ON public.reviews;
-CREATE POLICY "Allow public read access on approved reviews"
-  ON public.reviews FOR SELECT
-  USING (approved = true);
-
-DROP POLICY IF EXISTS "Allow public insert on reviews" ON public.reviews;
-CREATE POLICY "Allow public insert on reviews"
-  ON public.reviews FOR INSERT
-  WITH CHECK (true);
-
-DROP POLICY IF EXISTS "Allow service role full access on reviews" ON public.reviews;
-CREATE POLICY "Allow service role full access on reviews"
-  ON public.reviews FOR ALL
-  USING (auth.role() = 'service_role');
-
--- Requirements RLS
-ALTER TABLE public.requirements ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "Allow public insert on requirements" ON public.requirements;
-CREATE POLICY "Allow public insert on requirements"
-  ON public.requirements FOR INSERT
-  WITH CHECK (true);
-
-DROP POLICY IF EXISTS "Allow service role full access on requirements" ON public.requirements;
-CREATE POLICY "Allow service role full access on requirements"
-  ON public.requirements FOR ALL
-  USING (auth.role() = 'service_role');
-
--- Create useful indexes for fast queries
+-- Helpful indexes for query performance
 CREATE INDEX IF NOT EXISTS idx_projects_order ON public.projects ("order");
+CREATE INDEX IF NOT EXISTS idx_reviews_project ON public.reviews (project);
 CREATE INDEX IF NOT EXISTS idx_reviews_created_at ON public.reviews (created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_requirements_created_at ON public.requirements (created_at DESC);
 
 -- ==============================================================================
--- INITIAL SEED DATA
+-- 3. INSERT / SEED PORTFOLIO PROJECTS (Portfolio Reviews - Projects.csv)
 -- ==============================================================================
 
--- Insert initial portfolio projects
 INSERT INTO public.projects (id, title, subtitle, status, tagline, description, features, tech, link_texts, link_urls, categories, "order")
 VALUES ('zmr', 'ZMR Music', 'Premium YouTube Music Client // Flutter', 'Featured // Complete', 'Premium, high-performance YouTube Music client focused on sleek background audio and gesture navigation.', 'A gorgeous, high-fidelity YouTube Music client designed to provide a premium gesture-based mobile audio experience.', 'Dynamic discovery home feed with category filtering chips and Quick Picks.; Advanced playback with integrated crossfade, gapless playback, and volume normalization.; Full background playback with system lock screen media controls.; Fully local secure session handling (YouTube cookies saved locally, never sent to external servers).', 'Flutter; Riverpod; just_audio; Supabase; Cloudflare Workers', 'GitHub Repository', 'https://github.com/adil-rahman-3063/zmr', 'featured, mobile, personal', 1)
 ON CONFLICT (id) DO UPDATE SET
@@ -329,7 +281,10 @@ ON CONFLICT (id) DO UPDATE SET
   categories = EXCLUDED.categories,
   "order" = EXCLUDED."order";
 
--- Seed initial SaaS products
+-- ==============================================================================
+-- 4. INSERT / SEED SAAS PRODUCTS
+-- ==============================================================================
+
 INSERT INTO public.saas (id, title, subtitle, status, tagline, description, features, tech, link_texts, link_urls, categories, "order")
 VALUES ('membership-saas', 'AR Membership Manager', 'Universal B2B Subscription & Member Operations SaaS // Next.js', 'Featured // Live Production SaaS', 'Universal B2B subscription & member management platform with Google Sheets two-way sync, mobile QR check-ins, and automated WhatsApp billing.', 'A multi-tenant B2B membership management platform built for gyms, clubs, studios, co-working spaces, and any subscription-based business. Features complete tenant isolation with Supabase super admin governance, real-time Google Sheets member database syncing, mobile QR check-in engine, Meta WhatsApp Cloud API reminder campaigns, and direct UPI payment links.', 'Multi-Tenant Platform Governance: Super admin account management, subscription tracking, and tenant controls powered by Supabase.; Google Sheets Two-Way Member Sync: Zero-lockin member operations synchronizing directly with each business''s Google Sheet.; Instant Mobile Turnstile & QR Check-in: Real-time QR and phone check-in engine with live occupancy counting.; Automated WhatsApp Campaign Engine: Meta WhatsApp Cloud API integration dispatching payment reminders and renewal alerts.; Direct UPI & Gateway Billing: Dynamic UPI deep links (GPay, PhonePe, Paytm) and automated billing funnels embedded in reminders.; Universal Business Adaptation: Configurable tier structures and billing cycles tailored for any membership or subscription model.', 'Next.js, React, Supabase, Google Sheets API, Meta WhatsApp API, Cloudflare Workers, Tailwind CSS', 'Live Application', 'https://ar-membership-manager.pages.dev', 'saas, featured, web-Full-Stack', 1)
 ON CONFLICT (id) DO UPDATE SET
@@ -345,25 +300,40 @@ ON CONFLICT (id) DO UPDATE SET
   categories = EXCLUDED.categories,
   "order" = EXCLUDED."order";
 
--- Seed verified client reviews using unique project IDs
-INSERT INTO public.reviews (name, role, rating, review, project, approved)
+-- ==============================================================================
+-- 5. INSERT / SEED VERIFIED REVIEWS (Portfolio Reviews - Reviews.csv)
+--    Uses unique project IDs ('shopify', 'issaa') instead of non-unique order numbers
+-- ==============================================================================
+
+INSERT INTO public.reviews (name, role, rating, review, project, approved, created_at)
 SELECT 'aslambinkader', 'CEO', 5, 'I had a great experience working with Adil Rehman on the T2 Autohaus website. From the beginning, he understood the vision of creating a professional automotive brand and delivered a clean, modern Shopify store that reflects our business well.
 
 He was responsive, patient with revisions, and always willing to implement changes until everything matched what we wanted. The website is well-structured, easy to navigate, and provides a solid foundation for our growing business.
 
 I appreciate his professionalism, communication, and commitment throughout the project. I would confidently recommend Adil Rehman to anyone looking for a reliable Shopify website developer.
 
-Thank you, Adil, for helping bring the T2 Autohaus vision to life. I wish you continued success.', 'shopify', true
-WHERE NOT EXISTS (SELECT 1 FROM public.reviews WHERE name = 'aslambinkader');
+Thank you, Adil, for helping bring the T2 Autohaus vision to life. I wish you continued success.', 'shopify', true, '2026-07-15 02:42:04+00'
+WHERE NOT EXISTS (SELECT 1 FROM public.reviews WHERE name = 'aslambinkader' AND review = 'I had a great experience working with Adil Rehman on the T2 Autohaus website. From the beginning, he understood the vision of creating a professional automotive brand and delivered a clean, modern Shopify store that reflects our business well.
 
-INSERT INTO public.reviews (name, role, rating, review, project, approved)
-SELECT 'Mohamed Musthafa', 'Retired Teacher (Govt)', 5, 'Wonderful Excellent', 'issaa', true
-WHERE NOT EXISTS (SELECT 1 FROM public.reviews WHERE name = 'Mohamed Musthafa');
+He was responsive, patient with revisions, and always willing to implement changes until everything matched what we wanted. The website is well-structured, easy to navigate, and provides a solid foundation for our growing business.
 
-INSERT INTO public.reviews (name, role, rating, review, project, approved)
+I appreciate his professionalism, communication, and commitment throughout the project. I would confidently recommend Adil Rehman to anyone looking for a reliable Shopify website developer.
+
+Thank you, Adil, for helping bring the T2 Autohaus vision to life. I wish you continued success.');
+
+INSERT INTO public.reviews (name, role, rating, review, project, approved, created_at)
+SELECT 'Mohamed Musthafa', 'Retired Teacher (Govt)', 5, 'Wonderful Excellent', 'issaa', true, '2026-08-13 11:22:03+00'
+WHERE NOT EXISTS (SELECT 1 FROM public.reviews WHERE name = 'Mohamed Musthafa' AND review = 'Wonderful Excellent');
+
+INSERT INTO public.reviews (name, role, rating, review, project, approved, created_at)
 SELECT 'Basil', 'Merchant navy', 5, 'A huge congratulations and heartfelt thanks for creating the registration app for our Alumni Program!
 
 The effort you put into developing this app, along with your innovative ideas and smooth implementation, made the entire registration process seamless and impressive. It’s truly commendable to see someone of your age take such initiative and execute it so brilliantly.
 
-Keep shining, keep innovating, and continue setting the bar high! Wishing you all the best for your future endeavors.', 'issaa', true
-WHERE NOT EXISTS (SELECT 1 FROM public.reviews WHERE name = 'Basil');
+Keep shining, keep innovating, and continue setting the bar high! Wishing you all the best for your future endeavors.', 'issaa', true, '2026-08-13 18:43:45+00'
+WHERE NOT EXISTS (SELECT 1 FROM public.reviews WHERE name = 'Basil' AND review = 'A huge congratulations and heartfelt thanks for creating the registration app for our Alumni Program!
+
+The effort you put into developing this app, along with your innovative ideas and smooth implementation, made the entire registration process seamless and impressive. It’s truly commendable to see someone of your age take such initiative and execute it so brilliantly.
+
+Keep shining, keep innovating, and continue setting the bar high! Wishing you all the best for your future endeavors.');
+

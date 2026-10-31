@@ -1,5 +1,101 @@
 export const allBlogs = [
   {
+    id: 'sqlite-to-supabase-railway-deployment',
+    title: 'Taking an SQLite Codebase to Production: Purging Dev Hacks for Supabase & Railway',
+    seoTitle: 'Migrating an SQLite App to Supabase PostgreSQL on Railway | Adil Rahman',
+    date: 'October 31, 2026',
+    readTime: '5 min read',
+    excerpt: "I was handed a full-stack codebase built on local SQLite. Here is the step-by-step DevOps checklist I used to purge dev-mode workarounds, configure connection pooling, and deploy safely to Railway and Supabase.",
+    content: `**Category:** DevOps / Database Engineering / Deployment Architecture
+**Read Time:** ~5 mins
+
+## Introduction: The "Works on Localhost" Dilemma
+I recently took on the production deployment handover for a full-stack ed-tech platform featuring student portals, dynamic UPI billing, timed exam simulations, and course document viewers. 
+
+I didn't write this application from scratch—my task was taking an existing, working codebase and shepherding it into a bulletproof production release on **Railway** (backend API), **Cloudflare Pages** (frontend UI), and **Supabase** (managed PostgreSQL).
+
+When I pulled down the repo, everything ran smoothly on local development. But looking under the hood revealed a classic development setup: the entire data layer was hardwired to local **SQLite** with an auto-generated \`local.db\` file. 
+
+SQLite is fantastic for rapid prototyping. There are no Docker containers to spin up, no network credentials to manage, and migrations run instantly. But moving an SQLite-based application to containerized cloud infrastructure is full of hidden landmines. 
+
+If you simply swap your connection string from \`sqlite:///local.db\` to \`postgresql://...\` and hit deploy, things will break in production. 
+
+Here is the exact step-by-step checklist I executed to purge SQLite workarounds, harden database connection pooling, and ship safely.
+
+## Step 1: Kill the Silent Fallback
+In local development, config files often look like this:
+
+\`DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///local.db")\`
+
+This is dangerous in production. If a developer accidentally misspells an environment variable in Railway (or if the container boots before secret injection), the app will silently fall back to creating a brand new, empty SQLite file inside the container's ephemeral filesystem. 
+
+Your app will appear to start up normally. Users can register and create records. But the moment the container restarts or redeploys, Railway creates a fresh container—and all that data evaporates.
+
+To prevent this, I enforced an explicit crash-on-boot policy:
+
+- **Remove the Default:** Strip out the fallback to \`local.db\` entirely.
+- **Crash Loudly:** Raise a runtime error immediately if \`DATABASE_URL\` is absent.
+- **Normalize Protocols:** Supabase gives you URIs starting with \`postgres://\`, but SQLAlchemy 1.4+ deprecated that scheme in favor of \`postgresql://\`. I added automatic normalization to ensure seamless driver handshakes without breaking deployment scripts.
+
+## Step 2: Strip SQLite-Specific Engine Workarounds
+SQLite lacks many native features of client-server databases, forcing developers to litter their SQLAlchemy engines with custom flags. Leaving these flags active against a PostgreSQL server causes subtle bugs or unnecessary performance overhead.
+
+- **Removing check_same_thread:** This flag is an SQLite-specific mechanism to allow multi-threaded access to a single file. In PostgreSQL, multi-threading is handled natively through network sockets.
+- **Removing Foreign Key PRAGMA Listeners:** SQLite famously has foreign keys disabled by default. Dev codebases often contain SQLAlchemy event hooks that execute \`PRAGMA foreign_keys=ON\` on every new connection. When connecting to Supabase PostgreSQL, sending SQLite PRAGMA statements adds latency and connection noise.
+
+## Step 3: Untangling Alembic Migrations (The Batch Mode Trap)
+Perhaps the biggest headache when moving from SQLite to PostgreSQL is **Alembic batch mode**.
+
+Because SQLite cannot natively alter existing columns or drop foreign keys, Alembic provides a workaround: \`render_as_batch=True\`. Whenever you run a migration in batch mode, Alembic creates a duplicate shadow table with the new schema, copies every single row from the old table, drops the old table, and renames the shadow table.
+
+While this allows migrations to run on SQLite, running batch migrations against production PostgreSQL is a recipe for disaster:
+- It locks entire tables during schema updates.
+- It can cause sequence out-of-sync errors on auto-incrementing primary keys.
+- It creates circular foreign key dependency deadlocks.
+
+In \`migrations/env.py\`, I removed \`render_as_batch=True\`. PostgreSQL natively executes fast, transactional DDL alterations, column additions, and index creations without table rebuilds.
+
+## Step 4: Surviving Supabase Connection Pooler Timeouts
+When deploying to Railway and connecting to Supabase's transaction pooler (port 5432 or 6543 via Supavisor), you run straight into the infamous **"server closed the connection unexpectedly"** 500 error.
+
+Cloud poolers and AWS NAT gateways automatically terminate idle connections after a few minutes of inactivity. If an app receives no traffic for 10 minutes, the next incoming student request tries to reuse a dead pooled socket and crashes with an internal server error.
+
+To solve this, I configured production-grade connection pooling:
+
+- **pool_pre_ping=True:** Tests each connection with a lightweight ping query before handing it to a request. If the pooler terminated the connection, SQLAlchemy transparently recycles it without throwing an error to the user.
+- **pool_recycle=300:** Actively recycles idle connections every 5 minutes before the upstream Supabase pooler drops them.
+- **Bounded Pool Sizing:** Set \`pool_size=10\` and \`max_overflow=20\` to ensure multiple concurrent worker processes don't exceed Supabase connection tier limits.
+
+## Step 5: The Ephemeral Container Trap (Railway Volumes)
+Database records were safe in Supabase, but the application also manages uploaded student materials: private course PDFs, doubt images, and branding assets.
+
+In containerized platforms like Railway or Docker, the local disk is **ephemeral**. If a student or admin uploads a file to a local folder, that file only lives as long as that specific container instance. A single auto-deploy or health-check restart blows the files away.
+
+To guarantee persistent file storage without spending extra budget on an S3 bucket:
+- I provisioned a **Railway Persistent Volume** mounted at \`/data\`.
+- Routed all backend file storage variables (\`FILES_DIR=/data/private_files\` and \`MEDIA_DIR=/data/media\`) to the volume mount.
+- Added volume backup commands to the deployment disaster-recovery checklist.
+
+## Step 6: Preserving 1st-Party Cookies Without a Custom Domain
+The final deployment hurdle was authentication. 
+
+The frontend was hosted on Cloudflare Pages (\`*.pages.dev\`) and the API on Railway (\`*.up.railway.app\`). Because these are different subdomains on entirely different top-level domains, modern browsers (especially Safari on iOS) aggressively treat session cookies set across them as third-party tracking cookies—blocking logins.
+
+Instead of rushing to buy a custom domain or falling into the insecure trap of saving auth tokens in \`localStorage\`, I used a **Cloudflare Pages Edge Proxy Function** (\`functions/api/[[catchall]].js\`). 
+
+The proxy intercepts all calls to \`https://<project>.pages.dev/api/*\` and transparently forwards them to the Railway backend. The browser believes it is talking to a single origin, completely preserving secure, \`HttpOnly\` 1st-party session cookies across all student devices.
+
+## Key Takeaways for Deployment Engineers
+- **Never Assume Local Defaults Belong in Production:** The conveniences that make dev fast (SQLite, batch migrations, silent fallbacks) are the exact things that cause silent data loss and migration failures in production.
+- **Poolers Need Heartbeats:** Managed databases like Supabase use aggressive connection poolers. Always enable \`pool_pre_ping\` and conservative \`pool_recycle\` intervals in your ORM.
+- **Verify Every Tier of Persistence:** Securing your database is only half the battle. If your application handles media or document uploads, ensure your container volumes are properly mounted and backed up.
+
+---
+
+*Need help deploying, containerizing, or hardening your web apps and databases for production? Feel free to [reach out](https://adilrahman.cc) to talk shop or discuss a deployment audit.*`,
+  },
+
+  {
     id: 'supabase-cold-storage-archival',
     title: 'How I Built a 50% Cold Archival Engine to Keep SaaS Databases Under 500 MB',
     seoTitle: 'SaaS Cold Storage: Keeping Postgres Under 500MB | Adil',

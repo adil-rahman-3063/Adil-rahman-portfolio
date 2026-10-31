@@ -743,7 +743,6 @@ export function ReviewFormModal({ projects = allProjects, onClose }) {
   const [role, setRole]         = useState('');
   const [rating, setRating]     = useState(5);
   const [review, setReview]     = useState('');
-  const [selectedProject, setSelectedProject] = useState('');
   const [loading, setLoading]   = useState(false);
   const [success, setSuccess]   = useState(false);
   const [errorMsg, setErrorMsg] = useState(null);
@@ -762,7 +761,6 @@ export function ReviewFormModal({ projects = allProjects, onClose }) {
           role: role.trim(),
           rating,
           review: review.trim(),
-          project: selectedProject,
         }),
       });
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
@@ -803,22 +801,6 @@ export function ReviewFormModal({ projects = allProjects, onClose }) {
               onChange={(e) => setRole(e.target.value)}
               className="sheet-form-input" placeholder="e.g. CEO at TechCorp"
             />
-          </div>
-
-          <div className="sheet-form-group">
-            <label className="sheet-form-label">Related Project (Optional)</label>
-            <select
-              value={selectedProject}
-              onChange={(e) => setSelectedProject(e.target.value)}
-              className="sheet-form-input sheet-form-select"
-            >
-              <option value="" style={{ background: '#231513', color: '#EFEBE9' }}>-- Select Project --</option>
-              {(projects || []).map((p) => (
-                <option key={p.id} value={p.id} style={{ background: '#231513', color: '#EFEBE9' }}>
-                  {p.title} {p.subtitle ? `(${p.subtitle})` : ''}
-                </option>
-              ))}
-            </select>
           </div>
 
           <div className="sheet-form-group">

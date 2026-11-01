@@ -33,7 +33,7 @@ export default function LiveWorkspaceSection({ projects = [] }) {
           color: '#8C7355',
           marginRight: '8px'
         }}>
-          05 // 
+          06 // 
         </span>
         <h2 style={{
           fontFamily: 'var(--font-header)',

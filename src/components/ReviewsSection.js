@@ -78,7 +78,7 @@ export default function ReviewsSection({ projects = allProjects, onProjectClick 
             color: '#8C7355',
             marginRight: '8px'
           }}>
-            07 // 
+            08 // 
           </span>
           <h2 style={{
             fontFamily: 'var(--font-header)',

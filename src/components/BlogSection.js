@@ -14,7 +14,7 @@ export default function BlogSection({ onBlogClick }) {
             color: '#8C7355',
             marginRight: '8px'
           }}>
-            06 // 
+            07 // 
           </span>
           <h2 style={{
             fontFamily: 'var(--font-header)',

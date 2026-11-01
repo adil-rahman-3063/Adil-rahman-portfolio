@@ -1,12 +1,15 @@
-import { allProjects } from '../../../data/projectsData';
+import { allProjects, getProjectCategory, fetchProjectsFromSupabase, fetchProjectById } from '../../../data/projectsData';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 
 const SITE_URL = 'https://adilrahman.cc';
 
-// Required for next static export — generates a route for each project
+// Required for next static export — queries Supabase for all active project routes
 export async function generateStaticParams() {
-  return allProjects.map((project) => ({ id: project.id }));
+  const live = await fetchProjectsFromSupabase();
+  const paths = live.map((project) => ({ id: project.id }));
+  paths.push({ id: 'issaa_event' });
+  return paths;
 }
 
 // GitHub repository mapping for deep repo inspection
@@ -20,6 +23,8 @@ const githubRepoMap = {
   'membership-saas': 'adil-rahman-3063/Membership-app',
   calert: 'Dayal-Joy/C-Alert',
   poshan: 'adil-rahman-3063/poshan_abhiyaan',
+  sirr: 'adil-rahman-3063/Sirr',
+  cloudagent: 'adil-rahman-3063/cloudagent',
 };
 
 // Deep engineering architecture profiles to provide comprehensive technical depth (eliminates thin content)
@@ -69,8 +74,33 @@ const technicalDeepDives = {
     challenges: 'Maximizing mobile conversion rates and lowering Core Web Vitals to under 1.2s LCP. Engineered lazy-loaded asset pipelines, streamlined checkout funnels, and optimized product detail pages.',
     security: 'Fully compliant with Shopify 2.0 standards, secure PCI-DSS checkout compliance, and seamless multi-device responsiveness across desktops, tablets, and smartphones.',
   },
+  'edu-amicus-deployment': {
+    architecture: 'Production cloud architecture, SQLite-to-Supabase migration, and edge-proxied deployment for an EdTech platform. Managed Supabase PostgreSQL with 24 relational tables, Render-hosted Dockerized FastAPI backend, Cloudflare Pages frontend, and Cloudflare R2 object storage for PDF courseware.',
+    challenges: 'Preserving first-party HttpOnly session cookies across decoupled domains. Engineered a custom Cloudflare Pages Functions edge proxy with sliding-window edge rate limiting and Cloudflare Edge Cache (caches.default) to cap request quotas and prevent DDoS.',
+    security: 'S3-compatible R2 document persistence, Vite build optimization with immutable asset headers, scripted production database migration pipelines, and admin onboarding with 2FA security hardening.',
+  },
+  sirr: {
+    architecture: 'Cross-platform Islamic prayer companion built with Flutter, Provider, and Geolocator. Features real-time GPS prayer calculation, dynamic daylight-responsive period theming, precision Great Circle Kaaba navigation, and cross-platform notification scheduling across Android, iOS, and PWA.',
+    challenges: 'Guaranteeing timely prayer notifications across diverse OS battery-saver restrictions. Built a resilient scheduler binding Android exact alarms with boot persistence, iOS Darwin time-sensitive notifications, and ServiceWorker web push.',
+    security: 'Zero external telemetry or user data storage. All astronomical prayer coordinates and Qibla bearings compute entirely on-device with offline Aladhan API response caching.',
+  },
+  cloudagent: {
+    architecture: 'Local-first, privacy-focused AI assistant for Google Workspace and local dev environments, built entirely in Node.js. Translates natural language into local CLI tool executions via a structured JSON command protocol with SQLite WAL database.',
+    challenges: 'Integrating with Gmail, Drive, Tasks, and Calendar via the Google Workspace CLI (gws) while managing multi-model LLM fallbacks across OpenAI, Gemini, and Anthropic with automatic session recovery.',
+    security: '100% local data persistence in ~/.cloudagent/history.db with WAL mode. Strict 15-second request timeouts, auto-abort error traps, and automated doctor diagnostics to verify Node, Git, and GWS credentials.',
+  },
+  'redparrot-webhook': {
+    architecture: 'Serverless Google Apps Script backend that intercepts incoming Botbiz WhatsApp webhook payloads, parses session counts and batch completion statuses, and synchronizes student data across administrative spreadsheets.',
+    challenges: 'Handling high-concurrency webhook bursts and URL-encoded WhatsApp text without duplicate updates. Implemented ScriptLock concurrency locks and smart deduplication algorithms.',
+    security: 'Multi-sheet automated data pipeline exporting student records into 8-class, 12-class, 28-class, and closed batch tabs with installable event-driven onEdit trigger syncing employee updates.',
+  },
+  issaa: {
+    architecture: 'Responsive, lightweight event registration portal integrated directly with Google Sheets for zero-backend data storage. Built with HTML5, CSS3, vanilla JavaScript, and Google Apps Script JSONP cross-origin endpoints.',
+    challenges: 'Zero-latency on-site check-in verification without costly database infrastructure. Built a dynamic QR code generator that encodes registration IDs for instant scanner validation.',
+    security: 'Admin gate with credential verification, offline check-in capability, and clamped Malayalam numeric selectors to prevent registration tampering.',
+  },
   issaa_event: {
-    architecture: 'Lightweight, high-traffic event registration portal built with vanilla JavaScript, modern CSS, and Google Sheets backend storage via secure JSONP cross-origin endpoints.',
+    architecture: 'Responsive, lightweight event registration portal integrated directly with Google Sheets for zero-backend data storage. Built with HTML5, CSS3, vanilla JavaScript, and Google Apps Script JSONP cross-origin endpoints.',
     challenges: 'Zero-latency on-site check-in verification without costly database infrastructure. Built a dynamic QR code generator that encodes registration IDs for instant scanner validation.',
     security: 'Admin gate with credential verification, offline check-in capability, and clamped Malayalam numeric selectors to prevent registration tampering.',
   },
@@ -79,11 +109,12 @@ const technicalDeepDives = {
 // Per-SaaS SEO metadata
 export async function generateMetadata({ params }) {
   const { id } = await params;
-  const project = allProjects.find((p) => p.id === id);
+  const project = allProjects.find((p) => p.id === id || (id === 'issaa_event' && p.id === 'issaa')) || (await fetchProjectById(id));
   if (!project) return {};
 
-  const cleanTitle = `${project.title} — SaaS & Cloud App | Adil Rahman`.slice(0, 60);
+  const cleanTitle = `${project.title} — Technical Specs & Architecture | Adil Rahman`.slice(0, 60);
   const cleanDescription = (project.tagline || project.description || '').slice(0, 155);
+  const primaryCat = getProjectCategory(project.id, project);
 
   return {
     title: {
@@ -92,10 +123,9 @@ export async function generateMetadata({ params }) {
     description: cleanDescription,
     keywords: [
       project.title,
-      `${project.title} SaaS`,
-      'Adil Rahman SaaS',
-      'full-stack SaaS development',
-      'cloud software',
+      `${project.title} architecture`,
+      'Adil Rahman portfolio',
+      'full-stack engineering',
       ...(project.tech || []),
     ],
     openGraph: {
@@ -103,7 +133,7 @@ export async function generateMetadata({ params }) {
       description: cleanDescription,
       url: `${SITE_URL}/saas/${id}`,
       type: 'website',
-      siteName: 'Adil Rahman Portfolio & SaaS',
+      siteName: 'Adil Rahman Portfolio',
     },
     twitter: {
       card: 'summary_large_image',
@@ -112,7 +142,7 @@ export async function generateMetadata({ params }) {
       creator: '@adilrahmanms',
     },
     alternates: {
-      canonical: `/saas/${id}`,
+      canonical: `/project/${primaryCat}/${project.id}`,
     },
   };
 }
@@ -342,436 +372,6 @@ export default async function SaasDetailPage({ params }) {
             </div>
           </div>
         </footer>
-
-        <style>{`
-          @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
-
-          .saas-page {
-            min-height: 100vh;
-            background: linear-gradient(180deg, #1A0A08 0%, #231513 100%);
-            color: #EFEBE9;
-            font-family: 'Special Elite', monospace;
-          }
-
-          .saas-container {
-            max-width: 820px;
-            margin: 0 auto;
-            padding: 0 24px;
-          }
-
-          /* Nav */
-          .saas-nav {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 18px 28px;
-            border-bottom: 1px solid rgba(141, 110, 99, 0.2);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            background: rgba(26, 10, 8, 0.92);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-          }
-
-          .saas-nav-left {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-          }
-
-          .saas-nav-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            color: #8D6E63;
-            text-decoration: none;
-            font-size: 12px;
-            font-weight: bold;
-            transition: color 0.2s;
-          }
-          .saas-nav-link:hover { color: #FAF6EE; }
-
-          .saas-nav-sep {
-            color: rgba(141, 110, 99, 0.4);
-            font-size: 12px;
-          }
-
-          .saas-nav-brand {
-            font-size: 11px;
-            color: rgba(141, 110, 99, 0.6);
-            letter-spacing: 2px;
-          }
-
-          /* Hero */
-          .saas-hero {
-            padding: 64px 0 40px;
-            border-bottom: 1px solid rgba(141, 110, 99, 0.15);
-          }
-
-          .saas-meta-badge-row {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 16px;
-            flex-wrap: wrap;
-          }
-
-          .saas-badge {
-            font-size: 11px;
-            color: #8D6E63;
-            letter-spacing: 1.5px;
-            font-weight: bold;
-          }
-
-          .saas-status-pill {
-            font-size: 10px;
-            color: #8C7355;
-            background: rgba(141, 110, 99, 0.12);
-            border: 1px solid rgba(141, 110, 99, 0.3);
-            border-radius: 12px;
-            padding: 3px 10px;
-            letter-spacing: 0.5px;
-          }
-
-          .saas-title {
-            font-size: clamp(28px, 6vw, 44px);
-            font-weight: bold;
-            color: #FAF6EE;
-            line-height: 1.25;
-            margin: 0 0 12px;
-            letter-spacing: 0.5px;
-          }
-
-          .saas-subtitle {
-            font-size: 14px;
-            color: #8C7355;
-            margin: 0 0 20px;
-            letter-spacing: 0.5px;
-          }
-
-          .saas-tagline {
-            font-size: 15px;
-            line-height: 1.7;
-            color: #BCAAA4;
-            margin: 0 0 32px;
-          }
-
-          .saas-cta-group {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            flex-wrap: wrap;
-          }
-
-          /* Buttons */
-          .btn-primary {
-            display: inline-block;
-            background: linear-gradient(135deg, #8D6E63 0%, #6D4C41 100%);
-            color: #FAF6EE;
-            text-decoration: none;
-            border-radius: 30px;
-            font-size: 12px;
-            font-weight: bold;
-            letter-spacing: 0.5px;
-            padding: 13px 26px;
-            transition: all 0.2s;
-            box-shadow: 0 4px 14px rgba(141, 110, 99, 0.3);
-            border: none;
-          }
-          .btn-primary:hover {
-            opacity: 0.95;
-            transform: translateY(-1px);
-            box-shadow: 0 6px 18px rgba(141, 110, 99, 0.4);
-          }
-          .btn-primary.large {
-            padding: 15px 32px;
-            font-size: 13px;
-          }
-
-          .btn-secondary {
-            display: inline-block;
-            background: rgba(42, 21, 16, 0.7);
-            border: 1px solid rgba(141, 110, 99, 0.35);
-            color: #FAF6EE;
-            text-decoration: none;
-            border-radius: 30px;
-            font-size: 12px;
-            font-weight: bold;
-            letter-spacing: 0.5px;
-            padding: 12px 24px;
-            transition: all 0.2s;
-          }
-          .btn-secondary:hover {
-            border-color: #8D6E63;
-            background: rgba(141, 110, 99, 0.2);
-            transform: translateY(-1px);
-          }
-
-          .btn-outline {
-            display: inline-block;
-            border: 1px solid rgba(141, 110, 99, 0.25);
-            color: #BCAAA4;
-            text-decoration: none;
-            border-radius: 30px;
-            font-size: 12px;
-            font-weight: bold;
-            letter-spacing: 0.5px;
-            padding: 12px 22px;
-            transition: all 0.2s;
-          }
-          .btn-outline:hover {
-            color: #FAF6EE;
-            border-color: #FAF6EE;
-          }
-
-          /* Main */
-          .saas-main {
-            padding: 48px 0 64px;
-          }
-
-          .saas-card {
-            background: rgba(42, 21, 16, 0.45);
-            border: 1px solid rgba(141, 110, 99, 0.22);
-            border-radius: 12px;
-            padding: 32px;
-            margin-bottom: 24px;
-          }
-
-          .section-heading {
-            font-size: 13px;
-            color: #8D6E63;
-            letter-spacing: 1.5px;
-            font-weight: bold;
-            margin: 0 0 16px;
-          }
-
-          .section-body {
-            font-size: 14px;
-            line-height: 1.8;
-            color: #D7CCC8;
-            margin: 0;
-          }
-
-          /* Features */
-          .features-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-          }
-
-          .feature-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 14px;
-            background: rgba(26, 10, 8, 0.4);
-            border: 1px solid rgba(141, 110, 99, 0.15);
-            border-radius: 8px;
-            padding: 16px 20px;
-          }
-
-          .feature-number {
-            font-size: 13px;
-            color: #8D6E63;
-            font-weight: bold;
-            flex-shrink: 0;
-            margin-top: 1px;
-          }
-
-          .feature-text {
-            font-size: 13px;
-            line-height: 1.65;
-            color: #EFEBE9;
-            margin: 0;
-          }
-
-          /* Tech Chips */
-          .tech-chips-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-          }
-
-          .tech-chip {
-            background: rgba(141, 110, 99, 0.12);
-            border: 1px solid rgba(141, 110, 99, 0.3);
-            border-radius: 20px;
-            color: #FAF6EE;
-            font-size: 12px;
-            padding: 6px 16px;
-            letter-spacing: 0.5px;
-          }
-
-          /* Deep Dive Specifications Grid */
-          .deepdive-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-          }
-
-          .deepdive-item {
-            background: rgba(26, 10, 8, 0.4);
-            border: 1px solid rgba(141, 110, 99, 0.2);
-            border-radius: 8px;
-            padding: 20px;
-          }
-
-          .deepdive-title {
-            font-size: 13px;
-            color: #FAF6EE;
-            letter-spacing: 0.5px;
-            margin: 0 0 10px;
-            font-weight: bold;
-          }
-
-          .deepdive-text {
-            font-size: 13px;
-            line-height: 1.7;
-            color: #D7CCC8;
-            margin: 0;
-          }
-
-          /* Quality Standards Card */
-          .quality-card {
-            background: rgba(35, 21, 19, 0.6);
-            border-left: 3px solid #8D6E63;
-          }
-
-          /* Related Showcase Projects Grid */
-          .related-showcase-card {
-            background: rgba(26, 10, 8, 0.6);
-          }
-
-          .related-projects-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 16px;
-          }
-
-          .related-project-card {
-            background: rgba(42, 21, 16, 0.5);
-            border: 1px solid rgba(141, 110, 99, 0.2);
-            border-radius: 8px;
-            padding: 18px;
-            display: flex;
-            flex-direction: column;
-            transition: border-color 0.2s, transform 0.2s;
-          }
-          .related-project-card:hover {
-            border-color: #8D6E63;
-            transform: translateY(-2px);
-          }
-
-          .related-status {
-            font-size: 9px;
-            color: #8D6E63;
-            font-weight: bold;
-            margin-bottom: 6px;
-          }
-
-          .related-title {
-            font-size: 15px;
-            margin: 0 0 8px;
-            font-weight: bold;
-          }
-
-          .related-link {
-            color: #FAF6EE;
-            text-decoration: none;
-          }
-          .related-link:hover {
-            color: #8D6E63;
-          }
-
-          .related-desc {
-            font-size: 11px;
-            color: #BCAAA4;
-            line-height: 1.5;
-            margin: 0 0 14px;
-            flex-grow: 1;
-          }
-
-          .related-btn {
-            font-size: 11px;
-            color: #8D6E63;
-            text-decoration: none;
-            font-weight: bold;
-            letter-spacing: 0.5px;
-          }
-          .related-btn:hover {
-            color: #FAF6EE;
-          }
-
-          /* Launch Banner */
-          .launch-banner {
-            margin-top: 36px;
-            background: linear-gradient(135deg, rgba(42, 21, 16, 0.9) 0%, rgba(26, 10, 8, 0.95) 100%);
-            border: 1.5px solid rgba(141, 110, 99, 0.4);
-            border-radius: 16px;
-            padding: 40px;
-            text-align: center;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
-          }
-
-          .launch-heading {
-            font-size: 22px;
-            color: #FAF6EE;
-            margin: 0 0 12px;
-            font-weight: bold;
-          }
-
-          .launch-sub {
-            font-size: 13px;
-            line-height: 1.65;
-            color: #BCAAA4;
-            max-width: 560px;
-            margin: 0 auto 24px;
-          }
-
-          /* Footer CTA */
-          .saas-footer-cta {
-            border-top: 1px solid rgba(141, 110, 99, 0.15);
-            padding: 64px 0 80px;
-            background: rgba(26, 10, 8, 0.5);
-          }
-
-          .text-center { text-align: center; }
-
-          .footer-label {
-            font-size: 11px;
-            color: #8D6E63;
-            letter-spacing: 1.5px;
-            margin: 0 0 12px;
-          }
-
-          .footer-title {
-            font-size: 24px;
-            color: #FAF6EE;
-            margin: 0 0 12px;
-            font-weight: bold;
-          }
-
-          .footer-desc {
-            font-size: 13px;
-            line-height: 1.65;
-            color: #BCAAA4;
-            max-width: 580px;
-            margin: 0 auto 28px;
-          }
-
-          .footer-btn-row {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 14px;
-            flex-wrap: wrap;
-          }
-
-          @media (max-width: 600px) {
-            .saas-card { padding: 22px; }
-            .launch-banner { padding: 28px 20px; }
-          }
-        `}</style>
       </div>
     </>
   );

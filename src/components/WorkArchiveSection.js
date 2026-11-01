@@ -1,6 +1,7 @@
 'use client';
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { getProjectCategory } from '../data/projectsData';
 
 const categories = [
   { id: 'all', label: 'ALL' },
@@ -16,23 +17,24 @@ export default function WorkArchiveSection({ projects = [], onProjectClick }) {
   const isSaas = (p) => {
     if (!p.categories) return false;
     const cats = Array.isArray(p.categories) ? p.categories : [p.categories];
-    return cats.some((c) => typeof c === 'string' && c.toLowerCase().includes('saas'));
+    return cats.some((c) => typeof c === 'string' && c.toLowerCase().trim() === 'saas');
   };
 
   const isFreelance = (p) => {
     if (!p.categories) return false;
     const cats = Array.isArray(p.categories) ? p.categories : [p.categories];
-    return cats.some((c) => typeof c === 'string' && c.toLowerCase().includes('freelance'));
+    return cats.some((c) => typeof c === 'string' && c.toLowerCase().trim() === 'freelance');
   };
 
-  // Filter personal projects (exclude freelance and saas)
+  // Filter personal projects (projects in personal category)
   const personalProjects = projects.filter((p) => {
     if (isFreelance(p) || isSaas(p)) return false;
     if (activeCategory === 'all') return true;
-    return p.categories.some((c) => typeof c === 'string' && c.toLowerCase().trim() === activeCategory.toLowerCase());
+    const cats = Array.isArray(p.categories) ? p.categories : [p.categories];
+    return cats.some((c) => typeof c === 'string' && c.toLowerCase().trim() === activeCategory.toLowerCase());
   });
 
-  // Filter SaaS projects
+  // Filter SaaS projects (from Supabase: only membership-saas, or any new saas added)
   const saasProjects = projects.filter(isSaas);
 
   // Filter freelance projects
@@ -41,29 +43,39 @@ export default function WorkArchiveSection({ projects = [], onProjectClick }) {
   return (
     <section id="work-archive" style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
       {/* Section Header */}
-      <div style={{ display: 'flex', alignItems: 'center', width: '100%', marginBottom: '40px' }}>
-        <span style={{
-          fontFamily: 'var(--font-handwritten)',
-          fontSize: '26px',
-          color: '#8C7355',
-          marginRight: '8px'
-        }}>
-          04 // 
-        </span>
-        <h2 style={{
-          fontFamily: 'var(--font-header)',
-          fontSize: '22px',
-          color: '#EFEBE9',
-          fontWeight: 'bold',
-          letterSpacing: '1.0px',
-          margin: 0
-        }}>
-          WORK ARCHIVE
-        </h2>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', marginBottom: '40px', flexWrap: 'wrap', gap: '12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <span style={{
+            fontFamily: 'var(--font-handwritten)',
+            fontSize: '26px',
+            color: '#8C7355',
+            marginRight: '8px'
+          }}>
+            04 // 
+          </span>
+          <h2 style={{
+            fontFamily: 'var(--font-header)',
+            fontSize: '22px',
+            color: '#EFEBE9',
+            fontWeight: 'bold',
+            letterSpacing: '1.0px',
+            margin: 0
+          }}>
+            WORK ARCHIVE
+          </h2>
+        </div>
+        <Link href="/project" className="view-all-saas-chip">
+          Explore Projects Directory (/project) →
+        </Link>
       </div>
 
       {/* SUBSECTION 1: PERSONAL PROJECTS */}
-      <div className="archive-subsection-title">// PERSONAL PROJECTS</div>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px', flexWrap: 'wrap', gap: '10px' }}>
+        <div className="archive-subsection-title" style={{ marginBottom: 0 }}>// PERSONAL PROJECTS</div>
+        <Link href="/project/personal-project" className="view-all-saas-chip">
+          View All Personal Projects →
+        </Link>
+      </div>
       
       {/* Filter Tabs for Personal Projects */}
       <div className="tabs-container">
@@ -99,11 +111,11 @@ export default function WorkArchiveSection({ projects = [], onProjectClick }) {
             <div className="card-action-bar">
               <span className="card-action-quick">Quick View →</span>
               <Link
-                href={`/saas/${project.id}`}
+                href={`/project/personal-project/${project.id}`}
                 className="card-action-direct"
                 onClick={(e) => e.stopPropagation()}
               >
-                Page ↗
+                Specs & Case Study ↗
               </Link>
             </div>
           </div>
@@ -115,7 +127,7 @@ export default function WorkArchiveSection({ projects = [], onProjectClick }) {
         <>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px', flexWrap: 'wrap', gap: '10px' }}>
             <div className="archive-subsection-title" style={{ marginBottom: 0 }}>// SAAS PRODUCTS</div>
-            <Link href="/saas" className="view-all-saas-chip">
+            <Link href="/project/saas" className="view-all-saas-chip">
               Explore All SaaS Directory →
             </Link>
           </div>
@@ -142,7 +154,7 @@ export default function WorkArchiveSection({ projects = [], onProjectClick }) {
                 <div className="card-action-bar">
                   <span className="card-action-quick">Quick View →</span>
                   <Link
-                    href={`/saas/${project.id}`}
+                    href={`/project/saas/${project.id}`}
                     className="card-action-direct"
                     onClick={(e) => e.stopPropagation()}
                   >
@@ -156,7 +168,12 @@ export default function WorkArchiveSection({ projects = [], onProjectClick }) {
       )}
 
       {/* SUBSECTION 3: FREELANCE PROJECTS */}
-      <div className="archive-subsection-title">// FREELANCE PROJECTS</div>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px', flexWrap: 'wrap', gap: '10px' }}>
+        <div className="archive-subsection-title" style={{ marginBottom: 0 }}>// FREELANCE PROJECTS</div>
+        <Link href="/project/freelance" className="view-all-saas-chip">
+          View All Freelance Builds →
+        </Link>
+      </div>
 
       {/* Freelance Projects Grid */}
       <div className="projects-grid">
@@ -176,6 +193,16 @@ export default function WorkArchiveSection({ projects = [], onProjectClick }) {
                 {project.tech.join('; ')}
               </div>
             )}
+            <div className="card-action-bar">
+              <span className="card-action-quick">Quick View →</span>
+              <Link
+                href={`/project/freelance/${project.id}`}
+                className="card-action-direct"
+                onClick={(e) => e.stopPropagation()}
+              >
+                Architecture & Case Study ↗
+              </Link>
+            </div>
           </div>
         ))}
       </div>
@@ -244,8 +271,8 @@ export default function WorkArchiveSection({ projects = [], onProjectClick }) {
         }
 
         .project-card {
-          background-color: rgba(35, 21, 19, 0.4); /* Dark translucent background */
-          border: 1px solid rgba(141, 110, 99, 0.4); /* Cozy theme brown border */
+          background-color: rgba(35, 21, 19, 0.4);
+          border: 1px solid rgba(141, 110, 99, 0.4);
           border-radius: 8px;
           padding: 24px;
           display: flex;

@@ -11,11 +11,12 @@ import AboutSection from '../components/AboutSection';
 import ExperienceSection from '../components/ExperienceSection';
 import SkillsSection from '../components/SkillsSection';
 import WorkArchiveSection from '../components/WorkArchiveSection';
+import ToolsSection from '../components/ToolsSection';
 import LiveWorkspaceSection from '../components/LiveWorkspaceSection';
 import BlogSection from '../components/BlogSection';
 import ReviewsSection, { ReviewFormModal } from '../components/ReviewsSection';
 import ContactSection, { RequirementFormModal } from '../components/ContactSection';
-import { allProjects, projectsApiUrl, saasApiUrl } from '../data/projectsData';
+import { allProjects, fetchProjectsFromSupabase } from '../data/projectsData';
 import { allBlogs } from '../data/blogData';
 import ProjectModal from '../components/ProjectModal';
 import BlogModal from '../components/BlogModal';
@@ -33,15 +34,16 @@ export default function Home() {
 
   // Refs for each section to measure viewport positions
   const sectionRefs = [
-    useRef(null), // Home / Hero
-    useRef(null), // About
-    useRef(null), // Experience
-    useRef(null), // Skills
-    useRef(null), // Work Archive
-    useRef(null), // Live Workspace
-    useRef(null), // Blog
-    useRef(null), // Reviews
-    useRef(null), // Contact
+    useRef(null), // 0: Home / Hero
+    useRef(null), // 1: About
+    useRef(null), // 2: Experience
+    useRef(null), // 3: Skills
+    useRef(null), // 4: Work Archive
+    useRef(null), // 5: Tools
+    useRef(null), // 6: Live Workspace
+    useRef(null), // 7: Blog
+    useRef(null), // 8: Reviews
+    useRef(null), // 9: Contact
   ];
 
   // Redirect admin subdomain to /admin
@@ -51,101 +53,36 @@ export default function Home() {
     }
   }, []);
 
-  // Fetch projects from Google Sheets Apps Script on mount
+  // Fetch live projects directly from Supabase on mount
   useEffect(() => {
-    const fetchProjects = async (retries = 3, delay = 500) => {
-      try {
-        const res = await fetch(projectsApiUrl);
-        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-        const decoded = await res.json();
-        const rawList = Array.isArray(decoded) ? decoded : (decoded.data || []);
-        const fetched = rawList
-          .map(p => ({
-            id: p.id || '',
-            title: p.title || '',
-            subtitle: p.subtitle || '',
-            status: p.status || '',
-            tagline: p.tagline || '',
-            description: p.description || '',
-            features: typeof p.features === 'string' ? p.features.split(';').map(s => s.trim()) : (p.features || []),
-            tech: typeof p.tech === 'string' ? p.tech.split(',').map(s => s.trim()) : (p.tech || []),
-            links: typeof p.link_texts === 'string' && typeof p.link_urls === 'string'
-              ? p.link_texts.split('|').map((t, idx) => ({ text: t.trim(), url: p.link_urls.split('|')[idx]?.trim() || '' }))
-              : (p.links || []),
-            categories: typeof p.categories === 'string' ? p.categories.split(',').map(s => s.trim()) : (p.categories || []),
-            order: p.order !== undefined ? String(p.order) : '',
-          }))
-          .filter(p => p.id && p.title);
-        
-        // Also check if a dedicated SaaS endpoint or tab returns projects
-        let saasFetched = [];
-        try {
-          const saasRes = await fetch(saasApiUrl);
-          if (saasRes.ok) {
-            const saasDecoded = await saasRes.json();
-            const saasList = Array.isArray(saasDecoded) ? saasDecoded : (saasDecoded.data || []);
-            // Validate: only accept if it actually returned project items (not the reviews fallback)
-            if (saasList.length > 0 && saasList[0].title && !saasList[0].rating) {
-              saasFetched = saasList.map(p => ({
-                id: p.id || '',
-                title: p.title || '',
-                subtitle: p.subtitle || '',
-                status: p.status || '',
-                tagline: p.tagline || '',
-                description: p.description || '',
-                features: typeof p.features === 'string' ? p.features.split(';').map(s => s.trim()) : (p.features || []),
-                tech: typeof p.tech === 'string' ? p.tech.split(',').map(s => s.trim()) : (p.tech || []),
-                links: typeof p.link_texts === 'string' && typeof p.link_urls === 'string'
-                  ? p.link_texts.split('|').map((t, idx) => ({ text: t.trim(), url: p.link_urls.split('|')[idx]?.trim() || '' }))
-                  : (p.links || []),
-                categories: typeof p.categories === 'string'
-                  ? Array.from(new Set([...p.categories.split(',').map(s => s.trim()), 'saas']))
-                  : Array.from(new Set([...(p.categories || []), 'saas'])),
-                order: p.order !== undefined ? String(p.order) : '',
-              })).filter(p => p.id && p.title);
-            }
-          }
-        } catch (e) {
-          // Dedicated SaaS endpoint not configured yet; standard projects endpoint provides SaaS projects
-        }
-
-        const projectMap = new Map();
-        [...fetched, ...saasFetched].forEach(p => projectMap.set(p.id, p));
-        const combined = Array.from(projectMap.values());
-        
-        if (combined.length > 0) {
-          setProjects(combined);
-          localStorage.setItem('cached_projects', JSON.stringify(combined));
-        }
-      } catch (e) {
-        console.error('Failed to load dynamic projects:', e);
-        if (retries > 0) {
-          setTimeout(() => fetchProjects(retries - 1, delay * 2), delay);
-        } else {
-          // Fallback to localStorage cache if network fails completely
-          const cached = localStorage.getItem('cached_projects');
-          if (cached) {
-            try {
-              setProjects(JSON.parse(cached));
-            } catch (err) {
-              // fallback remains allProjects
-            }
-          }
-        }
-      }
-    };
-
-    // Load from cache first for instant load
+    // Instant cache paint
     if (typeof window !== 'undefined') {
       const cached = localStorage.getItem('cached_projects');
       if (cached) {
         try {
-          setProjects(JSON.parse(cached));
-        } catch (err) {}
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setProjects(parsed);
+          }
+        } catch (_) {}
       }
     }
-    
-    fetchProjects();
+
+    let isMounted = true;
+    const loadLiveProjects = async () => {
+      try {
+        const live = await fetchProjectsFromSupabase();
+        if (isMounted && Array.isArray(live) && live.length > 0) {
+          setProjects(live);
+          localStorage.setItem('cached_projects', JSON.stringify(live));
+        }
+      } catch (err) {
+        console.warn('Failed to sync live projects from Supabase:', err);
+      }
+    };
+
+    loadLiveProjects();
+    return () => { isMounted = false; };
   }, []);
 
   // Scroll listener to update scrollOffset and active index
@@ -304,7 +241,7 @@ export default function Home() {
             scrollOffset={scrollOffset}
             onNavigateSection={(idx) => scrollToSection(idx)}
             onAccessProjects={() => scrollToSection(4)}
-            onContactMe={() => scrollToSection(8)}
+            onContactMe={() => scrollToSection(9)}
             onGetQuote={handleGetQuote}
           />
         </div>
@@ -338,29 +275,36 @@ export default function Home() {
             </ScrollReveal>
           </div>
 
-          {/* Section 5: Live Workspace */}
+          {/* Section 5: Tools */}
           <div ref={sectionRefs[5]} className="section-wrapper">
+            <ScrollReveal delay={80}>
+              <ToolsSection />
+            </ScrollReveal>
+          </div>
+
+          {/* Section 6: Live Workspace */}
+          <div ref={sectionRefs[6]} className="section-wrapper">
             <ScrollReveal delay={80}>
               <LiveWorkspaceSection projects={projects} />
             </ScrollReveal>
           </div>
 
-          {/* Section 6: Blog */}
-          <div ref={sectionRefs[6]} className="section-wrapper">
+          {/* Section 7: Blog */}
+          <div ref={sectionRefs[7]} className="section-wrapper">
             <ScrollReveal delay={80}>
               <BlogSection onBlogClick={handleOpenBlog} />
             </ScrollReveal>
           </div>
 
-          {/* Section 7: Reviews */}
-          <div ref={sectionRefs[7]} className="section-wrapper">
+          {/* Section 8: Reviews */}
+          <div ref={sectionRefs[8]} className="section-wrapper">
             <ScrollReveal delay={80}>
               <ReviewsSection projects={projects} onProjectClick={handleOpenProject} />
             </ScrollReveal>
           </div>
 
-          {/* Section 8: Contact */}
-          <div ref={sectionRefs[8]} className="section-wrapper">
+          {/* Section 9: Contact */}
+          <div ref={sectionRefs[9]} className="section-wrapper">
             <ScrollReveal delay={80}>
               <ContactSection onGetQuote={handleGetQuote} />
             </ScrollReveal>
@@ -369,19 +313,29 @@ export default function Home() {
           {/* Footer */}
           <footer className="footer-section">
             <nav className="footer-nav" aria-label="Footer quick navigation">
-              <Link href="/resume-builder" className="footer-link">Free Resume Builder</Link>
+              <Link href="/project" className="footer-link">Projects Hub</Link>
+              <span className="footer-sep">·</span>
+              <Link href="/tools" className="footer-link">Tools</Link>
+              <span className="footer-sep">·</span>
+              <Link href="/tools/resume-builder" className="footer-link">Resume Builder</Link>
+              <span className="footer-sep">·</span>
+              <Link href="/project/saas" className="footer-link">SaaS</Link>
+              <span className="footer-sep">·</span>
+              <Link href="/project/freelance" className="footer-link">Freelance</Link>
+              <span className="footer-sep">·</span>
+              <Link href="/project/personal-project" className="footer-link">Personal</Link>
               <span className="footer-sep">·</span>
               <Link href="/services" className="footer-link">Services</Link>
               <span className="footer-sep">·</span>
-              <Link href="/saas" className="footer-link">SaaS Products</Link>
-              <span className="footer-sep">·</span>
-              <Link href="/blog" className="footer-link">Engineering Blog</Link>
+              <Link href="/blog" className="footer-link">Blog</Link>
               <span className="footer-sep">·</span>
               <button type="button" onClick={() => scrollToSection(1)} className="footer-link-btn">About</button>
               <span className="footer-sep">·</span>
               <button type="button" onClick={() => scrollToSection(4)} className="footer-link-btn">Projects</button>
               <span className="footer-sep">·</span>
-              <button type="button" onClick={() => scrollToSection(8)} className="footer-link-btn">Contact</button>
+              <button type="button" onClick={() => scrollToSection(5)} className="footer-link-btn">Tools</button>
+              <span className="footer-sep">·</span>
+              <button type="button" onClick={() => scrollToSection(9)} className="footer-link-btn">Contact</button>
             </nav>
             <p className="footer-copyright">© 2026 Adil Rahman | All Rights Reserved</p>
             <p className="footer-version">MADE AND DEPLOYED BY ME // PORTFOLIO v3.0.0</p>

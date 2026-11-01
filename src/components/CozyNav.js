@@ -7,6 +7,7 @@ const labels = [
   'EXPERIENCE',
   'SKILLS',
   'WORK ARCHIVE',
+  'TOOLS',
   'WORKSPACE',
   'BLOG',
   'REVIEWS',

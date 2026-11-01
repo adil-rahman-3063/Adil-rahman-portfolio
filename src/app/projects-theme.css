@@ -1,0 +1,1034 @@
+/* ==========================================================================
+   ADIL RAHMAN // PORTFOLIO COZY THEME STYLES
+   Unified stylesheet for Projects Hub, Category Directories, Detail Pages,
+   SaaS Directory, and Tools Hub.
+   Matches the homepage typewriter / espresso / paper aesthetic 100%.
+   ========================================================================== */
+
+/* ─── Global Reset & Hyperlink Enforcements for Projects & Tools ─── */
+.projects-hub-page,
+.category-directory-page,
+.project-detail-page,
+.saas-directory-page,
+.tools-hub-page {
+  min-height: 100vh;
+  background-color: #231513; /* Deep warm espresso */
+  background-image: radial-gradient(circle at 50% 0%, #2e1c19 0%, #231513 70%);
+  color: #EFEBE9;
+  font-family: var(--font-special-elite), monospace;
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Eliminate ANY generic browser blue/purple hyperlinks */
+.projects-hub-page a,
+.category-directory-page a,
+.project-detail-page a,
+.saas-directory-page a,
+.tools-hub-page a {
+  color: #8D6E63;
+  text-decoration: none;
+  transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.projects-hub-page a:hover,
+.category-directory-page a:hover,
+.project-detail-page a:hover,
+.saas-directory-page a:hover,
+.tools-hub-page a:hover {
+  color: #FAF6EE;
+}
+
+.projects-hub-page a:visited,
+.category-directory-page a:visited,
+.project-detail-page a:visited,
+.saas-directory-page a:visited,
+.tools-hub-page a:visited {
+  color: inherit;
+}
+
+/* ─── Sticky Cozy Navigation & Breadcrumbs ─── */
+.projects-nav,
+.category-nav,
+.project-nav,
+.saas-nav,
+.tools-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 32px;
+  border-bottom: 1px solid rgba(141, 110, 99, 0.25);
+  background: rgba(26, 14, 12, 0.94);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.nav-left,
+.nav-breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.projects-back-link,
+.category-back-link,
+.back-link,
+.saas-back-link,
+.nav-crumb {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-special-elite), monospace;
+  font-size: 13px;
+  color: #8D6E63 !important;
+  text-decoration: none !important;
+  font-weight: 500;
+}
+
+.projects-back-link:hover,
+.category-back-link:hover,
+.back-link:hover,
+.saas-back-link:hover,
+.nav-crumb:hover {
+  color: #FAF6EE !important;
+}
+
+.crumb-sep,
+.breadcrumb-sep,
+.banner-sep {
+  color: rgba(141, 110, 99, 0.4);
+  font-size: 12px;
+}
+
+.crumb-active,
+.breadcrumb-current {
+  font-family: var(--font-special-elite), monospace;
+  font-size: 12.5px;
+  color: #FAF6EE;
+  font-weight: 600;
+}
+
+.projects-nav-brand,
+.category-home-link,
+.nav-brand,
+.nav-home-btn,
+.saas-nav-brand {
+  font-family: var(--font-special-elite), monospace;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  color: #8C7355 !important;
+  text-decoration: none !important;
+  font-weight: bold;
+}
+
+.category-home-link:hover,
+.nav-home-btn:hover {
+  color: #FAF6EE !important;
+}
+
+/* Hub Redirection Notice */
+.hub-notice-bar {
+  background: rgba(140, 115, 85, 0.12);
+  border-bottom: 1px solid rgba(140, 115, 85, 0.25);
+  padding: 10px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-family: var(--font-special-elite), monospace;
+  font-size: 11.5px;
+  color: #BCAAA4;
+}
+
+.hub-notice-link {
+  color: #FAF6EE !important;
+  font-weight: bold;
+  text-decoration: underline !important;
+}
+
+/* ─── Headers & Page Introductions ─── */
+.projects-header,
+.category-header,
+.saas-header,
+.tools-header,
+.project-header {
+  padding: 56px 32px 32px;
+  display: flex;
+  justify-content: center;
+}
+
+.projects-header-inner,
+.category-header-inner,
+.saas-header-inner,
+.tools-header-inner,
+.project-inner {
+  max-width: 1100px;
+  width: 100%;
+}
+
+.projects-tag,
+.category-tag,
+.saas-tag,
+.tools-tag {
+  font-family: var(--font-special-elite), monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: #8C7355;
+  display: block;
+  margin-bottom: 12px;
+  font-weight: bold;
+}
+
+.projects-title,
+.category-title,
+.saas-title,
+.tools-title,
+.project-title {
+  font-family: var(--font-special-elite), monospace;
+  font-size: clamp(30px, 4.5vw, 48px);
+  font-weight: 700;
+  color: #FAF6EE;
+  margin: 0 0 16px;
+  line-height: 1.15;
+  letter-spacing: 0.5px;
+}
+
+.projects-excerpt,
+.category-excerpt,
+.saas-excerpt,
+.tools-excerpt,
+.project-subtitle,
+.project-tagline {
+  font-size: 15px;
+  line-height: 1.65;
+  color: #BCAAA4;
+  max-width: 800px;
+  margin: 0 0 28px;
+  font-family: var(--font-special-elite), monospace;
+}
+
+.project-subtitle {
+  color: #8C7355;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.project-tagline {
+  color: #FAF6EE;
+  font-size: 16px;
+  margin-bottom: 24px;
+}
+
+.projects-author-card,
+.saas-author-card {
+  background: rgba(46, 28, 25, 0.45);
+  border: 1px solid rgba(141, 110, 99, 0.3);
+  border-left: 3px solid #8C7355;
+  padding: 18px 22px;
+  border-radius: 6px;
+  margin-bottom: 32px;
+}
+
+.projects-author-text,
+.saas-author-text {
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: #EFEBE9;
+  margin: 0;
+  font-family: var(--font-special-elite), monospace;
+}
+
+.projects-author-text strong,
+.saas-author-text strong {
+  color: #FAF6EE;
+}
+
+.projects-header-line,
+.category-header-line,
+.saas-header-line,
+.tools-header-line,
+.section-divider {
+  height: 1px;
+  background: linear-gradient(90deg, rgba(141, 110, 99, 0.45), rgba(141, 110, 99, 0.1) 80%, transparent);
+  border: none;
+  width: 100%;
+  margin: 20px 0 0 0;
+}
+
+/* ─── Category Quick-Filter Switcher Chips ─── */
+.category-switcher-bar,
+.category-quick-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.switcher-label,
+.filter-title {
+  font-family: var(--font-special-elite), monospace;
+  font-size: 10.5px;
+  letter-spacing: 1.5px;
+  color: #8C7355;
+  font-weight: bold;
+}
+
+.switcher-chips,
+.filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.switcher-chip,
+.filter-chip {
+  font-family: var(--font-special-elite), monospace;
+  font-size: 12px;
+  padding: 7px 16px;
+  border-radius: 20px;
+  border: 1.5px solid rgba(141, 110, 99, 0.35);
+  color: #BCAAA4 !important;
+  text-decoration: none !important;
+  background: transparent;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.switcher-chip:hover,
+.filter-chip:hover {
+  border-color: #8D6E63;
+  color: #FAF6EE !important;
+  background: rgba(141, 110, 99, 0.18);
+  transform: translateY(-1px);
+}
+
+.switcher-chip.active,
+.filter-chip.active {
+  background: #8D6E63 !important;
+  color: #FAF6EE !important;
+  border-color: #8D6E63 !important;
+  font-weight: bold;
+}
+
+/* Category Stats Bar */
+.category-stats-bar {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 32px;
+}
+
+.stat-pill {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  background: rgba(46, 28, 25, 0.5);
+  border: 1px solid rgba(141, 110, 99, 0.25);
+  padding: 8px 16px;
+  border-radius: 6px;
+}
+
+.stat-label {
+  font-family: var(--font-special-elite), monospace;
+  font-size: 9.5px;
+  color: #8C7355;
+  letter-spacing: 1px;
+}
+
+.stat-val {
+  font-family: var(--font-special-elite), monospace;
+  font-size: 13px;
+  color: #FAF6EE;
+  font-weight: bold;
+}
+
+/* ─── Main Content Container & Grids ─── */
+.projects-main,
+.category-main,
+.saas-main,
+.tools-main,
+.project-content {
+  display: flex;
+  justify-content: center;
+  padding: 0 32px 80px;
+}
+
+.projects-grid-container,
+.category-grid-container,
+.saas-grid-container,
+.tools-grid-container {
+  max-width: 1100px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 56px;
+}
+
+.category-tier-section,
+.saas-tier-section {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.tier-header {
+  border-bottom: 1px solid rgba(141, 110, 99, 0.25);
+  padding-bottom: 16px;
+}
+
+.tier-title-row,
+.tier-header-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.tier-badge {
+  font-family: var(--font-special-elite), monospace;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  color: #8C7355;
+  display: block;
+  margin-bottom: 4px;
+  font-weight: bold;
+}
+
+.tier-heading,
+.saas-section-subtitle,
+.section-title {
+  font-family: var(--font-special-elite), monospace;
+  font-size: 22px;
+  color: #FAF6EE;
+  margin: 0;
+  letter-spacing: 0.5px;
+  font-weight: bold;
+}
+
+.tier-view-all-link,
+.tier-chip-link,
+.view-all-saas-chip,
+.view-all-tools-chip {
+  font-family: var(--font-special-elite), monospace;
+  font-size: 11.5px;
+  color: #8D6E63 !important;
+  text-decoration: none !important;
+  font-weight: bold;
+  border: 1px solid rgba(141, 110, 99, 0.35);
+  padding: 5px 14px;
+  border-radius: 16px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.tier-view-all-link:hover,
+.tier-chip-link:hover,
+.view-all-saas-chip:hover,
+.view-all-tools-chip:hover {
+  background: #8D6E63;
+  color: #FAF6EE !important;
+  border-color: #8D6E63;
+}
+
+.tier-desc {
+  font-size: 13.5px;
+  color: #BCAAA4;
+  margin: 0;
+  line-height: 1.5;
+  font-family: var(--font-special-elite), monospace;
+}
+
+/* Grids */
+.projects-cards-grid,
+.category-cards-grid,
+.saas-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.tools-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  width: 100%;
+}
+
+/* ─── Unified Card Styles (Match Homepage WorkArchive) ─── */
+.project-card-item,
+.saas-card-item,
+.tool-card {
+  background-color: rgba(35, 21, 19, 0.55);
+  border: 1px solid rgba(141, 110, 99, 0.35);
+  border-radius: 8px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+.project-card-item:hover,
+.saas-card-item:hover,
+.tool-card:hover {
+  border-color: #8D6E63;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.4);
+}
+
+.featured-card,
+.featured-tool-card {
+  border-left: 3px solid #8C7355;
+}
+
+.project-card-top,
+.saas-card-top,
+.tool-card-top,
+.header-badges {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.project-status-badge,
+.saas-status-badge,
+.tool-status-text,
+.badge-status,
+.status-badge {
+  font-family: var(--font-special-elite), monospace;
+  font-size: 10px;
+  color: #8C7355;
+  letter-spacing: 0.8px;
+  font-weight: bold;
+}
+
+.project-category-badge,
+.saas-category-badge,
+.tool-badge,
+.category-badge,
+.badge-category-link {
+  font-family: var(--font-special-elite), monospace;
+  font-size: 9px;
+  color: #FAF6EE !important;
+  background: rgba(141, 110, 99, 0.25);
+  border: 1px solid rgba(141, 110, 99, 0.5);
+  padding: 2px 7px;
+  border-radius: 4px;
+  letter-spacing: 0.8px;
+  text-decoration: none !important;
+  text-transform: uppercase;
+}
+
+.project-card-name,
+.saas-card-name,
+.tool-name {
+  font-family: var(--font-special-elite), monospace;
+  font-size: 21px;
+  color: #FAF6EE;
+  margin: 0;
+  line-height: 1.25;
+  font-weight: bold;
+}
+
+.project-card-title-link,
+.saas-card-title-link,
+.tool-title-link {
+  color: #FAF6EE !important;
+  text-decoration: none !important;
+  transition: color 0.2s ease;
+}
+
+.project-card-title-link:hover,
+.saas-card-title-link:hover,
+.tool-title-link:hover {
+  color: #D7CCC8 !important;
+}
+
+.project-card-subtitle,
+.saas-card-subtitle,
+.tool-subtitle {
+  font-family: var(--font-special-elite), monospace;
+  font-size: 11px;
+  color: #8C7355;
+  letter-spacing: 0.5px;
+}
+
+.project-card-description,
+.saas-card-description,
+.tool-card-desc,
+.tool-desc,
+.description-text {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #BCAAA4;
+  margin: 0;
+  flex-grow: 1;
+  font-family: var(--font-special-elite), monospace;
+}
+
+/* Tech Pills */
+.project-card-tech,
+.saas-card-tech,
+.tool-tech-pills,
+.tech-pills-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tech-pill,
+.tech-chip {
+  font-family: var(--font-special-elite), monospace;
+  font-size: 10.5px;
+  color: #FAF6EE;
+  background: rgba(141, 110, 99, 0.15);
+  border: 1px solid rgba(141, 110, 99, 0.35);
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+/* Actions in Cards */
+.project-card-actions,
+.saas-card-actions,
+.tool-card-actions,
+.tool-actions,
+.card-action-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 6px;
+  padding-top: 14px;
+  border-top: 1px dashed rgba(141, 110, 99, 0.25);
+  flex-wrap: wrap;
+}
+
+.project-detail-btn,
+.saas-detail-btn,
+.tool-specs-btn,
+.btn-specs,
+.card-action-direct {
+  font-family: var(--font-special-elite), monospace;
+  font-size: 11.5px;
+  color: #8C7355 !important;
+  text-decoration: none !important;
+  font-weight: bold;
+  transition: color 0.2s;
+}
+
+.project-detail-btn:hover,
+.saas-detail-btn:hover,
+.tool-specs-btn:hover,
+.btn-specs:hover,
+.card-action-direct:hover {
+  color: #FAF6EE !important;
+}
+
+.project-live-btn,
+.saas-live-btn,
+.tool-launch-btn,
+.btn-launch {
+  font-family: var(--font-special-elite), monospace;
+  font-size: 11px;
+  color: #FAF6EE !important;
+  background: #8D6E63;
+  padding: 5px 14px;
+  border-radius: 14px;
+  text-decoration: none !important;
+  font-weight: bold;
+  transition: opacity 0.2s;
+  white-space: nowrap;
+}
+
+.project-live-btn:hover,
+.saas-live-btn:hover,
+.tool-launch-btn:hover,
+.btn-launch:hover {
+  opacity: 0.85;
+}
+
+/* ─── Detail Page Architecture Specs ─── */
+.action-links-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 16px 0 24px;
+}
+
+.btn-github,
+.btn-discuss {
+  font-family: var(--font-special-elite), monospace;
+  font-size: 11.5px;
+  color: #FAF6EE !important;
+  background: transparent;
+  border: 1px solid rgba(141, 110, 99, 0.5);
+  padding: 6px 14px;
+  border-radius: 14px;
+  text-decoration: none !important;
+  font-weight: bold;
+  transition: all 0.2s ease;
+}
+
+.btn-github:hover,
+.btn-discuss:hover {
+  background: rgba(141, 110, 99, 0.2);
+  border-color: #8D6E63;
+}
+
+.architecture-section,
+.features-section,
+.tech-section,
+.related-section {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-top: 36px;
+}
+
+.architecture-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.arch-card {
+  background: rgba(35, 21, 19, 0.55);
+  border: 1px solid rgba(141, 110, 99, 0.35);
+  border-radius: 8px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.card-num {
+  font-family: var(--font-special-elite), monospace;
+  font-size: 20px;
+  color: #8D6E63;
+  font-weight: bold;
+}
+
+.arch-card h3 {
+  font-family: var(--font-special-elite), monospace;
+  font-size: 17px;
+  color: #FAF6EE;
+  margin: 0;
+}
+
+.arch-card p {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #BCAAA4;
+  margin: 0;
+  font-family: var(--font-special-elite), monospace;
+}
+
+.features-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+}
+
+.feature-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 13.5px;
+  color: #EFEBE9;
+  line-height: 1.55;
+  font-family: var(--font-special-elite), monospace;
+}
+
+.feature-bullet {
+  color: #8C7355;
+  font-weight: bold;
+}
+
+.tool-features-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: rgba(20, 13, 11, 0.4);
+  border: 1px solid rgba(141, 110, 99, 0.25);
+  padding: 16px 20px;
+  border-radius: 6px;
+}
+
+.related-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.related-view-all {
+  font-family: var(--font-special-elite), monospace;
+  font-size: 11.5px;
+  color: #8D6E63 !important;
+  text-decoration: none !important;
+  font-weight: bold;
+}
+
+.related-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.related-card {
+  background: rgba(35, 21, 19, 0.5);
+  border: 1px solid rgba(141, 110, 99, 0.3);
+  border-radius: 8px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-decoration: none !important;
+  transition: all 0.2s ease;
+}
+
+.related-card:hover {
+  border-color: #8D6E63;
+  transform: translateY(-2px);
+  background: rgba(46, 28, 25, 0.6);
+}
+
+.related-status {
+  font-family: var(--font-special-elite), monospace;
+  font-size: 9.5px;
+  color: #8C7355;
+}
+
+.related-title {
+  font-family: var(--font-special-elite), monospace;
+  font-size: 17px;
+  color: #FAF6EE;
+  margin: 0;
+}
+
+.related-desc {
+  font-family: var(--font-special-elite), monospace;
+  font-size: 12px;
+  color: #BCAAA4;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.related-arrow {
+  font-family: var(--font-special-elite), monospace;
+  font-size: 11.5px;
+  color: #8D6E63;
+  margin-top: 4px;
+}
+
+/* ─── Philosophy Card (Engineering Standards) ─── */
+.projects-philosophy-card,
+.saas-philosophy-card {
+  background: rgba(35, 21, 19, 0.45);
+  border: 1px solid rgba(141, 110, 99, 0.3);
+  border-radius: 8px;
+  padding: 36px;
+}
+
+.phil-heading {
+  font-family: var(--font-special-elite), monospace;
+  font-size: 13px;
+  color: #8C7355;
+  letter-spacing: 1.5px;
+  margin: 0 0 28px;
+  font-weight: bold;
+}
+
+.phil-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 28px;
+}
+
+.phil-col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.phil-num {
+  font-family: var(--font-special-elite), monospace;
+  font-size: 20px;
+  color: #8D6E63;
+  font-weight: bold;
+}
+
+.phil-col h3 {
+  font-family: var(--font-special-elite), monospace;
+  font-size: 17px;
+  color: #FAF6EE;
+  margin: 0;
+}
+
+.phil-col p {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #BCAAA4;
+  margin: 0;
+  font-family: var(--font-special-elite), monospace;
+}
+
+/* ─── Bottom CTA Banners ─── */
+.projects-bottom-cta,
+.category-bottom-cta,
+.tools-bottom-cta,
+.saas-footer-cta {
+  text-align: center;
+  padding: 48px 32px;
+  background: linear-gradient(180deg, rgba(35, 21, 19, 0.35), rgba(35, 21, 19, 0.85));
+  border: 1px solid rgba(141, 110, 99, 0.35);
+  border-radius: 8px;
+}
+
+.bottom-cta-heading,
+.footer-title {
+  font-family: var(--font-special-elite), monospace;
+  font-size: 26px;
+  color: #FAF6EE;
+  margin: 0 0 12px;
+  font-weight: bold;
+}
+
+.bottom-cta-sub,
+.footer-desc {
+  font-size: 14px;
+  color: #BCAAA4;
+  max-width: 600px;
+  margin: 0 auto 24px;
+  line-height: 1.6;
+  font-family: var(--font-special-elite), monospace;
+}
+
+.bottom-cta-actions,
+.footer-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.cta-btn-primary,
+.btn-primary {
+  font-family: var(--font-special-elite), monospace;
+  font-size: 12.5px;
+  background: #8D6E63;
+  color: #FAF6EE !important;
+  padding: 10px 22px;
+  border-radius: 20px;
+  text-decoration: none !important;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.cta-btn-primary:hover,
+.btn-primary:hover {
+  opacity: 0.85;
+}
+
+.cta-btn-secondary,
+.btn-secondary {
+  font-family: var(--font-special-elite), monospace;
+  font-size: 12.5px;
+  background: transparent;
+  border: 1px solid #8D6E63;
+  color: #FAF6EE !important;
+  padding: 10px 22px;
+  border-radius: 20px;
+  text-decoration: none !important;
+  font-weight: bold;
+  transition: background 0.2s ease;
+}
+
+.cta-btn-secondary:hover,
+.btn-secondary:hover {
+  background: rgba(141, 110, 99, 0.2);
+}
+
+/* ─── Unified Footers ─── */
+.projects-footer,
+.category-footer,
+.tools-footer {
+  border-top: 1px solid rgba(141, 110, 99, 0.25);
+  padding: 32px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+
+.footer-links-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.footer-link {
+  font-family: var(--font-special-elite), monospace;
+  font-size: 11.5px;
+  color: #8D6E63 !important;
+  text-decoration: none !important;
+}
+
+.footer-link:hover {
+  color: #FAF6EE !important;
+}
+
+.footer-copy {
+  font-family: var(--font-special-elite), monospace;
+  font-size: 11px;
+  color: #8C7355;
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .projects-header,
+  .category-header,
+  .saas-header,
+  .tools-header,
+  .project-header {
+    padding: 36px 18px 20px;
+  }
+  .projects-main,
+  .category-main,
+  .saas-main,
+  .tools-main,
+  .project-content {
+    padding: 0 18px 50px;
+  }
+  .projects-cards-grid,
+  .category-cards-grid,
+  .saas-cards-grid {
+    grid-template-columns: 1fr;
+  }
+  .projects-philosophy-card,
+  .saas-philosophy-card {
+    padding: 22px;
+  }
+}
+

@@ -2,6 +2,11 @@ name = "adil-portfolio-worker"
 main = "src/index.js"
 compatibility_date = "2024-09-23"
 
+[observability.logs]
+enabled = true
+invocation_logs = true
+persist = true
+
 # Public environment variables (non-secret defaults)
 [vars]
 MODEL_PRIMARY = "gpt-4.1-nano"

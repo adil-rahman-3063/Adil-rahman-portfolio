@@ -218,64 +218,67 @@ export default async function ProjectDetailPage({ params }) {
       <nav className="project-nav">
         <div className="nav-breadcrumbs">
           <Link href="/project" className="nav-crumb">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+              <path d="M10 12L6 8L10 4" stroke="#8D6E63" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
             Projects
           </Link>
           <span className="crumb-sep">/</span>
-          {cat ? (
-            <Link href={`/project/${normCategory}`} className="nav-crumb">
-              {cat.navLabel || cat.name}
-            </Link>
-          ) : (
-            <span className="nav-crumb">All</span>
+          {cat && (
+            <>
+              <Link href={`/project/${normCategory}`} className="nav-crumb">
+                {cat.navLabel || cat.name}
+              </Link>
+              <span className="crumb-sep">/</span>
+            </>
           )}
-          <span className="crumb-sep">/</span>
-          <span className="crumb-active">{project.title}</span>
+          <span className="crumb-active" title={project.title}>{project.title}</span>
         </div>
 
         <Link href="/" className="nav-home-btn">
-          Portfolio
+          Portfolio Home →
         </Link>
       </nav>
+
+      {/* ── Header Banner ── */}
+      <header className="project-header">
+        <div className="project-header-inner">
+          <div className="header-badges">
+            <span className="badge-status">{project.status}</span>
+            {cat && (
+              <Link href={`/project/${normCategory}`} className="badge-category-link">
+                {cat.badge}
+              </Link>
+            )}
+          </div>
+
+          <h1 className="project-title">{project.title}</h1>
+          <p className="project-subtitle">{project.subtitle}</p>
+
+          <p className="project-tagline">{project.tagline}</p>
+
+          {/* Quick Action Links */}
+          <div className="action-links-row">
+            {liveUrl && (
+              <a href={liveUrl} target="_blank" rel="noreferrer" className="btn-launch">
+                Launch Live App ↗
+              </a>
+            )}
+            {githubRepo && (
+              <a href={`https://github.com/${githubRepo}`} target="_blank" rel="noreferrer" className="btn-github">
+                Inspect Source on GitHub ↗
+              </a>
+            )}
+            <Link href="/?quote=open#contact" className="btn-discuss">
+              Hire for Similar Project →
+            </Link>
+          </div>
+        </div>
+      </header>
 
       {/* ── Main Container ── */}
       <main className="project-content">
         <div className="project-inner">
-
-          {/* Header Banner */}
-          <header className="project-header">
-            <div className="header-badges">
-              <span className="badge-status">{project.status}</span>
-              {cat && (
-                <Link href={`/project/${normCategory}`} className="badge-category-link">
-                  {cat.badge}
-                </Link>
-              )}
-            </div>
-
-            <h1 className="project-title">{project.title}</h1>
-            <p className="project-subtitle">{project.subtitle}</p>
-
-            <p className="project-tagline">{project.tagline}</p>
-
-            {/* Quick Action Links */}
-            <div className="action-links-row">
-              {liveUrl && (
-                <a href={liveUrl} target="_blank" rel="noreferrer" className="btn-launch">
-                  Launch Live App ↗
-                </a>
-              )}
-              {githubRepo && (
-                <a href={`https://github.com/${githubRepo}`} target="_blank" rel="noreferrer" className="btn-github">
-                  Inspect Source on GitHub ↗
-                </a>
-              )}
-              <Link href="/?hire=true" className="btn-discuss">
-                Hire for Similar Project
-              </Link>
-            </div>
-          </header>
-
-          <hr className="section-divider" />
 
           {/* Deep Architectural Breakdown */}
           <section className="architecture-section">

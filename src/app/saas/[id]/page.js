@@ -107,13 +107,71 @@ const technicalDeepDives = {
   },
 };
 
+export function getSaasSeoTitle(project) {
+  const brand = ' | Adil Rahman';
+  const maxLen = 60;
+
+  if (project.id === 'edu-amicus-deployment') {
+    return 'Edu Amicus — Cloud Architecture & Specs | Adil Rahman';
+  }
+  if (project.id === 'shopify') {
+    return 'Shopify Theme Engineering & Specs | Adil Rahman';
+  }
+  if (project.id === 'membership-saas') {
+    return 'AR Membership Manager — SaaS Architecture | Adil Rahman';
+  }
+  if (project.id === 'teledrive') {
+    return 'TeleDrive — Cloud Architecture & Specs | Adil Rahman';
+  }
+  if (project.id === 'viewpick') {
+    return 'ViewPick PWA — Architecture & Specs | Adil Rahman';
+  }
+  if (project.id === 'resume-editor') {
+    return 'ATS Resume Engine — System Architecture | Adil Rahman';
+  }
+  if (project.id === 'zmr') {
+    return 'ZMR Music — Audio Architecture & Specs | Adil Rahman';
+  }
+  if (project.id === 'redparrot-webhook') {
+    return 'Red Parrot Webhook — Architecture & Specs | Adil Rahman';
+  }
+  if (project.id === 'redparrot') {
+    return 'Red Parrot — Scheduler Architecture & Specs | Adil Rahman';
+  }
+  if (project.id === 'poshan') {
+    return 'Poshan Abhiyaan — Architecture & Specs | Adil Rahman';
+  }
+  if (project.id === 'calert') {
+    return 'C-Alert ML App — Architecture & Specs | Adil Rahman';
+  }
+  if (project.id === 'sirr') {
+    return 'Sirr (سِرّ) — Architecture & System Specs | Adil Rahman';
+  }
+  if (project.id === 'cloudagent') {
+    return 'Cloud Agent — Architecture & System Specs | Adil Rahman';
+  }
+  if (project.id === 'issaa') {
+    return 'ISSAA Event Portal — Architecture & Specs | Adil Rahman';
+  }
+
+  const candidate = `${project.title} — Tech Specs${brand}`;
+  if (candidate.length <= maxLen) return candidate;
+
+  const shortCandidate = `${project.title}${brand}`;
+  if (shortCandidate.length <= maxLen) return shortCandidate;
+
+  const truncated = shortCandidate.slice(0, maxLen - 3);
+  const lastSpace = truncated.lastIndexOf(' ');
+  return (lastSpace > 25 ? truncated.slice(0, lastSpace) : truncated) + '...';
+}
+
 // Per-SaaS SEO metadata
 export async function generateMetadata({ params }) {
   const { id } = await params;
   const project = allProjects.find((p) => p.id === id || (id === 'issaa_event' && p.id === 'issaa')) || (await fetchProjectById(id));
   if (!project) return {};
 
-  const cleanTitle = `${project.title} — Technical Specs & Architecture | Adil Rahman`.slice(0, 60);
+  const cleanTitle = getSaasSeoTitle(project);
   const cleanDescription = (project.tagline || project.description || '').slice(0, 155);
   const primaryCat = getProjectCategory(project.id, project);
 
@@ -152,7 +210,7 @@ export async function generateMetadata({ params }) {
 function SoftwareJsonLd({ project }) {
   const liveUrl = project.links?.find((l) => l.url?.startsWith('http') && !l.url?.includes('github.com'))?.url || `${SITE_URL}/saas/${project.id}`;
   
-  const schema = {
+  const softwareSchema = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
     name: project.title,
@@ -174,11 +232,42 @@ function SoftwareJsonLd({ project }) {
     keywords: (project.tech || []).join(', '),
   };
 
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Portfolio',
+        item: SITE_URL,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Projects',
+        item: `${SITE_URL}/project`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: project.title,
+        item: `${SITE_URL}/saas/${project.id}`,
+      },
+    ],
+  };
+
   return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-    />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+    </>
   );
 }
 

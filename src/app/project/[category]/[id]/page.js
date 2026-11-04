@@ -105,6 +105,53 @@ const technicalDeepDives = {
   },
 };
 
+export function getProjectSeoTitle(project, catName) {
+  if (project.seoTitle) return project.seoTitle;
+  const brand = ' | Adil Rahman';
+  const maxLen = 60;
+
+  if (project.id === 'edu-amicus-deployment') {
+    return 'Edu Amicus – Cloud Migration & Deployment | Adil Rahman';
+  }
+  if (project.id === 'shopify') {
+    return 'Custom Shopify Storefront Development | Adil Rahman';
+  }
+  if (project.id === 'redparrot-webhook') {
+    return 'Red Parrot WhatsApp & Sheets Webhook | Adil Rahman';
+  }
+  if (project.id === 'zmr') {
+    return 'ZMR Music – YouTube Music Client | Adil Rahman';
+  }
+  if (project.id === 'viewpick') {
+    return 'ViewPick – Swipe Movie Discovery PWA | Adil Rahman';
+  }
+  if (project.id === 'membership-saas') {
+    return 'AR Membership Manager – B2B Gym SaaS | Adil Rahman';
+  }
+  if (project.id === 'teledrive') {
+    return 'TeleDrive – Cloud Storage Web App | Adil Rahman';
+  }
+  if (project.id === 'resume-editor') {
+    return 'ATS Resume & CV Engine – Open-Source | Adil Rahman';
+  }
+  if (project.id === 'poshan') {
+    return 'Poshan Abhiyaan — Nutrition Tracker | Adil Rahman';
+  }
+  if (project.id === 'redparrot') {
+    return 'Red Parrot — Institutional Scheduler | Adil Rahman';
+  }
+
+  const candidate = catName ? `${project.title} — ${catName}${brand}` : `${project.title}${brand}`;
+  if (candidate.length <= maxLen) return candidate;
+
+  const shortCandidate = `${project.title}${brand}`;
+  if (shortCandidate.length <= maxLen) return shortCandidate;
+
+  const truncated = shortCandidate.slice(0, maxLen - 3);
+  const lastSpace = truncated.lastIndexOf(' ');
+  return (lastSpace > 25 ? truncated.slice(0, lastSpace) : truncated) + '...';
+}
+
 // Per-project SEO metadata
 export async function generateMetadata({ params }) {
   const { category, id } = await params;
@@ -115,7 +162,7 @@ export async function generateMetadata({ params }) {
   const cat = PROJECT_CATEGORIES[normCategory];
   const catName = cat ? cat.name : 'Projects';
 
-  const cleanTitle = `${project.title} — ${catName} | Adil Rahman`.slice(0, 60);
+  const cleanTitle = getProjectSeoTitle(project, catName);
   const cleanDescription = (project.tagline || project.description || '').slice(0, 155);
 
   return {
@@ -150,10 +197,10 @@ export async function generateMetadata({ params }) {
 }
 
 // JSON-LD SoftwareApplication Schema
-function ProjectJsonLd({ project, categorySlug }) {
+function ProjectJsonLd({ project, categorySlug, catName }) {
   const liveUrl = project.links?.find((l) => l.url?.startsWith('http') && !l.url?.includes('github.com'))?.url || `${SITE_URL}/project/${categorySlug}/${project.id}`;
   
-  const schema = {
+  const softwareSchema = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
     name: project.title,
@@ -174,11 +221,42 @@ function ProjectJsonLd({ project, categorySlug }) {
     url: liveUrl,
   };
 
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Portfolio',
+        item: SITE_URL,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: catName || 'Projects',
+        item: `${SITE_URL}/project/${categorySlug}`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: project.title,
+        item: `${SITE_URL}/project/${categorySlug}/${project.id}`,
+      },
+    ],
+  };
+
   return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-    />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+    </>
   );
 }
 
@@ -212,7 +290,7 @@ export default async function ProjectDetailPage({ params }) {
 
   return (
     <div className="project-detail-page">
-      <ProjectJsonLd project={project} categorySlug={normCategory} />
+      <ProjectJsonLd project={project} categorySlug={normCategory} catName={cat?.name} />
 
       {/* ── Navigation ── */}
       <nav className="project-nav">

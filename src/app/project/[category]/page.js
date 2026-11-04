@@ -62,11 +62,64 @@ export default async function ProjectCategoryPage({ params }) {
 
   const projects = getCategoryProjects(normCategory);
 
+  const collectionSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: cat.name,
+    description: cat.metaDesc || cat.tagline,
+    url: `${SITE_URL}/project/${normCategory}`,
+    mainEntity: {
+      '@type': 'ItemList',
+      name: `${cat.name} Portfolio Projects`,
+      itemListElement: (projects || []).map((p, idx) => ({
+        '@type': 'ListItem',
+        position: idx + 1,
+        name: p.title,
+        url: `${SITE_URL}/project/${normCategory}/${p.id}`,
+      })),
+    },
+  };
+
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Portfolio',
+        item: SITE_URL,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Projects',
+        item: `${SITE_URL}/project`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: cat.name,
+        item: `${SITE_URL}/project/${normCategory}`,
+      },
+    ],
+  };
+
   return (
-    <CategoryDirectoryClient
-      category={category}
-      initialProjects={projects}
-      allInitialProjects={allProjects}
-    />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      <CategoryDirectoryClient
+        category={category}
+        initialProjects={projects}
+        allInitialProjects={allProjects}
+      />
+    </>
   );
 }

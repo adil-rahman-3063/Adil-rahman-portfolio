@@ -16,7 +16,7 @@ export async function generateMetadata({ params }) {
 
   return {
     title: {
-      absolute: `${service.seoTitle} | Adil Rahman`.slice(0, 60),
+      absolute: service.seoTitle,
     },
     description: service.metaDesc.slice(0, 155),
     keywords: [
@@ -27,14 +27,14 @@ export async function generateMetadata({ params }) {
       slug.replace('-', ' '),
     ],
     openGraph: {
-      title: `${service.seoTitle} | Adil Rahman`,
+      title: service.seoTitle,
       description: service.metaDesc,
       url: `${SITE_URL}/services/${slug}`,
       type: 'website',
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${service.seoTitle} | Adil Rahman`,
+      title: service.seoTitle,
       description: service.metaDesc,
       creator: '@adilrahmanms',
     },
@@ -49,8 +49,67 @@ export default async function ServiceDetailPage({ params }) {
   const service = allServices.find((s) => s.slug === slug);
   if (!service) notFound();
 
+  const serviceSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: service.title,
+    serviceType: service.badge,
+    description: service.metaDesc,
+    provider: {
+      '@type': 'Person',
+      name: 'Adil Rahman',
+      url: SITE_URL,
+      jobTitle: 'Full-Stack & Mobile Engineer',
+    },
+    areaServed: 'Worldwide',
+    hasOfferCatalog: {
+      '@type': 'OfferCatalog',
+      name: service.heroTitle,
+      itemListElement: (service.deliverables || []).map((item) => ({
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'Service',
+          name: item,
+        },
+      })),
+    },
+  };
+
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Portfolio',
+        item: SITE_URL,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Services',
+        item: `${SITE_URL}/services`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: service.title,
+        item: `${SITE_URL}/services/${slug}`,
+      },
+    ],
+  };
+
   return (
     <div className="service-page">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
       {/* ── Navigation ── */}
       <nav className="service-nav">
         <div className="service-nav-left">

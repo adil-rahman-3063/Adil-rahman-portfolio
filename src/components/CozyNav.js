@@ -30,7 +30,7 @@ export default function CozyNav({ currentIndex, onTap }) {
           <div className="logo-section">
             <img
               src="/assets/Gemini_Generated_Image_cfgv0jcfgv0jcfgv-removebg-preview.png"
-              alt="Logo"
+              alt="Adil Rahman — Full-Stack Developer Logo"
               className="logo-img"
             />
             <span className="signature">Adil Rahman</span>

@@ -197,6 +197,10 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${specialElite.variable} ${laBelleAurore.variable}`} suppressHydrationWarning>
       <head>
+        {/* Machine-readable AI & Agent Context */}
+        <link rel="alternate" type="text/markdown" href="/llms.txt" title="LLM Context" />
+        <link rel="author" href="https://adilrahman.cc" />
+
         {/* Preload LCP hero image so browser fetches it immediately */}
         <link
           rel="preload"

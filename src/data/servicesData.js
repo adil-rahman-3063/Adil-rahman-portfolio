@@ -7,6 +7,21 @@ export const allServices = [
     heroTitle: 'Cross-Platform Flutter Mobile Apps & PWAs',
     heroSubtitle: 'Single Codebase. 60 FPS Native Performance across iOS, Android, and Web.',
     tagline: 'Skip the overhead of separate iOS and Android teams. I engineer production-ready Flutter applications with clean Riverpod/Provider state architectures, local SQLite/Hive caching, and beautiful 60 FPS gesture animations.',
+    directAnswer: {
+      question: 'How fast can a production Flutter MVP be built?',
+      answer: 'A complete, functional Flutter MVP with authentication, local offline caching, responsive UI, and backend API integration is delivered within 1 to 3 weeks. Full production multi-feature platforms with custom gesture engines and app store releases take 4 to 8 weeks.',
+    },
+    comparisonTable: {
+      title: 'Architecture Comparison: Flutter vs. React Native vs. Separate Native Teams',
+      headers: ['Criteria', 'Flutter (Adil Rahman)', 'React Native', 'Separate Native Teams'],
+      rows: [
+        ['Codebase', 'Single Dart Codebase (iOS, Android, PWA)', 'Shared JS/TS with bridge overhead', '2 separate codebases (2x budget)'],
+        ['UI Performance', 'Compiled ARM 60/120 FPS native canvas', 'JSI/Bridge dependent frame drops', '60/120 FPS native'],
+        ['Time to MVP', '1 to 3 weeks', '3 to 6 weeks', '8 to 14 weeks'],
+        ['Maintenance Cost', 'Single developer maintenance', 'Dual platform patch risk', 'Requires separate iOS & Android devs'],
+      ],
+      summary: 'Bottom Line: Flutter delivers compiled native 60 FPS performance from a single codebase, cutting initial development costs and ongoing maintenance by over 50% without compromising gesture fidelity or offline capabilities.',
+    },
     deliverables: [
       'Cross-platform iOS and Android production releases.',
       'Progressive Web Apps (PWAs) with offline service worker support.',
@@ -31,6 +46,21 @@ export const allServices = [
     heroTitle: 'Custom Shopify Storefronts & Liquid Theme Engineering',
     heroSubtitle: 'Bespoke E-Commerce Experiences Engineered to Convert Browsers into Buyers.',
     tagline: 'Don’t settle for generic, bloated Shopify templates. I build custom Liquid themes, reusable drag-and-drop sections, and lightning-fast checkout experiences tailored to your brand identity.',
+    directAnswer: {
+      question: 'Why choose custom Shopify Liquid development over pre-made templates?',
+      answer: 'Custom Liquid themes eliminate bloated third-party app scripts, achieving 90+ Lighthouse mobile performance and faster checkout conversions. Tailored drag-and-drop Theme Editor sections empower merchants to manage landing pages without recurring app subscription fees or developer intervention.',
+    },
+    comparisonTable: {
+      title: 'Storefront Architecture: Custom Bespoke Liquid vs. Pre-made Theme Templates',
+      headers: ['Criteria', 'Custom Liquid (Adil Rahman)', 'Commercial Theme Store Template', 'Headless Storefront (Hydrogen/Next)'],
+      rows: [
+        ['Core Web Vitals', '90+ Mobile score, zero script bloat', '40-60 score, heavy unused CSS/JS', '85-95 score, high infrastructure overhead'],
+        ['Theme Editor Control', 'Bespoke drag-and-drop sections designed for your catalog', 'Generic rigid sections requiring apps', 'Requires developer for simple copy/image updates'],
+        ['App Dependency', 'Native Liquid logic (zero monthly app fees for basics)', 'Requires 8-15 paid third-party apps', 'Custom API connectors required'],
+        ['Turnaround', '1 to 2 weeks', '3 to 5 days setup (then custom CSS fights)', '6 to 12 weeks'],
+      ],
+      summary: 'Bottom Line: A bespoke Liquid theme gives your brand unique conversion sections and 90+ mobile speeds without bloated third-party apps or recurring app subscription overhead.',
+    },
     deliverables: [
       'Bespoke Shopify theme development from Figma / Adobe XD designs.',
       'Custom Liquid section architecture with intuitive Theme Editor controls.',
@@ -53,6 +83,21 @@ export const allServices = [
     heroTitle: 'Production Next.js & Full-Stack Web Architectures',
     heroSubtitle: 'Sub-Second Edge Latency, Server Components, and Scalable Cloud Backends.',
     tagline: 'From multi-tenant B2B operations platforms to edge-accelerated web applications, I architect full-stack solutions using Next.js App Router, React 19, Supabase PostgreSQL, and Cloudflare Workers.',
+    directAnswer: {
+      question: 'What is the optimal full-stack architecture for modern web applications?',
+      answer: 'The optimal full-stack architecture pairs Next.js 15 App Router with Supabase PostgreSQL and Cloudflare edge proxies. This delivers sub-second global responses, 100% crawlable search engine rendering, secure tenant isolation via Row-Level Security (RLS), and zero cold-start latency.',
+    },
+    comparisonTable: {
+      title: 'Web Platform Architecture: Next.js 15 App Router vs. Traditional React SPA',
+      headers: ['Criteria', 'Next.js 15 App Router (Adil Rahman)', 'Traditional React SPA (Vite/CRA)', 'Serverless Monolith'],
+      rows: [
+        ['Search Engine Indexing', '100% crawlable SSR/SSG HTML in initial response', 'Empty root div requiring client JS execution', 'Standard HTML with slow server roundtrips'],
+        ['Cold-Start Latency', 'Edge cached sub-second global responses', 'Fast assets, slow dynamic API roundtrips', '300-1500ms container cold starts'],
+        ['Database Isolation', 'Supabase PostgreSQL with Row-Level Security', 'External API endpoints with auth overhead', 'Centralized DB prone to noisy neighbors'],
+        ['Turnaround for SaaS MVP', '2 to 4 weeks with auth, billing & dashboard', '4 to 8 weeks requiring separate backend repo', '6 to 10 weeks'],
+      ],
+      summary: 'Bottom Line: Next.js App Router combined with Cloudflare Workers and Supabase PostgreSQL gives startups sub-second global latency, built-in search engine crawlability, and secure multi-tenant database isolation from day one.',
+    },
     deliverables: [
       'Next.js App Router full-stack web application development.',
       'Multi-tenant B2B architectures with tenant database isolation and row-level security.',

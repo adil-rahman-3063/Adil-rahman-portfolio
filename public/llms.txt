@@ -1,0 +1,28 @@
+# Adil Rahman — Full-Stack, Flutter & Shopify Engineer
+
+> Full-stack software engineer and mobile app developer based in Kerala, India. Specializes in cross-platform mobile apps (Flutter), scalable cloud web applications (Next.js 15, React 19, Supabase, Cloudflare Workers), and bespoke e-commerce engineering (Shopify Liquid).
+
+## Core Capabilities & Services
+- **Flutter Mobile & Web Development:** 60 FPS cross-platform apps for iOS, Android, and PWAs. Clean Riverpod/Provider state architecture, local SQLite/Hive caching, background audio processing, on-device TensorFlow Lite models. Typical MVP turnaround: 2–4 weeks.
+- **Custom Shopify Liquid Engineering:** Bespoke theme development, custom section architecture, conversion rate optimization, and API webhooks. Typical turnaround: 1–2 weeks.
+- **Next.js & Cloud Edge Architecture:** Multi-tenant B2B SaaS platforms, Supabase PostgreSQL, edge proxy routing, and WhatsApp/Google Sheets automation. Typical turnaround: 2–4 weeks.
+
+## Verified Portfolio & Case Studies
+- [AR Membership Manager](https://adilrahman.cc/saas/membership-saas): Multi-tenant B2B gym management SaaS with automated WhatsApp reminders.
+- [Edu Amicus Cloud Migration](https://adilrahman.cc/saas/edu-amicus-deployment): SQLite-to-Supabase migration and edge-proxied deployment on Railway & Cloudflare.
+- [ZMR Music](https://adilrahman.cc/saas/zmr): YouTube Music client in Flutter with background isolates and lockscreen playback.
+- [ViewPick](https://adilrahman.cc/saas/viewpick): Swipe-based movie discovery PWA built with Flutter Web and TMDB.
+- [Free ATS Resume Builder](https://adilrahman.cc/tools/resume-builder): Browser-based ATS resume builder with dual PDF export engines.
+
+## Machine-Readable Pricing & Engagement
+- Full pricing guidelines and project category estimates are available at: [https://adilrahman.cc/pricing.md](https://adilrahman.cc/pricing.md)
+- Projects are delivered on milestone-based contracts calibrated for an upcoming freelance developer in India (₹ INR and international equivalent).
+- Standard engagement includes production deployment, 2 revision rounds, and 14–30 days post-launch support. Third-party infrastructure and store developer accounts are passed at actual cost.
+
+## Contact & Hiring
+- Website: https://adilrahman.cc
+- Direct Quote Request: https://adilrahman.cc/?hire=true#contact
+- WhatsApp: +91 9207114070
+- Email: adilrahman3063@gmail.com
+- GitHub: https://github.com/adil-rahman-3063
+- LinkedIn: https://www.linkedin.com/in/adil-rahiman-3815b5290/

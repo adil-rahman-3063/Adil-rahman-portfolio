@@ -1,0 +1,78 @@
+# Adil Rahman — Full-Stack, Flutter & Shopify Engineer (Complete Technical Context)
+
+> Full-stack software engineer and mobile app developer based in Kerala, India. Specializes in cross-platform mobile apps (Flutter), scalable cloud web applications (Next.js 15, React 19, Supabase, Cloudflare Workers), and bespoke e-commerce engineering (Shopify Liquid).
+
+## Biographical & Technical Profile
+- **Name:** Adil Rahman
+- **Role:** Full-Stack Software Engineer & Mobile Developer
+- **Education:** B.Tech in Computer Science & Engineering (First Class, 7.01 CGPA) from APJ Abdul Kalam Technological University (KTU).
+- **Location:** Thrissur, Kerala, India (Remote worldwide)
+- **Primary Tech Stack:**
+  - **Mobile:** Flutter, Dart, Riverpod, SQLite, Hive, just_audio, TensorFlow Lite.
+  - **Frontend:** Next.js (App Router), React 19, Vanilla JS, HTML5 Semantic, Tailwind CSS.
+  - **Backend & Cloud:** Node.js, Python (FastAPI), Supabase (PostgreSQL, Row-Level Security), Cloudflare Workers, Railway, Docker.
+  - **E-Commerce:** Shopify Liquid theme engineering, Theme Editor sections, Storefront APIs.
+  - **Automation:** Google Apps Script, Meta WhatsApp Cloud API webhooks.
+
+---
+
+## Service Offerings & Scope
+
+### 1. Cross-Platform Flutter Mobile Apps & PWAs
+- **URL:** https://adilrahman.cc/services/flutter-developer
+- **Deliverables:** Single codebase for iOS, Android, and Progressive Web Apps (PWAs). Offline caching, background audio processing, on-device ML models, resilient REST API sync.
+- **Turnaround:** 1 to 3 weeks for MVP / Prototype; 4 to 8 weeks for full production platform.
+
+### 2. Custom Shopify Storefront & Liquid Theme Engineering
+- **URL:** https://adilrahman.cc/services/shopify-developer
+- **Deliverables:** Bespoke Shopify Liquid theme development from Figma designs, custom drag-and-drop sections, Core Web Vitals speed optimization, conversion rate optimization (CRO), third-party app integrations.
+- **Turnaround:** 1 to 2 weeks for custom storefront theme builds; 3 to 5 days for custom sections.
+
+### 3. Production Next.js & Full-Stack Web Architectures
+- **URL:** https://adilrahman.cc/services/nextjs-developer
+- **Deliverables:** Next.js App Router full-stack web applications, multi-tenant B2B SaaS architectures with database isolation, Cloudflare Workers edge proxies, Supabase PostgreSQL schema design and migrations, WhatsApp Cloud API and payment webhooks.
+- **Turnaround:** 2 to 4 weeks for complete functional SaaS MVP with authentication and billing.
+
+---
+
+## Featured Case Studies & System Architectures
+
+### 1. Edu Amicus — Cloud Migration & Production Deployment
+- **URL:** https://adilrahman.cc/saas/edu-amicus-deployment
+- **Architecture:** Production cloud architecture, SQLite-to-Supabase migration, and edge-proxied deployment on Railway & Cloudflare Pages. Engineered a custom Cloudflare Pages Functions edge proxy with sliding-window edge rate limiting and Cloudflare Edge Cache. Configured Supabase connection pooling with `pool_pre_ping=True` and `pool_recycle=300` to prevent transaction pooler timeouts.
+
+### 2. AR Membership Manager — Multi-Tenant B2B Gym SaaS
+- **URL:** https://adilrahman.cc/saas/membership-saas
+- **Architecture:** Multi-tenant B2B subscription and member management platform built with Next.js, Supabase PostgreSQL with Row-Level Security (RLS), and automated WhatsApp messaging via Meta Cloud API.
+
+### 3. ZMR Music — YouTube Music Client
+- **URL:** https://adilrahman.cc/saas/zmr
+- **Architecture:** High-performance YouTube Music streaming client built in Flutter using Riverpod for immutable state management and `just_audio` with background isolates and lockscreen notification controls.
+
+### 4. ViewPick — Movie Discovery PWA
+- **URL:** https://adilrahman.cc/saas/viewpick
+- **Architecture:** Interactive movie curation Progressive Web App built with Flutter Web, TMDB API, and Supabase, featuring a 60 FPS swipe interface and offline service worker caching.
+
+### 5. Free ATS Resume & CV Builder
+- **URL:** https://adilrahman.cc/tools/resume-builder
+- **Architecture:** Client-side zero-dependency browser resume builder featuring live WYSIWYG editing, parser-safe single-column ATS export with custom section sequence badges, and instant localStorage persistence. 100% free, zero login, no watermark.
+
+---
+
+## Pricing Guidelines (Calibrated for Freelance Engagements in India)
+- Full breakdown: https://adilrahman.cc/pricing.md
+- Landing Page / Marketing Website: ₹8,000 – ₹15,000 (3–7 days)
+- Custom Shopify Storefront: ₹15,000 – ₹30,000 (1–2 weeks)
+- Cross-Platform Flutter Mobile MVP: ₹25,000 – ₹50,000 (2–4 weeks)
+- Full-Stack SaaS MVP: ₹30,000 – ₹65,000 (3–6 weeks)
+- Automations / Scripts: ₹6,000 – ₹14,000 (2–5 days)
+- Terms: 2 revision rounds, 14–30 days post-launch support. Hosting, domain, app store fees ($25 Google Play, $99 Apple), and API credits are passed at actual cost.
+
+---
+
+## Verified Contact Details
+- Direct Quote: https://adilrahman.cc/?hire=true#contact
+- WhatsApp: +91 9207114070
+- Email: adilrahman3063@gmail.com
+- GitHub: https://github.com/adil-rahman-3063
+- LinkedIn: https://www.linkedin.com/in/adil-rahiman-3815b5290/

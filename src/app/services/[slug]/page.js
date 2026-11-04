@@ -100,6 +100,21 @@ export default async function ServiceDetailPage({ params }) {
     ],
   };
 
+  const faqSchema = service.directAnswer ? {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: service.directAnswer.question,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: service.directAnswer.answer,
+        },
+      },
+    ],
+  } : null;
+
   return (
     <div className="service-page">
       <script
@@ -110,6 +125,12 @@ export default async function ServiceDetailPage({ params }) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
+      {faqSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+        />
+      )}
       {/* ── Navigation ── */}
       <nav className="service-nav">
         <div className="service-nav-left">
@@ -176,6 +197,44 @@ export default async function ServiceDetailPage({ params }) {
               ))}
             </div>
           </section>
+
+          {/* Direct Answer Block (AI Extractable Passage) */}
+          {service.directAnswer && (
+            <section className="service-card direct-answer-card">
+              <h2 className="section-title">// QUICK ANSWER & TIMELINE</h2>
+              <h3 className="direct-answer-question">{service.directAnswer.question}</h3>
+              <p className="direct-answer-text">{service.directAnswer.answer}</p>
+            </section>
+          )}
+
+          {/* Architectural Comparison Table (GEO Extraction Magnet) */}
+          {service.comparisonTable && (
+            <section className="service-card comparison-card">
+              <h2 className="section-title">// ARCHITECTURAL COMPARISON</h2>
+              <h3 className="comparison-table-title">{service.comparisonTable.title}</h3>
+              <div className="table-responsive">
+                <table className="geo-table">
+                  <thead>
+                    <tr>
+                      {service.comparisonTable.headers.map((h, i) => (
+                        <th key={i} className={i === 1 ? 'col-highlight' : ''}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {service.comparisonTable.rows.map((row, rIdx) => (
+                      <tr key={rIdx}>
+                        {row.map((cell, cIdx) => (
+                          <td key={cIdx} className={cIdx === 1 ? 'cell-highlight' : ''}>{cell}</td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <p className="comparison-summary">{service.comparisonTable.summary}</p>
+            </section>
+          )}
 
           {/* Turnaround Guarantee */}
           <section className="turnaround-card">
@@ -438,6 +497,82 @@ export default async function ServiceDetailPage({ params }) {
         }
         .proof-link:hover {
           text-decoration: underline;
+        }
+
+        .direct-answer-card {
+          background: rgba(42, 21, 16, 0.6);
+          border: 1px solid rgba(140, 115, 85, 0.45);
+        }
+
+        .direct-answer-question {
+          font-size: 17px;
+          font-weight: bold;
+          color: #FAF6EE;
+          margin: 0 0 10px;
+        }
+
+        .direct-answer-text {
+          font-size: 13.5px;
+          line-height: 1.75;
+          color: #D7CCC8;
+          margin: 0;
+        }
+
+        .comparison-table-title {
+          font-size: 16px;
+          font-weight: bold;
+          color: #FAF6EE;
+          margin: 0 0 16px;
+        }
+
+        .table-responsive {
+          overflow-x: auto;
+          margin: 16px 0;
+          border-radius: 8px;
+          border: 1px solid rgba(141, 110, 99, 0.25);
+        }
+
+        .geo-table {
+          width: 100%;
+          border-collapse: collapse;
+          font-size: 12px;
+          text-align: left;
+        }
+
+        .geo-table th {
+          padding: 12px 14px;
+          background: rgba(26, 10, 8, 0.85);
+          color: #BCAAA4;
+          border-bottom: 1px solid rgba(141, 110, 99, 0.3);
+          font-weight: bold;
+          white-space: nowrap;
+        }
+
+        .geo-table td {
+          padding: 12px 14px;
+          border-bottom: 1px solid rgba(141, 110, 99, 0.15);
+          color: #EFEBE9;
+          vertical-align: top;
+          line-height: 1.5;
+        }
+
+        .geo-table tr:last-child td {
+          border-bottom: none;
+        }
+
+        .geo-table .col-highlight,
+        .geo-table .cell-highlight {
+          background: rgba(141, 110, 99, 0.15);
+          color: #FAF6EE;
+          font-weight: bold;
+        }
+
+        .comparison-summary {
+          font-size: 13px;
+          color: #8C7355;
+          margin: 14px 0 0;
+          line-height: 1.6;
+          font-style: italic;
         }
 
         .turnaround-card {

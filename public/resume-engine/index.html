@@ -123,17 +123,110 @@
 
     .print-hint {
       position: fixed;
-      top: calc(60px + env(safe-area-inset-top, 0px));
+      top: calc(62px + env(safe-area-inset-top, 0px));
       right: 16px;
       z-index: 59;
-      max-width: 240px;
+      max-width: 250px;
       background: #1D1F23;
       color: #C9CBC7;
       font-size: 11px;
       line-height: 1.5;
-      padding: 10px 12px;
+      padding: 10px 14px;
       border-radius: 8px;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28);
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      box-sizing: border-box;
+      transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+                  height 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+                  padding 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+                  border-radius 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+                  background 0.2s ease,
+                  box-shadow 0.3s ease;
+      overflow: hidden;
+    }
+
+    .print-hint-icon {
+      display: none;
+      font-family: 'Inter', -apple-system, sans-serif;
+      font-weight: 800;
+      font-size: 14px;
+      line-height: 1;
+      color: var(--accent-bright);
+      text-align: center;
+      user-select: none;
+    }
+
+    .print-hint-text {
+      font-family: 'Inter', -apple-system, sans-serif;
+      font-size: 11px;
+      line-height: 1.5;
+      color: #C9CBC7;
+      transition: opacity 0.2s ease;
+    }
+
+    /* Shrunk state: compact circular exclamation badge after 3 seconds */
+    .print-hint.shrunk {
+      width: 28px;
+      height: 28px;
+      max-width: 28px;
+      max-height: 28px;
+      padding: 0;
+      border-radius: 50%;
+      border-color: var(--accent-bright);
+      background: #15171A;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), 0 0 10px rgba(53, 168, 151, 0.25);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .print-hint.shrunk .print-hint-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+    }
+
+    .print-hint.shrunk .print-hint-text {
+      display: none;
+      opacity: 0;
+    }
+
+    /* Hover or active expansion when shrunk */
+    .print-hint.shrunk:hover,
+    .print-hint.shrunk.expanded {
+      width: auto;
+      height: auto;
+      max-width: 260px;
+      max-height: 300px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      background: #1D1F23;
+      border-color: var(--accent-bright);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 14px rgba(53, 168, 151, 0.3);
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      cursor: default;
+    }
+
+    .print-hint.shrunk:hover .print-hint-icon,
+    .print-hint.shrunk.expanded .print-hint-icon {
+      display: block;
+      width: auto;
+      height: auto;
+      margin-top: 1px;
+    }
+
+    .print-hint.shrunk:hover .print-hint-text,
+    .print-hint.shrunk.expanded .print-hint-text {
+      display: block;
+      opacity: 1;
     }
 
     /* ---------- Theme Color Picker Launcher & Panel ---------- */
@@ -506,7 +599,7 @@
     }
 
     @media (max-width: 760px) {
-      .print-hint {
+      .print-hint:not(.shrunk) {
         display: none;
       }
     }
@@ -1533,7 +1626,10 @@
     <button class="btn-secondary" id="atsPrintBtn">Download ATS PDF</button>
     <button class="btn-primary" id="printBtn">Download Design PDF</button>
   </div>
-  <div class="print-hint no-print" id="printHint">Tip: Use the ATS # box on the left of any section header to customize its export sequence for ATS PDF. In the print dialog, turn off "Headers and footers" for a clean PDF.</div>
+  <div class="print-hint no-print" id="printHint" role="button" tabindex="0" title="Click to view ATS export tip" aria-label="ATS export tips and instructions">
+    <span class="print-hint-icon" aria-hidden="true">!</span>
+    <span class="print-hint-text">Tip: Use the ATS # box on the left of any section header to customize its export sequence for ATS PDF. In the print dialog, turn off &quot;Headers and footers&quot; for a clean PDF.</span>
+  </div>
 
       <div id="selectionPopup" class="selection-popup no-print">
     <button id="popBoldBtn" class="pop-btn" title="Bold (Ctrl+B)"><b>B</b></button>
@@ -2819,9 +2915,57 @@
         }
       }, { passive: true });
 
+      function initPrintHint() {
+        const hintEl = document.getElementById("printHint");
+        if (!hintEl) return;
+
+        let hintTimer = setTimeout(() => {
+          if (!hintEl.matches(":hover")) {
+            hintEl.classList.add("shrunk");
+          }
+        }, 3000);
+
+        hintEl.addEventListener("mouseenter", () => {
+          if (!hintEl.classList.contains("shrunk") && hintTimer) {
+            clearTimeout(hintTimer);
+          }
+        });
+
+        hintEl.addEventListener("mouseleave", () => {
+          if (!hintEl.classList.contains("shrunk")) {
+            hintTimer = setTimeout(() => {
+              hintEl.classList.add("shrunk");
+            }, 1500);
+          } else {
+            hintEl.classList.remove("expanded");
+          }
+        });
+
+        hintEl.addEventListener("click", (e) => {
+          if (hintEl.classList.contains("shrunk")) {
+            e.stopPropagation();
+            hintEl.classList.toggle("expanded");
+          }
+        });
+
+        hintEl.addEventListener("keydown", (e) => {
+          if ((e.key === "Enter" || e.key === " ") && hintEl.classList.contains("shrunk")) {
+            e.preventDefault();
+            hintEl.classList.toggle("expanded");
+          }
+        });
+
+        document.addEventListener("click", (e) => {
+          if (hintEl.classList.contains("expanded") && !hintEl.contains(e.target)) {
+            hintEl.classList.remove("expanded");
+          }
+        });
+      }
+
       loadState();
       renderAll();
       initThemePicker();
+      initPrintHint();
 
       // Auto-post precise height of .doc to parent window
       let lastSentHeight = 0;

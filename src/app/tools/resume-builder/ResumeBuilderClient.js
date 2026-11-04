@@ -6,6 +6,23 @@ import ResumeGuideModal from '../../../components/ResumeGuideModal';
 import SiteFooter from '../../../components/SiteFooter';
 
 export default function ResumeBuilderClient() {
+  React.useEffect(() => {
+    function handleMessage(e) {
+      if (e.data && e.data.type === 'RESUME_IFRAME_HEIGHT' && e.data.height) {
+        const iframe = document.querySelector('.builder-iframe');
+        if (iframe && e.data.height > 600) {
+          iframe.style.height = `${e.data.height}px`;
+          const wrapper = document.querySelector('.builder-frame-wrapper');
+          if (wrapper) {
+            wrapper.style.height = 'auto';
+          }
+        }
+      }
+    }
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
+
   return (
     <div className="resume-builder-page">
       {/* ── Top Sticky Converter Header ── */}

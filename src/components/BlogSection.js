@@ -107,11 +107,12 @@ export default function BlogSection({ onBlogClick }) {
           margin: 0 0 16px 0;
         }
 
-        .blog-section-hub-link {
+        .blog-section-hub-link,
+        .blog-section-hub-link:visited {
           font-family: var(--font-mono);
           font-size: 12px;
-          color: #8D6E63;
-          text-decoration: none;
+          color: #8D6E63 !important;
+          text-decoration: none !important;
           font-weight: bold;
           letter-spacing: 0.5px;
           border: 1px solid rgba(141, 110, 99, 0.35);
@@ -121,7 +122,7 @@ export default function BlogSection({ onBlogClick }) {
         }
         .blog-section-hub-link:hover {
           background-color: #8D6E63;
-          color: #FAF6EE;
+          color: #FAF6EE !important;
           border-color: #8D6E63;
         }
 
@@ -142,11 +143,12 @@ export default function BlogSection({ onBlogClick }) {
           text-decoration: underline;
         }
 
-        .blog-direct-link {
+        .blog-direct-link,
+        .blog-direct-link:visited {
           font-family: var(--font-mono);
           font-size: 11px;
-          color: #8C7355;
-          text-decoration: none;
+          color: #8C7355 !important;
+          text-decoration: none !important;
           font-weight: bold;
           padding: 4px 10px;
           background: rgba(141, 110, 99, 0.08);
@@ -156,7 +158,7 @@ export default function BlogSection({ onBlogClick }) {
         }
         .blog-direct-link:hover {
           background: #8D6E63;
-          color: #FAF6EE;
+          color: #FAF6EE !important;
         }
       `}</style>
     </section>

@@ -27,7 +27,11 @@ export default function ToolsSection() {
             TOOLS
           </h2>
         </div>
-        <Link href="/tools" className="view-all-tools-chip">
+        <Link
+          href="/tools"
+          className="view-all-tools-chip"
+          style={{ color: '#8D6E63', textDecoration: 'none' }}
+        >
           Explore Tools Hub (/tools) →
         </Link>
       </div>
@@ -44,7 +48,11 @@ export default function ToolsSection() {
           </div>
 
           <h3 className="tool-card-title">
-            <Link href="/tools/resume-builder" className="tool-card-title-link">
+            <Link
+              href="/tools/resume-builder"
+              className="tool-card-title-link"
+              style={{ color: '#FAF6EE', textDecoration: 'none' }}
+            >
               Free ATS Resume & CV Builder
             </Link>
           </h3>
@@ -66,10 +74,18 @@ export default function ToolsSection() {
           </div>
 
           <div className="tool-card-actions">
-            <Link href="/tools/resume-builder" className="tool-launch-btn">
+            <Link
+              href="/tools/resume-builder"
+              className="tool-launch-btn"
+              style={{ color: '#FAF6EE', textDecoration: 'none' }}
+            >
               Launch Free Builder ↗
             </Link>
-            <Link href="/project/personal-project/resume-editor" className="tool-specs-btn">
+            <Link
+              href="/project/personal-project/resume-editor"
+              className="tool-specs-btn"
+              style={{ color: '#8C7355', textDecoration: 'none' }}
+            >
               Technical Architecture & Specs →
             </Link>
           </div>
@@ -86,11 +102,12 @@ export default function ToolsSection() {
           letter-spacing: 0.5px;
         }
 
-        .view-all-tools-chip {
+        .view-all-tools-chip,
+        .view-all-tools-chip:visited {
           font-family: var(--font-mono);
           font-size: 11px;
-          color: #8D6E63;
-          text-decoration: none;
+          color: #8D6E63 !important;
+          text-decoration: none !important;
           font-weight: bold;
           border: 1px solid rgba(141, 110, 99, 0.35);
           padding: 4px 12px;
@@ -99,7 +116,7 @@ export default function ToolsSection() {
         }
         .view-all-tools-chip:hover {
           background-color: #8D6E63;
-          color: #FAF6EE;
+          color: #FAF6EE !important;
         }
 
         .tools-grid {
@@ -160,18 +177,19 @@ export default function ToolsSection() {
         .tool-card-title {
           font-family: var(--font-header);
           font-size: 22px;
-          color: #FAF6EE;
+          color: #FAF6EE !important;
           font-weight: bold;
           margin: 0 0 6px 0;
         }
 
-        .tool-card-title-link {
-          color: inherit;
-          text-decoration: none;
+        .tool-card-title-link,
+        .tool-card-title-link:visited {
+          color: #FAF6EE !important;
+          text-decoration: none !important;
           transition: color 0.2s;
         }
         .tool-card-title-link:hover {
-          color: #D7CCC8;
+          color: #D7CCC8 !important;
         }
 
         .tool-card-subtitle {
@@ -215,14 +233,15 @@ export default function ToolsSection() {
           flex-wrap: wrap;
         }
 
-        .tool-launch-btn {
+        .tool-launch-btn,
+        .tool-launch-btn:visited {
           font-family: var(--font-mono);
           font-size: 12px;
           background: #8D6E63;
-          color: #FAF6EE;
+          color: #FAF6EE !important;
           padding: 7px 18px;
           border-radius: 16px;
-          text-decoration: none;
+          text-decoration: none !important;
           font-weight: bold;
           transition: opacity 0.2s;
         }
@@ -230,16 +249,17 @@ export default function ToolsSection() {
           opacity: 0.85;
         }
 
-        .tool-specs-btn {
+        .tool-specs-btn,
+        .tool-specs-btn:visited {
           font-family: var(--font-mono);
           font-size: 11.5px;
-          color: #8C7355;
-          text-decoration: none;
+          color: #8C7355 !important;
+          text-decoration: none !important;
           font-weight: bold;
           transition: color 0.2s;
         }
         .tool-specs-btn:hover {
-          color: #FAF6EE;
+          color: #FAF6EE !important;
         }
       `}</style>
     </section>

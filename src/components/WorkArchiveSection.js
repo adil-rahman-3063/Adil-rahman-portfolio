@@ -347,11 +347,12 @@ export default function WorkArchiveSection({ projects = [], onProjectClick }) {
           text-transform: uppercase;
         }
 
-        .view-all-saas-chip {
+        .view-all-saas-chip,
+        .view-all-saas-chip:visited {
           font-family: var(--font-mono);
           font-size: 11px;
-          color: #8D6E63;
-          text-decoration: none;
+          color: #8D6E63 !important;
+          text-decoration: none !important;
           font-weight: bold;
           border: 1px solid rgba(141, 110, 99, 0.35);
           padding: 4px 12px;
@@ -360,7 +361,7 @@ export default function WorkArchiveSection({ projects = [], onProjectClick }) {
         }
         .view-all-saas-chip:hover {
           background-color: #8D6E63;
-          color: #FAF6EE;
+          color: #FAF6EE !important;
         }
 
         .card-action-bar {
@@ -381,11 +382,12 @@ export default function WorkArchiveSection({ projects = [], onProjectClick }) {
           text-decoration: underline;
         }
 
-        .card-action-direct {
+        .card-action-direct,
+        .card-action-direct:visited {
           font-family: var(--font-mono);
           font-size: 11px;
-          color: #8C7355;
-          text-decoration: none;
+          color: #8C7355 !important;
+          text-decoration: none !important;
           font-weight: bold;
           padding: 3px 9px;
           background: rgba(141, 110, 99, 0.08);
@@ -395,7 +397,7 @@ export default function WorkArchiveSection({ projects = [], onProjectClick }) {
         }
         .card-action-direct:hover {
           background: #8D6E63;
-          color: #FAF6EE;
+          color: #FAF6EE !important;
         }
       `}</style>
     </section>

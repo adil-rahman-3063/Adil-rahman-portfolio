@@ -543,15 +543,25 @@
 
 .project-card-title-link,
 .saas-card-title-link,
-.tool-title-link {
+.tool-title-link,
+.tool-card-title-link {
   color: #FAF6EE !important;
   text-decoration: none !important;
   transition: color 0.2s ease;
 }
 
+.project-card-title-link:visited,
+.saas-card-title-link:visited,
+.tool-title-link:visited,
+.tool-card-title-link:visited {
+  color: #FAF6EE !important;
+  text-decoration: none !important;
+}
+
 .project-card-title-link:hover,
 .saas-card-title-link:hover,
-.tool-title-link:hover {
+.tool-title-link:hover,
+.tool-card-title-link:hover {
   color: #D7CCC8 !important;
 }
 
@@ -627,6 +637,15 @@
   transition: color 0.2s;
 }
 
+.project-detail-btn:visited,
+.saas-detail-btn:visited,
+.tool-specs-btn:visited,
+.btn-specs:visited,
+.card-action-direct:visited {
+  color: #8C7355 !important;
+  text-decoration: none !important;
+}
+
 .project-detail-btn:hover,
 .saas-detail-btn:hover,
 .tool-specs-btn:hover,
@@ -648,7 +667,36 @@
   text-decoration: none !important;
   font-weight: bold;
   transition: opacity 0.2s;
-  white-space: nowrap;
+}
+
+.project-live-btn:visited,
+.saas-live-btn:visited,
+.tool-launch-btn:visited,
+.btn-launch:visited {
+  color: #FAF6EE !important;
+  text-decoration: none !important;
+}
+
+.view-all-tools-chip {
+  font-family: var(--font-special-elite), monospace;
+  font-size: 11px;
+  color: #8D6E63 !important;
+  text-decoration: none !important;
+  font-weight: bold;
+  border: 1px solid rgba(141, 110, 99, 0.35);
+  padding: 4px 12px;
+  border-radius: 16px;
+  transition: all 0.2s;
+}
+
+.view-all-tools-chip:visited {
+  color: #8D6E63 !important;
+  text-decoration: none !important;
+}
+
+.view-all-tools-chip:hover {
+  background-color: #8D6E63;
+  color: #FAF6EE !important;
 }
 
 .project-live-btn:hover,
@@ -986,7 +1034,11 @@
 .blog-cta-btn,
 .btn-primary,
 .cta-btn-primary,
-.footer-cta-btn {
+.footer-cta-btn,
+.blog-cta-btn:visited,
+.btn-primary:visited,
+.cta-btn-primary:visited,
+.footer-cta-btn:visited {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1019,7 +1071,11 @@
 .blog-secondary-btn,
 .btn-secondary,
 .cta-btn-secondary,
-.footer-secondary-btn {
+.footer-secondary-btn,
+.blog-secondary-btn:visited,
+.btn-secondary:visited,
+.cta-btn-secondary:visited,
+.footer-secondary-btn:visited {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1073,7 +1129,8 @@
   gap: 8px 12px;
 }
 
-.footer-link {
+.footer-link,
+.footer-link:visited {
   font-family: var(--font-special-elite), monospace;
   font-size: 11.5px;
   color: #8D6E63 !important;

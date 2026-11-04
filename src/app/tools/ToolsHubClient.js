@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import SiteFooter from '../../components/SiteFooter';
 
 export default function ToolsHubClient() {
   return (
@@ -93,42 +94,18 @@ export default function ToolsHubClient() {
             </div>
           </article>
 
-          {/* Need a Custom Tool CTA */}
-          <div className="tools-bottom-cta">
-            <h2 className="bottom-cta-heading">Need a Custom Web Tool or SaaS Utility?</h2>
-            <p className="bottom-cta-sub">
-              Available to design and deploy specialized web applications, calculation engines, client portals, and automation utilities.
-            </p>
-            <div className="bottom-cta-actions">
-              <Link href="/services" className="cta-btn-primary">
-                Explore Engineering Services →
-              </Link>
-              <Link href="/?quote=open#contact" className="cta-btn-secondary">
-                Request a Custom Quote ↗
-              </Link>
-            </div>
-          </div>
-
         </div>
       </main>
 
-      {/* ── Footer ── */}
-      <footer className="tools-footer">
-        <div className="footer-links-row">
-          <Link href="/" className="footer-link">Portfolio Home</Link>
-          <span className="footer-sep">·</span>
-          <Link href="/project" className="footer-link">Projects Hub</Link>
-          <span className="footer-sep">·</span>
-          <Link href="/tools/resume-builder" className="footer-link">Resume Builder</Link>
-          <span className="footer-sep">·</span>
-          <Link href="/project/saas" className="footer-link">SaaS Platforms</Link>
-          <span className="footer-sep">·</span>
-          <Link href="/services" className="footer-link">Services</Link>
-          <span className="footer-sep">·</span>
-          <Link href="/blog" className="footer-link">Blog</Link>
-        </div>
-        <p className="footer-copy">© 2026 Adil Rahman | Engineered with Next.js, Vanilla JS & Cloudflare</p>
-      </footer>
+      {/* ── Blog-Style Footer CTA & Site Links ── */}
+      <SiteFooter
+        ctaLabel="// NEED A BESPOKE TOOL OR UTILITY?"
+        ctaTitle="Need a Custom Web Tool or SaaS Utility?"
+        ctaDesc="Available to design and deploy specialized web applications, calculation engines, client portals, and automation utilities."
+        primaryBtn={{ label: "Request a Custom Quote →", href: "/?quote=open#contact" }}
+        secondaryBtn={{ label: "Explore Engineering Services", href: "/services" }}
+        tertiaryBtn={{ label: "Resume Builder Tool", href: "/tools/resume-builder" }}
+      />
     </div>
   );
 }

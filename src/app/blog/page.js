@@ -1,5 +1,6 @@
 import { allBlogs } from '../../data/blogData';
 import Link from 'next/link';
+import SiteFooter from '../../components/SiteFooter';
 
 const SITE_URL = 'https://adilrahman.cc';
 
@@ -150,20 +151,15 @@ export default function BlogIndexPage() {
         </div>
       </section>
 
-      {/* ── Footer CTA ── */}
-      <div className="blog-footer-cta">
-        <div className="blog-footer-cta-inner">
-          <p className="blog-footer-label">// LOOKING FOR A DEVELOPER?</p>
-          <h3 className="blog-footer-title">Let&apos;s Build Something Together</h3>
-          <p className="blog-footer-desc">
-            Available for freelance full-stack, cross-platform mobile apps (Flutter), custom Shopify storefronts, and MVP builds worldwide.
-          </p>
-          <div className="blog-footer-links">
-            <Link href="/#contact" className="blog-cta-btn">Get In Touch</Link>
-            <Link href="/" className="blog-secondary-btn">View Portfolio</Link>
-          </div>
-        </div>
-      </div>
+      {/* ── Footer CTA & Site Links ── */}
+      <SiteFooter
+        ctaLabel="// LOOKING FOR A DEVELOPER?"
+        ctaTitle="Let's Build Something Together"
+        ctaDesc="Available for freelance full-stack, cross-platform mobile apps (Flutter), custom Shopify storefronts, and MVP builds worldwide."
+        primaryBtn={{ label: "Get In Touch", href: "/#contact" }}
+        secondaryBtn={{ label: "View Portfolio", href: "/" }}
+        tertiaryBtn={{ label: "Projects Hub", href: "/project" }}
+      />
 
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');

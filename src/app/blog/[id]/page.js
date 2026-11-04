@@ -1,6 +1,7 @@
 import { allBlogs } from '../../../data/blogData';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import SiteFooter from '../../../components/SiteFooter';
 
 const SITE_URL = 'https://adilrahman.cc';
 
@@ -166,15 +167,15 @@ export default async function BlogPostPage({ params }) {
           </div>
         </article>
 
-        {/* ── Footer CTA ───────────────────────────────────────────────── */}
-        <div className="blog-footer-cta">
-          <div className="blog-footer-cta-inner">
-            <p className="blog-footer-label">// ENJOYED THIS?</p>
-            <h3 className="blog-footer-title">Let's Build Something Together</h3>
-            <p className="blog-footer-desc">Have a project in mind? I'm available for freelance work — Flutter, Shopify, full-stack web apps.</p>
-            <Link href="/#contact" className="blog-cta-btn">Get In Touch</Link>
-          </div>
-        </div>
+        {/* ── Footer CTA & Site Links ── */}
+        <SiteFooter
+          ctaLabel="// ENJOYED THIS?"
+          ctaTitle="Let's Build Something Together"
+          ctaDesc="Have a project in mind? I'm available for freelance work — Flutter, Shopify, full-stack web apps."
+          primaryBtn={{ label: "Get In Touch", href: "/#contact" }}
+          secondaryBtn={{ label: "Back to Blog", href: "/blog" }}
+          tertiaryBtn={{ label: "Projects Hub", href: "/project" }}
+        />
 
         <style>{`
           @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');

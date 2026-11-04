@@ -1,6 +1,7 @@
 import { allProjects, getProjectCategory, fetchProjectsFromSupabase, fetchProjectById } from '../../../data/projectsData';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import SiteFooter from '../../../components/SiteFooter';
 
 const SITE_URL = 'https://adilrahman.cc';
 
@@ -354,24 +355,15 @@ export default async function SaasDetailPage({ params }) {
           </div>
         </main>
 
-        {/* ── Footer CTA ── */}
-        <footer className="saas-footer-cta">
-          <div className="saas-container text-center">
-            <p className="footer-label">// LOOKING TO BUILD A SAAS PRODUCT?</p>
-            <h2 className="footer-title">Need a Custom MVP or Enterprise Platform?</h2>
-            <p className="footer-desc">
-              I build high-performance web applications, multi-tenant B2B architectures, Flutter cross-platform PWAs, and custom SaaS tools with rapid turnaround.
-            </p>
-            <div className="footer-btn-row">
-              <Link href="/#contact" className="btn-primary">
-                Get a Development Quote
-              </Link>
-              <Link href="/saas" className="btn-secondary">
-                Explore Other SaaS Projects
-              </Link>
-            </div>
-          </div>
-        </footer>
+        {/* ── Blog-Style Footer CTA & Site Links ── */}
+        <SiteFooter
+          ctaLabel="// LOOKING TO BUILD A SAAS PRODUCT?"
+          ctaTitle="Need a Custom MVP or Enterprise Platform?"
+          ctaDesc="I build high-performance web applications, multi-tenant B2B architectures, Flutter cross-platform PWAs, and custom SaaS tools with rapid turnaround."
+          primaryBtn={{ label: "Get a Development Quote →", href: "/#contact" }}
+          secondaryBtn={{ label: "Explore Other SaaS Projects", href: "/project/saas" }}
+          tertiaryBtn={{ label: "All Projects Hub", href: "/project" }}
+        />
       </div>
     </>
   );

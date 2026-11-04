@@ -1,6 +1,7 @@
 import { allProjects, PROJECT_CATEGORIES, getCategoryProjects, getAllProjectCategoryPaths, fetchProjectsFromSupabase, fetchProjectById } from '../../../../data/projectsData';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import SiteFooter from '../../../../components/SiteFooter';
 
 const SITE_URL = 'https://adilrahman.cc';
 
@@ -361,26 +362,15 @@ export default async function ProjectDetailPage({ params }) {
         </div>
       </main>
 
-      {/* ── Footer CTA ── */}
-      <footer className="detail-footer-cta">
-        <div className="footer-inner">
-          <p className="footer-label">// LOOKING TO BUILD SOMETHING SIMILAR?</p>
-          <h2 className="footer-heading">Let's Discuss Your Project Scope</h2>
-          <p className="footer-subtext">
-            Available for freelance full-stack software development, MVPs, cross-platform apps, and automated workflows.
-          </p>
-          <div className="footer-actions">
-            <Link href="/?hire=true" className="btn-primary">
-              Get in Touch with Adil
-            </Link>
-            {cat && (
-              <Link href={`/project/${normCategory}`} className="btn-secondary">
-                Back to {cat.name}
-              </Link>
-            )}
-          </div>
-        </div>
-      </footer>
+      {/* ── Blog-Style Footer CTA & Site Links ── */}
+      <SiteFooter
+        ctaLabel="// LOOKING TO BUILD SOMETHING SIMILAR?"
+        ctaTitle="Let's Discuss Your Project Scope"
+        ctaDesc="Available for freelance full-stack software development, MVPs, cross-platform apps, and automated workflows."
+        primaryBtn={{ label: "Get in Touch with Adil", href: "/?hire=true" }}
+        secondaryBtn={cat ? { label: `Back to ${cat.name}`, href: `/project/${normCategory}` } : { label: "All Projects Hub", href: "/project" }}
+        tertiaryBtn={cat ? { label: "All Projects Hub", href: "/project" } : null}
+      />
     </div>
   );
 }

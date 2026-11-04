@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import SiteFooter from '../../components/SiteFooter';
 import { getCategoryProjects, fetchProjectsFromSupabase } from '../../data/projectsData';
 
 function renderProjectCard(project, categorySlug, defaultBadge) {
@@ -223,46 +224,17 @@ export default function ProjectsHubClient({ initialProjects = [] }) {
             </div>
           </section>
 
-          {/* Bottom CTA */}
-          <div className="projects-bottom-cta">
-            <h2 className="bottom-cta-heading">Need a Production System Engineered?</h2>
-            <p className="bottom-cta-sub">
-              Available for full-stack Next.js platforms, cross-platform Flutter mobile applications, and custom Shopify storefronts worldwide.
-            </p>
-            <div className="bottom-cta-actions">
-              <Link href="/services" className="cta-btn-primary">
-                Explore Engineering Services →
-              </Link>
-              <Link href="/?quote=open#contact" className="cta-btn-secondary">
-                Request a Custom Quote ↗
-              </Link>
-            </div>
-          </div>
-
         </div>
       </main>
 
-      {/* ── Footer ── */}
-      <footer className="projects-footer">
-        <div className="footer-links-row">
-          <Link href="/" className="footer-link">Portfolio Home</Link>
-          <span className="footer-sep">·</span>
-          <Link href="/project/saas" className="footer-link">SaaS Platforms</Link>
-          <span className="footer-sep">·</span>
-          <Link href="/project/freelance" className="footer-link">Freelance Systems</Link>
-          <span className="footer-sep">·</span>
-          <Link href="/project/personal-project" className="footer-link">Personal Projects</Link>
-          <span className="footer-sep">·</span>
-          <Link href="/tools" className="footer-link">Tools</Link>
-          <span className="footer-sep">·</span>
-          <Link href="/tools/resume-builder" className="footer-link">Resume Builder</Link>
-          <span className="footer-sep">·</span>
-          <Link href="/services" className="footer-link">Services</Link>
-          <span className="footer-sep">·</span>
-          <Link href="/blog" className="footer-link">Blog</Link>
-        </div>
-        <p className="footer-copy">© 2026 Adil Rahman | Engineered with Next.js, Supabase & Cloudflare</p>
-      </footer>
+      {/* ── Blog-Style Footer CTA & Site Links ── */}
+      <SiteFooter
+        ctaLabel="// READY TO BUILD A PRODUCTION SYSTEM?"
+        ctaTitle="Need a Production System Engineered?"
+        ctaDesc="Available for full-stack Next.js platforms, cross-platform Flutter mobile applications, and custom Shopify storefronts worldwide."
+        primaryBtn={{ label: "Request a Custom Quote →", href: "/?quote=open#contact" }}
+        secondaryBtn={{ label: "Explore Engineering Services", href: "/services" }}
+      />
     </div>
   );
 }

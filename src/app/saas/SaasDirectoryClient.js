@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import SiteFooter from '../../components/SiteFooter';
 import { getCategoryProjects, getProjectCategory, fetchProjectsFromSupabase } from '../../data/projectsData';
 
 function renderProjectCard(project, defaultBadge) {
@@ -239,24 +240,15 @@ export default function SaasDirectoryClient({ initialProjects = [] }) {
         </div>
       </main>
 
-      {/* ── Footer CTA ── */}
-      <footer className="saas-footer-cta">
-        <div className="saas-footer-inner">
-          <p className="footer-label">// HAVE A SAAS IDEA?</p>
-          <h2 className="footer-title">Need a Custom Software Solution Built?</h2>
-          <p className="footer-desc">
-            Available for freelance full-stack software development, MVPs, cross-platform apps, and automated workflows.
-          </p>
-          <div className="footer-buttons">
-            <Link href="/?quote=open#contact" className="btn-primary">
-              Discuss Your SaaS Project
-            </Link>
-            <Link href="/services" className="btn-secondary">
-              View Developer Services
-            </Link>
-          </div>
-        </div>
-      </footer>
+      {/* ── Blog-Style Footer CTA & Site Links ── */}
+      <SiteFooter
+        ctaLabel="// HAVE A SAAS IDEA?"
+        ctaTitle="Need a Custom Software Solution Built?"
+        ctaDesc="Available for freelance full-stack software development, MVPs, cross-platform apps, and automated workflows."
+        primaryBtn={{ label: "Discuss Your SaaS Project →", href: "/?quote=open#contact" }}
+        secondaryBtn={{ label: "View Developer Services", href: "/services" }}
+        tertiaryBtn={{ label: "All Projects Hub", href: "/project" }}
+      />
     </div>
   );
 }

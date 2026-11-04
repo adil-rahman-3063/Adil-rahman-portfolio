@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import SiteFooter from '../../../components/SiteFooter';
 import { PROJECT_CATEGORIES, getCategoryProjects, fetchProjectsFromSupabase } from '../../../data/projectsData';
 
 function renderProjectCard(project, categorySlug, defaultBadge) {
@@ -166,47 +167,18 @@ export default function CategoryDirectoryClient({ category, initialProjects = []
             </div>
           )}
 
-          {/* Bottom CTA */}
-          <div className="category-bottom-cta">
-            <h2 className="bottom-cta-heading">Need a Similar System Engineered?</h2>
-            <p className="bottom-cta-sub">
-              Adil Rahman is available for custom contract software engineering, mobile development, and full-stack SaaS builds.
-            </p>
-            <div className="bottom-cta-actions">
-              <Link href="/services" className="cta-btn-primary">
-                Explore Services →
-              </Link>
-              <Link href="/?quote=open#contact" className="cta-btn-secondary">
-                Request a Custom Quote ↗
-              </Link>
-            </div>
-          </div>
         </div>
       </main>
 
-      {/* ── Footer ── */}
-      <footer className="category-footer">
-        <div className="footer-links-row">
-          <Link href="/" className="footer-link">Portfolio Home</Link>
-          <span className="footer-sep">·</span>
-          <Link href="/project" className="footer-link">Projects Hub</Link>
-          <span className="footer-sep">·</span>
-          <Link href="/project/saas" className="footer-link">SaaS</Link>
-          <span className="footer-sep">·</span>
-          <Link href="/project/freelance" className="footer-link">Freelance</Link>
-          <span className="footer-sep">·</span>
-          <Link href="/project/personal-project" className="footer-link">Personal</Link>
-          <span className="footer-sep">·</span>
-          <Link href="/tools" className="footer-link">Tools</Link>
-          <span className="footer-sep">·</span>
-          <Link href="/tools/resume-builder" className="footer-link">Resume Builder</Link>
-          <span className="footer-sep">·</span>
-          <Link href="/services" className="footer-link">Services</Link>
-          <span className="footer-sep">·</span>
-          <Link href="/blog" className="footer-link">Blog</Link>
-        </div>
-        <p className="footer-copy">© 2026 Adil Rahman | Engineered with Next.js, Supabase & Cloudflare</p>
-      </footer>
+      {/* ── Blog-Style Footer CTA & Site Links ── */}
+      <SiteFooter
+        ctaLabel="// NEED A SIMILAR SYSTEM ENGINEERED?"
+        ctaTitle={`Ready to Build Your ${cat.name} Product?`}
+        ctaDesc="Adil Rahman is available for custom contract software engineering, mobile development, and full-stack SaaS builds."
+        primaryBtn={{ label: "Request a Custom Quote →", href: "/?quote=open#contact" }}
+        secondaryBtn={{ label: "Explore Engineering Services", href: "/services" }}
+        tertiaryBtn={{ label: "All Projects Hub", href: "/project" }}
+      />
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { allServices } from '../../../data/servicesData';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import SiteFooter from '../../../components/SiteFooter';
 
 const SITE_URL = 'https://adilrahman.cc';
 
@@ -128,19 +129,15 @@ export default async function ServiceDetailPage({ params }) {
         </div>
       </main>
 
-      {/* ── Footer CTA ── */}
-      <footer className="service-footer">
-        <div className="service-container text-center">
-          <p className="footer-label">// READY TO START?</p>
-          <h2 className="footer-title">Let&apos;s Build Your Next Project</h2>
-          <p className="footer-desc">
-            Submit your feature specifications, budget targets, and timeline to receive a structured architecture breakdown and quote.
-          </p>
-          <Link href="/#contact" className="btn-primary large">
-            Contact Adil Rahman
-          </Link>
-        </div>
-      </footer>
+      {/* ── Blog-Style Footer CTA & Site Links ── */}
+      <SiteFooter
+        ctaLabel="// READY TO START?"
+        ctaTitle="Let's Build Your Next Project"
+        ctaDesc="Submit your feature specifications, budget targets, and timeline to receive a structured architecture breakdown and quote."
+        primaryBtn={{ label: "Contact Adil Rahman →", href: "/#contact" }}
+        secondaryBtn={{ label: "All Services Hub", href: "/services" }}
+        tertiaryBtn={{ label: "Projects Hub", href: "/project" }}
+      />
 
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');

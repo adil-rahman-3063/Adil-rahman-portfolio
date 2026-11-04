@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import SiteFooter from '../../components/SiteFooter';
 import { allServices } from '../../data/servicesData';
 
 const SITE_URL = 'https://adilrahman.cc';
@@ -151,29 +152,15 @@ export default function ServicesHubPage() {
         </div>
       </main>
 
-      <footer className="hub-footer">
-        <div className="content-container text-center">
-          <p className="footer-label">// READY TO SHIP?</p>
-          <h2 className="footer-title">Let’s Discuss Your Next Build</h2>
-          <p className="footer-desc">
-            Available for selected freelance contracts, MVPs, and long-term architectural consulting.
-          </p>
-          <div className="footer-cta-buttons">
-            <Link
-              href="/?hire=true"
-              className="footer-cta-btn"
-            >
-              Get a Project Quote →
-            </Link>
-            <Link
-              href="/#contact"
-              className="footer-secondary-btn"
-            >
-              Contact Form
-            </Link>
-          </div>
-        </div>
-      </footer>
+      {/* ── Blog-Style Footer CTA & Site Links ── */}
+      <SiteFooter
+        ctaLabel="// READY TO SHIP?"
+        ctaTitle="Let’s Discuss Your Next Build"
+        ctaDesc="Available for selected freelance contracts, MVPs, and long-term architectural consulting."
+        primaryBtn={{ label: "Get a Project Quote →", href: "/?hire=true" }}
+        secondaryBtn={{ label: "Contact Form", href: "/#contact" }}
+        tertiaryBtn={{ label: "Projects Hub", href: "/project" }}
+      />
 
       <style>{`
         .services-hub-page {

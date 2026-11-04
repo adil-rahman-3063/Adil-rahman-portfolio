@@ -889,102 +889,188 @@
   font-family: var(--font-special-elite), monospace;
 }
 
-/* ─── Bottom CTA Banners ─── */
+/* ==========================================================================
+   UNIFIED BLOG-STYLE FOOTER CTA & BOTTOM FOOTER
+   Matches the cozy typewriter/espresso aesthetic of the blog pages 100%.
+   Centered card container, warm glassmorphic gradient, pill buttons.
+   ========================================================================== */
+.site-footer-wrapper {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.blog-footer-cta,
+.detail-footer-cta,
 .projects-bottom-cta,
 .category-bottom-cta,
 .tools-bottom-cta,
-.saas-footer-cta {
-  text-align: center;
-  padding: 48px 32px;
-  background: linear-gradient(180deg, rgba(35, 21, 19, 0.35), rgba(35, 21, 19, 0.85));
-  border: 1px solid rgba(141, 110, 99, 0.35);
-  border-radius: 8px;
-}
-
-.bottom-cta-heading,
-.footer-title {
-  font-family: var(--font-special-elite), monospace;
-  font-size: 26px;
-  color: #FAF6EE;
-  margin: 0 0 12px;
-  font-weight: bold;
-}
-
-.bottom-cta-sub,
-.footer-desc {
-  font-size: 14px;
-  color: #BCAAA4;
-  max-width: 600px;
-  margin: 0 auto 24px;
-  line-height: 1.6;
-  font-family: var(--font-special-elite), monospace;
-}
-
-.bottom-cta-actions,
-.footer-buttons {
+.saas-footer-cta,
+.hub-footer,
+.service-footer {
+  padding: 32px 24px 72px;
+  width: 100%;
+  box-sizing: border-box;
   display: flex;
+  justify-content: center;
+}
+
+.blog-footer-cta-inner,
+.footer-inner,
+.projects-bottom-cta-inner,
+.category-bottom-cta-inner,
+.tools-bottom-cta-inner,
+.saas-footer-inner,
+.content-container.text-center,
+.service-container.text-center {
+  max-width: 720px;
+  width: 100%;
+  margin: 0 auto;
+  background: linear-gradient(135deg, rgba(42, 21, 16, 0.85) 0%, rgba(26, 10, 8, 0.95) 100%);
+  border: 1px solid rgba(141, 110, 99, 0.3);
+  border-radius: 16px;
+  padding: 44px 32px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  box-sizing: border-box;
+}
+
+.blog-footer-label,
+.footer-label {
+  font-family: var(--font-special-elite), monospace;
+  font-size: 11px;
+  color: #8D6E63;
+  letter-spacing: 1.5px;
+  font-weight: bold;
+  margin: 0 0 12px;
+  text-transform: uppercase;
+}
+
+.blog-footer-title,
+.footer-heading,
+.footer-title,
+.bottom-cta-heading {
+  font-family: var(--font-special-elite), monospace;
+  font-size: clamp(22px, 4vw, 28px);
+  color: #FAF6EE;
+  margin: 0 0 14px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  line-height: 1.25;
+}
+
+.blog-footer-desc,
+.footer-subtext,
+.footer-desc,
+.bottom-cta-sub {
+  font-family: var(--font-special-elite), monospace;
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: #BCAAA4;
+  max-width: 560px;
+  margin: 0 auto 28px;
+}
+
+.blog-footer-links,
+.footer-actions,
+.footer-buttons,
+.bottom-cta-actions,
+.footer-cta-buttons,
+.footer-btn-row {
+  display: flex;
+  align-items: center;
   justify-content: center;
   gap: 14px;
   flex-wrap: wrap;
 }
 
+.blog-cta-btn,
+.btn-primary,
 .cta-btn-primary,
-.btn-primary {
-  font-family: var(--font-special-elite), monospace;
-  font-size: 12.5px;
-  background: #8D6E63;
+.footer-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #8D6E63 0%, #6D4C41 100%);
   color: #FAF6EE !important;
-  padding: 10px 22px;
-  border-radius: 20px;
   text-decoration: none !important;
+  border-radius: 30px;
+  padding: 13px 28px;
+  font-family: var(--font-special-elite), monospace;
+  font-size: 12px;
   font-weight: bold;
-  border: none;
+  letter-spacing: 0.5px;
+  border: 1px solid rgba(141, 110, 99, 0.4);
+  box-shadow: 0 4px 16px rgba(141, 110, 99, 0.3);
+  transition: all 0.2s ease;
   cursor: pointer;
-  transition: opacity 0.2s ease;
+  white-space: nowrap;
 }
 
+.blog-cta-btn:hover,
+.btn-primary:hover,
 .cta-btn-primary:hover,
-.btn-primary:hover {
-  opacity: 0.85;
-}
-
-.cta-btn-secondary,
-.btn-secondary {
-  font-family: var(--font-special-elite), monospace;
-  font-size: 12.5px;
-  background: transparent;
-  border: 1px solid #8D6E63;
+.footer-cta-btn:hover {
+  background: linear-gradient(135deg, #A1887F 0%, #795548 100%);
   color: #FAF6EE !important;
-  padding: 10px 22px;
-  border-radius: 20px;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(141, 110, 99, 0.45);
+}
+
+.blog-secondary-btn,
+.btn-secondary,
+.cta-btn-secondary,
+.footer-secondary-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(42, 21, 16, 0.45);
+  border: 1px solid rgba(141, 110, 99, 0.4);
+  color: #FAF6EE !important;
   text-decoration: none !important;
+  border-radius: 30px;
+  padding: 13px 26px;
+  font-family: var(--font-special-elite), monospace;
+  font-size: 12px;
   font-weight: bold;
-  transition: background 0.2s ease;
+  letter-spacing: 0.5px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  white-space: nowrap;
 }
 
+.blog-secondary-btn:hover,
+.btn-secondary:hover,
 .cta-btn-secondary:hover,
-.btn-secondary:hover {
-  background: rgba(141, 110, 99, 0.2);
+.footer-secondary-btn:hover {
+  border-color: #FAF6EE;
+  background: rgba(141, 110, 99, 0.25);
+  color: #FAF6EE !important;
+  transform: translateY(-2px);
 }
 
-/* ─── Unified Footers ─── */
+/* ─── Unified Bottom Navigation Bar ─── */
+.site-bottom-footer,
 .projects-footer,
 .category-footer,
 .tools-footer {
-  border-top: 1px solid rgba(141, 110, 99, 0.25);
-  padding: 32px;
+  border-top: 1px solid rgba(141, 110, 99, 0.2);
+  padding: 32px 24px;
   text-align: center;
   display: flex;
   flex-direction: column;
   gap: 12px;
   align-items: center;
+  background: rgba(20, 10, 8, 0.75);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .footer-links-row {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 10px;
+  align-items: center;
+  gap: 8px 12px;
 }
 
 .footer-link {
@@ -992,10 +1078,16 @@
   font-size: 11.5px;
   color: #8D6E63 !important;
   text-decoration: none !important;
+  transition: color 0.2s ease;
 }
 
 .footer-link:hover {
   color: #FAF6EE !important;
+}
+
+.footer-sep {
+  color: rgba(141, 110, 99, 0.4);
+  font-size: 11px;
 }
 
 .footer-copy {
@@ -1003,6 +1095,7 @@
   font-size: 11px;
   color: #8C7355;
   margin: 0;
+  letter-spacing: 0.5px;
 }
 
 /* Responsive */

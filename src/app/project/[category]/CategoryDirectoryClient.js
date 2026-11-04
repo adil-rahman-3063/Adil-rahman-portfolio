@@ -17,11 +17,11 @@ function renderProjectCard(project, categorySlug, defaultBadge) {
         <span className="project-category-badge">{defaultBadge}</span>
       </div>
 
-      <h3 className="project-card-name">
+      <h2 className="project-card-name">
         <Link href={projectHref} className="project-card-title-link">
           {project.title}
         </Link>
-      </h3>
+      </h2>
       <div className="project-card-subtitle">{project.subtitle}</div>
 
       <p className="project-card-description">{project.tagline || project.description}</p>
@@ -165,6 +165,94 @@ export default function CategoryDirectoryClient({ category, initialProjects = []
                 renderProjectCard(project, normCategory, cat.badge)
               )}
             </div>
+          )}
+
+          {/* ── Category Architecture & Engineering Standards (SEO & Technical Substance) ── */}
+          {normCategory === 'saas' && (
+            <section className="projects-philosophy-card">
+              <h2 className="phil-heading">// MULTI-TENANT SAAS ENGINEERING PRINCIPLES</h2>
+              <div className="phil-grid">
+                <div className="phil-col">
+                  <span className="phil-num">01</span>
+                  <h3>Tenant Schema Isolation & Strict RLS</h3>
+                  <p>
+                    Every multi-tenant platform engineered by Adil Rahman implements Row-Level Security (RLS) directly in PostgreSQL. Tenants are cryptographically segmented to guarantee zero data bleeding, with sub-millisecond query execution across high-concurrency environments.
+                  </p>
+                </div>
+                <div className="phil-col">
+                  <span className="phil-num">02</span>
+                  <h3>Event-Driven Webhooks & Billing Pipelines</h3>
+                  <p>
+                    Decoupled webhooks integrate with UPI payment networks, Stripe, and Razorpay. Background reconciliation engines handle recurring subscriptions, proration, and payment failures automatically, triggering instant transactional notifications via WhatsApp and email.
+                  </p>
+                </div>
+                <div className="phil-col">
+                  <span className="phil-num">03</span>
+                  <h3>Edge-Cached Global Infrastructure</h3>
+                  <p>
+                    Built with Next.js App Router and Cloudflare Edge Proxies. Static assets, API route caching, and sliding-window rate limiting prevent DDoS attacks and provide sub-50ms Time to First Byte (TTFB) for users across mobile and desktop.
+                  </p>
+                </div>
+              </div>
+            </section>
+          )}
+
+          {normCategory === 'freelance' && (
+            <section className="projects-philosophy-card">
+              <h2 className="phil-heading">// FREELANCE DELIVERY & CLIENT COLLABORATION STANDARDS</h2>
+              <div className="phil-grid">
+                <div className="phil-col">
+                  <span className="phil-num">01</span>
+                  <h3>Rapid 1–3 Week MVP Delivery</h3>
+                  <p>
+                    Tight sprint cadences turn early Figma wireframes and client requirements into live, production-grade applications. Zero agency overhead means direct Slack or WhatsApp communication with the engineer writing your code.
+                  </p>
+                </div>
+                <div className="phil-col">
+                  <span className="phil-num">02</span>
+                  <h3>Clean Code & Zero Vendor Lock-in</h3>
+                  <p>
+                    Every project is delivered with structured Git repositories, clean pull requests, environment variable templates, and automated Docker build pipelines so internal teams can take over maintenance effortlessly.
+                  </p>
+                </div>
+                <div className="phil-col">
+                  <span className="phil-num">03</span>
+                  <h3>Performance & Conversion Optimization</h3>
+                  <p>
+                    Custom Liquid themes and responsive web applications engineered for sub-1.2s Largest Contentful Paint (LCP) and 90+ Google PageSpeed scores, maximizing conversion funnels and mobile user retention.
+                  </p>
+                </div>
+              </div>
+            </section>
+          )}
+
+          {normCategory === 'personal-project' && (
+            <section className="projects-philosophy-card">
+              <h2 className="phil-heading">// OPEN-SOURCE & SYSTEMS ARCHITECTURE PHILOSOPHY</h2>
+              <div className="phil-grid">
+                <div className="phil-col">
+                  <span className="phil-num">01</span>
+                  <h3>Offline-First & Privacy Preserving</h3>
+                  <p>
+                    Utilities engineered with zero third-party telemetry. Core calculations, astronomical coordinate algorithms, and document manipulations run entirely client-side using device storage and on-device WebAssembly.
+                  </p>
+                </div>
+                <div className="phil-col">
+                  <span className="phil-num">02</span>
+                  <h3>Cross-Platform Native Compilations</h3>
+                  <p>
+                    Leveraging Flutter and modern web stacks to compile high-performance binaries across Android, iOS, and Progressive Web Apps from single, maintainable codebases without sacrificing 60 FPS gesture responsiveness.
+                  </p>
+                </div>
+                <div className="phil-col">
+                  <span className="phil-num">03</span>
+                  <h3>Public Auditable Codebases</h3>
+                  <p>
+                    Complete source code for developer tools and open-source mobile projects is publicly hosted on GitHub with transparent release notes, MIT licensing, and documented issue trackers.
+                  </p>
+                </div>
+              </div>
+            </section>
           )}
 
         </div>

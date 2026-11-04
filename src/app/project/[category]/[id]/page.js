@@ -350,7 +350,7 @@ export default async function ProjectDetailPage({ params }) {
                     className="related-card"
                   >
                     <span className="related-status">{rel.status}</span>
-                    <h4 className="related-title">{rel.title}</h4>
+                    <h3 className="related-title">{rel.title}</h3>
                     <p className="related-desc">{rel.tagline || rel.description}</p>
                     <span className="related-link-text">View Architecture →</span>
                   </Link>

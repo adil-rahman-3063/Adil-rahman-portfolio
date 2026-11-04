@@ -34,7 +34,7 @@ export const metadata = {
 };
 
 export default function ToolsResumeBuilderPage() {
-  const jsonLd = {
+  const webAppJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'WebApplication',
     name: 'Free ATS Resume & CV Builder',
@@ -55,11 +55,46 @@ export default function ToolsResumeBuilderPage() {
     },
   };
 
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'Is this ATS resume builder truly 100% free with no watermark?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Yes. Unlike commercial resume services that hold your finished resume hostage behind a paywall, this editor is 100% free with zero watermarks or subscriptions.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Is my personal resume data stored on your server?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'No. All personal resume data, bullet points, and formatting choices are stored exclusively in your browser localStorage without being sent to external databases.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How do automated ATS scanners evaluate this resume layout?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'The builder generates a semantic, single-column document stream without multi-column table traps or text boxes, ensuring 100% parsing accuracy across Workday, Lever, Greenhouse, and Taleo.',
+        },
+      },
+    ],
+  };
+
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(webAppJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
       <ResumeBuilderClient />
     </>

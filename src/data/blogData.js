@@ -2,10 +2,10 @@ export const allBlogs = [
   {
     id: 'sqlite-to-supabase-railway-deployment',
     title: 'Taking an SQLite Codebase to Production: Purging Dev Hacks for Supabase & Railway',
-    seoTitle: 'Migrating an SQLite App to Supabase PostgreSQL on Railway | Adil Rahman',
+    seoTitle: 'SQLite to Supabase Migration on Railway | Adil Rahman',
     date: 'October 31, 2026',
     readTime: '5 min read',
-    excerpt: "I was handed a full-stack codebase built on local SQLite. Here is the step-by-step DevOps checklist I used to purge dev-mode workarounds, configure connection pooling, and deploy safely to Railway and Supabase.",
+    excerpt: 'Step-by-step checklist to migrate a local SQLite app to production Supabase PostgreSQL and Railway, with connection pooling and secure deployment.',
     content: `**Category:** DevOps / Database Engineering / Deployment Architecture
 **Read Time:** ~5 mins
 

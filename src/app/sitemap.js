@@ -43,14 +43,6 @@ export default async function sitemap() {
     };
   });
 
-  // Legacy saas routes (preserved so already-indexed search links remain active)
-  const legacySaasRoutes = projectsList.map((project) => ({
-    url: `${SITE_URL}/saas/${project.id}`,
-    lastModified: new Date(),
-    changeFrequency: 'monthly',
-    priority: 0.75,
-  }));
-
   const serviceRoutes = allServices.map((service) => ({
     url: `${SITE_URL}/services/${service.slug}`,
     lastModified: new Date(),
@@ -58,6 +50,8 @@ export default async function sitemap() {
     priority: 0.9,
   }));
 
+  // Pure canonical routes only — non-canonical aliases (/saas, /resume-builder, /saas/*)
+  // are omitted to ensure 100% sitemap cleanliness and eliminate orphan/canonicalized warnings.
   return [
     {
       url: SITE_URL,
@@ -78,12 +72,6 @@ export default async function sitemap() {
       priority: 0.95,
     },
     {
-      url: `${SITE_URL}/saas`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.9,
-    },
-    {
       url: `${SITE_URL}/tools`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
@@ -96,12 +84,6 @@ export default async function sitemap() {
       priority: 0.95,
     },
     {
-      url: `${SITE_URL}/resume-builder`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.85,
-    },
-    {
       url: `${SITE_URL}/blog`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
@@ -111,6 +93,5 @@ export default async function sitemap() {
     ...projectDetailRoutes,
     ...serviceRoutes,
     ...blogRoutes,
-    ...legacySaasRoutes,
   ];
 }

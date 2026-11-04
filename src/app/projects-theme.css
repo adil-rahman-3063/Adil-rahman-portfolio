@@ -1125,3 +1125,233 @@
   }
 }
 
+/* ─── Resume Builder Page & Guide ─── */
+.resume-builder-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #231513;
+  color: #EFEBE9;
+  font-family: var(--font-special-elite), monospace;
+}
+
+.builder-top-banner {
+  background: rgba(26, 14, 12, 0.96);
+  border-bottom: 1px solid rgba(141, 110, 99, 0.25);
+  padding: 12px 24px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(8px);
+}
+
+.banner-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1600px;
+  margin: 0 auto;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.banner-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.portfolio-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #8D6E63 !important;
+  text-decoration: none !important;
+  font-family: var(--font-special-elite), monospace;
+  font-size: 12px;
+  font-weight: bold;
+}
+.portfolio-link:hover {
+  color: #FAF6EE !important;
+}
+
+.banner-sep {
+  color: rgba(141, 110, 99, 0.4);
+  font-size: 12px;
+}
+
+.tool-name {
+  font-family: var(--font-special-elite), monospace;
+  font-size: 14px;
+  color: #FAF6EE;
+  margin: 0;
+  font-weight: bold;
+}
+
+.banner-center {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pill-badge {
+  font-family: var(--font-special-elite), monospace;
+  font-size: 11px;
+  color: #FAF6EE;
+  background: rgba(141, 110, 99, 0.2);
+  border: 1px solid rgba(141, 110, 99, 0.4);
+  padding: 4px 10px;
+  border-radius: 12px;
+  white-space: nowrap;
+}
+
+.banner-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.banner-cta-label {
+  font-family: var(--font-special-elite), monospace;
+  font-size: 11px;
+  color: #BCAAA4;
+}
+
+.hire-cta-btn {
+  font-family: var(--font-special-elite), monospace;
+  font-size: 11.5px;
+  color: #FAF6EE !important;
+  background: #8D6E63;
+  padding: 6px 16px;
+  border-radius: 14px;
+  text-decoration: none !important;
+  font-weight: bold;
+  white-space: nowrap;
+}
+.hire-cta-btn:hover {
+  opacity: 0.85;
+}
+
+.builder-frame-wrapper {
+  width: 100%;
+  height: 85vh;
+  min-height: 750px;
+  border-bottom: 1px solid rgba(141, 110, 99, 0.25);
+  background: #1A0E0C;
+}
+
+.builder-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
+
+.builder-guide-container {
+  max-width: 1000px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 60px 24px 40px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+
+.guide-pill-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+}
+
+.guide-badge {
+  font-family: var(--font-special-elite), monospace;
+  font-size: 11px;
+  color: #FAF6EE;
+  background: rgba(141, 110, 99, 0.2);
+  border: 1px solid rgba(141, 110, 99, 0.35);
+  padding: 6px 14px;
+  border-radius: 16px;
+}
+
+.guide-heading {
+  font-family: var(--font-special-elite), monospace;
+  font-size: 15px;
+  color: #8C7355;
+  letter-spacing: 1.5px;
+  margin: 0 0 20px;
+  font-weight: bold;
+}
+
+.guide-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.guide-card {
+  background: rgba(35, 21, 19, 0.55);
+  border: 1px solid rgba(141, 110, 99, 0.3);
+  border-radius: 8px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.guide-num {
+  font-family: var(--font-special-elite), monospace;
+  font-size: 18px;
+  color: #8D6E63;
+  font-weight: bold;
+}
+
+.guide-card h3 {
+  font-family: var(--font-special-elite), monospace;
+  font-size: 16px;
+  color: #FAF6EE;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.guide-card p {
+  font-family: var(--font-special-elite), monospace;
+  font-size: 13px;
+  line-height: 1.65;
+  color: #BCAAA4;
+  margin: 0;
+}
+
+.faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.faq-item {
+  background: rgba(35, 21, 19, 0.45);
+  border: 1px solid rgba(141, 110, 99, 0.25);
+  border-radius: 8px;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.faq-item h3 {
+  font-family: var(--font-special-elite), monospace;
+  font-size: 15px;
+  color: #FAF6EE;
+  margin: 0;
+}
+
+.faq-item p {
+  font-family: var(--font-special-elite), monospace;
+  font-size: 13px;
+  line-height: 1.65;
+  color: #BCAAA4;
+  margin: 0;
+}
+

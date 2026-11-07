@@ -44,6 +44,8 @@ function renderMarkdown(md) {
   const lines = md.split('\n');
   const elements = [];
   let listItems = [];
+  let inCodeBlock = false;
+  let codeLines = [];
   let key = 0;
 
   const flushList = () => {
@@ -54,12 +56,13 @@ function renderMarkdown(md) {
   };
 
   const inlineRender = (text) => {
-    // Single capturing group only — no nested groups — avoids undefined split parts
-    const parts = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*|\[[^\]]+\]\([^)]+\))/g);
+    // Single capturing group only — matches bold, italic, links, and inline code
+    const parts = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*|\[[^\]]+\]\([^)]+\)|`[^`]+`)/g);
     return parts.filter(Boolean).map((part, i) => {
       if (!part) return null;
       if (/^\*\*[^*]+\*\*$/.test(part)) return <strong key={i}>{part.slice(2, -2)}</strong>;
       if (/^\*[^*]+\*$/.test(part)) return <em key={i}>{part.slice(1, -1)}</em>;
+      if (/^`[^`]+`$/.test(part)) return <code key={i} className="blog-inline-code">{part.slice(1, -1)}</code>;
       const linkMatch = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
       if (linkMatch) return <a key={i} href={linkMatch[2]} target="_blank" rel="noreferrer" className="blog-link">{linkMatch[1]}</a>;
       return part;
@@ -67,6 +70,27 @@ function renderMarkdown(md) {
   };
 
   for (const line of lines) {
+    if (line.startsWith('```')) {
+      flushList();
+      if (inCodeBlock) {
+        elements.push(
+          <pre key={key++} className="blog-code-pre">
+            <code>{codeLines.join('\n')}</code>
+          </pre>
+        );
+        codeLines = [];
+        inCodeBlock = false;
+      } else {
+        inCodeBlock = true;
+      }
+      continue;
+    }
+
+    if (inCodeBlock) {
+      codeLines.push(line);
+      continue;
+    }
+
     if (line.startsWith('# ')) {
       flushList();
       elements.push(<h2 key={key++} className="blog-h2">{inlineRender(line.slice(2))}</h2>);
@@ -89,6 +113,13 @@ function renderMarkdown(md) {
     }
   }
   flushList();
+  if (inCodeBlock && codeLines.length > 0) {
+    elements.push(
+      <pre key={key++} className="blog-code-pre">
+        <code>{codeLines.join('\n')}</code>
+      </pre>
+    );
+  }
   return elements;
 }
 
@@ -328,6 +359,35 @@ export default async function BlogPostPage({ params }) {
           .blog-p em {
             color: #D7CCC8;
             font-style: italic;
+          }
+
+          .blog-inline-code {
+            font-family: var(--font-mono);
+            font-size: 13px;
+            background: rgba(141, 110, 99, 0.18);
+            border: 1px solid rgba(141, 110, 99, 0.35);
+            color: #EFEBE9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            word-break: break-word;
+          }
+
+          .blog-code-pre {
+            background: #140806;
+            border: 1px solid rgba(141, 110, 99, 0.25);
+            border-radius: 8px;
+            padding: 18px 22px;
+            overflow-x: auto;
+            margin: 24px 0;
+            font-family: var(--font-mono);
+            font-size: 13px;
+            line-height: 1.65;
+            color: #FAF6EE;
+          }
+
+          .blog-code-pre code {
+            font-family: inherit;
+            color: inherit;
           }
 
           .blog-list {

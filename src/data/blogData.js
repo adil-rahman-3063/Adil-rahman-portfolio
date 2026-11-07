@@ -1,14 +1,168 @@
 export const allBlogs = [
   {
-  "id": "cloudflare-pages-npm-ci-wasm-trap",
-  "title": "The Windows-to-Linux npm ci Trap: Debugging Missing WebAssembly Bindings on Cloudflare Pages",
-  "seoTitle": "Cloudflare Pages npm ci Wasm Lockfile Fix | Adil Rahman",
-  "date": "November 7, 2026",
-  "readTime": "6 min read",
-  "excerpt": "Why local builds on Windows succeed while Cloudflare Pages Linux CI crashes with npm ci EUSAGE errors on Wasm packages—and how to fix package-lock.json parity.",
-  "content": "**Category:** DevOps / Edge Deployment / Node.js Tooling\n**Read Time:** ~6 mins\n\n## Introduction: The \"Green on Local, Red on CI\" Mystery\nA few days ago, while pushing a release for **Fileo**—an in-browser file utility and image manipulation platform built on **Astro 5** and **Tailwind CSS v4**—I ran into a classic modern frontend developer nightmare.\n\nOn my primary local workstation (Windows 11, Node v24), everything was pristine. I ran `npm run build`:\n- All 29 static routes compiled in 1.48 seconds.\n- Wasm decoders, responsive layouts, and SEO manifests generated without a single warning.\n- The dev server passed every end-to-end check.\n\nConfident that everything was solid, I committed the code and pushed to GitHub. The push immediately triggered an automated production build on **Cloudflare Pages**.\n\nTen seconds later, the Cloudflare deployment log threw a hard red error before compiling a single line of code:\n\n```text\n12:41:02.104  Executing user command: npm ci\n12:41:04.819  npm error code EUSAGE\n12:41:04.821  npm error The `npm ci` command can only install with an existing package-lock.json...\n12:41:04.822  npm error Missing: @emnapi/core@1.11.3 from lock file\n12:41:04.823  npm error Missing: @emnapi/runtime@1.11.3 from lock file\n12:41:04.825  npm error Failed at the npm ci step. Exited with status 1.\n```\n\nI stared at the terminal output. My local `package-lock.json` was clearly committed in the repository root. `npm run build` ran seamlessly on my laptop 30 seconds prior.\n\nWhy does a codebase that builds cleanly on a local Windows machine violently explode on a remote Linux runner during `npm ci`?\n\nThe culprit lies deep within how modern JavaScript frameworks distribute WebAssembly and native Rust bindings—and how npm silently prunes dependencies on Windows.\n\n## The Modern Tooling Shift: The Rise of Native WASI Bindings\nOver the past two years, the JavaScript ecosystem has undergone a massive Rust and WebAssembly renaissance. \n\nTo achieve sub-second build times and instant hot-module replacement, tools like **Astro 5** (utilizing the Rolldown bundler), **Tailwind CSS v4** (powered by the native Oxide engine), **SWC**, and **Biome** have largely abandoned pure JavaScript parsers. Instead, they compile their performance-critical cores directly into native platform binaries (`.node`) and **WASI** (WebAssembly System Interface) modules.\n\nTo distribute these packages across every operating system without bloating your `node_modules` with 200 MB of multi-platform binaries, package maintainers distribute them as **optional platform-specific dependencies**:\n\n- `@tailwindcss/oxide-win32-x64-msvc` (for Windows)\n- `@tailwindcss/oxide-linux-x64-gnu` (for Linux)\n- `@astrojs/compiler-binding-wasm32-wasi` (universal WASI runtime)\n- `@rolldown/binding-wasm32-wasi`\n\nThese WASI modules in turn depend on bridging packages like `@emnapi/core` and `@emnapi/runtime`—Node-API emulators that allow C/Rust WebAssembly binaries to communicate with the Node.js V8 runtime.\n\nAnd that is where the trap is set.\n\n## The Windows Culprit: How npm install Silently Prunes Linux Bindings\nWhen you initialize a project or run `npm install` on a Windows development machine, npm's dependency solver inspects your current operating environment:\n- `process.platform === 'win32'`\n- `process.arch === 'x64'`\n\nBecause you are on Windows, npm's solver classifies the Linux and WASI binding packages as non-matching optional targets. \n\nIn `package-lock.json` (specifically under the `packages` map in lockfile format v2 and v3), npm records the packages installed for your local machine. However, to save time and disk space, npm silently omits or prunes transitive dependencies of non-matching platforms. \n\nSpecifically, `@emnapi/core` and `@emnapi/runtime` (sub-dependencies of `@astrojs/compiler-binding-wasm32-wasi`) were never downloaded into your Windows `node_modules`. Crucially, their download URLs, version pins, and SHA-512 integrity hashes were **omitted from the lockfile tree**.\n\nOn Windows, your build never notices. Astro simply loads the Windows native binding or standard compiler, and everything runs smoothly.\n\n## The Cloudflare Pages Trap: Why npm ci Is Unforgiving\nNow, you push your code to Cloudflare Pages. \n\nCloudflare Pages build runners boot up inside **Ubuntu Linux container environments** (`linux-x64`). \n\nUnlike a developer running `npm install` (which evaluates what's missing and downloads packages dynamically), continuous integration environments enforce `npm ci` (**Clean Install**). \n\nThe `npm ci` command has a fundamentally different philosophy:\n1. It deletes existing `node_modules`.\n2. It **never modifies** `package-lock.json`.\n3. It treats `package-lock.json` as an absolute, unchangeable source of truth.\n4. It validates the current runtime environment against the lockfile.\n\nWhen Cloudflare's Linux runner evaluates the project, it determines that `@astrojs/compiler-binding-wasm32-wasi` is required for its Linux environment. It looks inside `package-lock.json` for `@emnapi/core@1.11.3`... and finds nothing.\n\nBecause `npm ci` is strictly deterministic and forbidden from resolving new packages over the network on its own, it crashes immediately:\n`npm error code EUSAGE: Missing: @emnapi/core@1.11.3 from lock file`.\n\n## The False Fixes That Waste Hours\nWhen developers encounter this error for the first time, they usually try three intuitive workarounds—all of which fail:\n\n### False Fix 1: Changing the Build Command\nMany developers try editing Cloudflare's build settings, changing the command to:\n`npm install && npm run build`\n\n**Why it fails:** Cloudflare Pages executes its dependency installation step (`npm ci`) *before* your custom build command is ever invoked. The build never reaches your script.\n\n### False Fix 2: Deleting package-lock.json\n\"If the lockfile is broken, I'll just delete it and let Cloudflare generate a fresh one!\"\n\n**Why it fails:** Committing without a lockfile creates unpredictable builds. Minor upstream dependency bumps can break production silently, and fresh dependency resolution adds 30–60 seconds to every single deployment.\n\n### False Fix 3: Setting SKIP_DEPENDENCY_INSTALL=true\nCloudflare provides an environment variable `SKIP_DEPENDENCY_INSTALL=1`. If you enable it, Cloudflare skips `npm ci` entirely.\n\n**Why it fails:** It skips the install step, meaning your build command now runs with an empty `node_modules` folder, failing with `sh: astro: command not found`.\n\n## The Real Fixes: Achieving Cross-Platform Lockfile Parity\nHere are the 3 production-grade solutions to solve lockfile cross-platform parity once and for all:\n\n### Method 1: The Multi-Arch Lockfile Regeneration (Simplest)\nModern versions of npm (v8.15.0+) allow you to instruct the solver to fetch dependencies for foreign operating systems and architectures.\n\nFrom your local Windows terminal, you can force npm to populate the Linux/WASI dependencies into your existing lockfile by running:\n\n```bash\nnpm install --os=linux --cpu=x64 --save-optional\n```\n\nThis instructs npm's dependency graph solver: *\"Even though I am on Windows, evaluate the package tree as if this project will run on 64-bit Linux, and record all optional platform binaries and transitive peer packages into package-lock.json.\"*\n\nCommit the updated `package-lock.json`, push upstream, and Cloudflare Pages will pass `npm ci` cleanly.\n\n### Method 2: Surgical Lockfile Injection (When npm Solver Refuses)\nIn complex monorepos or with bleeding-edge WASI bindings (like `@astrojs/compiler-binding-wasm32-wasi` and `@tailwindcss/oxide-wasm32-wasi`), npm's local solver on Windows may still aggressively prune transitive WASI shims.\n\nIn that scenario, you can inspect the missing packages directly from the npm registry and declare them explicitly in `package-lock.json` under `node_modules`:\n\n```json\n\"node_modules/@astrojs/compiler-binding-wasm32-wasi/node_modules/@emnapi/core\": {\n  \"version\": \"1.11.3\",\n  \"resolved\": \"https://registry.npmjs.org/@emnapi/core/-/core-1.11.3.tgz\",\n  \"integrity\": \"sha512-HndTgoU5S5Ue6SfaKA0e+mOH/u+8yPke+fNE/vI5P9sFk70p0yS/S0q/oV3BwBw0WzY5S8yHj9pX8lKqA==\",\n  \"license\": \"MIT\"\n},\n\"node_modules/@astrojs/compiler-binding-wasm32-wasi/node_modules/@emnapi/runtime\": {\n  \"version\": \"1.11.3\",\n  \"resolved\": \"https://registry.npmjs.org/@emnapi/runtime/-/runtime-1.11.3.tgz\",\n  \"integrity\": \"sha512-92a+yR5Pq6b/2p3Z4L8g5sK0QpA2WbW5S5Ue6SfaKA0e+mOH/u+8yPke+fNE/vI5P9sFk70p0yS/S0q/oV3Bw==\",\n  \"license\": \"MIT\"\n}\n```\n\nBy providing the exact `version`, `resolved` tarball, and `integrity` SHA-512 hash, `npm ci` on Cloudflare Pages finds the exact pre-computed entry and installs without a hitch.\n\n### Method 3: The Pre-Push Docker / WSL Verification\nIf you develop on Windows and deploy to Linux, you should never guess whether `npm ci` will pass. \n\nBefore pushing critical releases, run a quick one-liner using Docker to simulate the exact Cloudflare Pages execution environment:\n\n```bash\ndocker run --rm -v \"%cd%\":/app -w /app node:22-alpine npm ci\n```\n\n*(On WSL or PowerShell, replace `%cd%` with `$PWD`)*\n\nIf this passes locally inside a Linux container, it is mathematically guaranteed to pass on Cloudflare Pages, Vercel, Railway, or AWS CodeBuild.\n\n## Key Takeaways for Web Engineers\n- **Frontend Tooling is Now Multi-Platform Native:** With Astro, Vite, Tailwind v4, and Rolldown shipping compiled Rust/Wasm modules, your JavaScript dependencies behave like native C libraries.\n- **package-lock.json is Environment-Sensitive:** A lockfile generated on Windows is not automatically valid for Linux unless optional dependencies are explicitly included.\n- **Never Fight npm ci on CI:** Don't try to hack around `npm ci` with custom scripts or deleting lockfiles. Fix the tree parity at the source, and your edge deployments will remain rock-solid.\n\n---\n\n*Running into stubborn CI deployment bottlenecks, edge hosting issues, or database pooling traps? Feel free to [reach out](https://adilrahman.cc) to talk shop or collaborate.*"
+    id: 'cloudflare-pages-npm-ci-wasm-trap',
+    title: 'The Windows-to-Linux npm ci Trap: Debugging Missing WebAssembly Bindings on Cloudflare Pages',
+    seoTitle: 'Cloudflare Pages npm ci Wasm Lockfile Fix | Adil Rahman',
+    date: 'November 7, 2026',
+    readTime: '6 min read',
+    excerpt: 'Why local builds on Windows succeed while Cloudflare Pages Linux CI crashes with npm ci EUSAGE errors on Wasm packages—and how to fix package-lock.json parity.',
+    content: `**Category:** DevOps / Edge Deployment / Node.js Tooling
+**Read Time:** ~6 mins
+
+## Introduction: The "Green on Local, Red on CI" Mystery
+A few days ago, while pushing a release for **Fileo**—an in-browser file utility and image manipulation platform built on **Astro 5** and **Tailwind CSS v4**—I ran into a classic modern frontend developer nightmare.
+
+On my primary local workstation (Windows 11, Node v24), everything was pristine. I ran \`npm run build\`:
+- All 29 static routes compiled in 1.48 seconds.
+- Wasm decoders, responsive layouts, and SEO manifests generated without a single warning.
+- The dev server passed every end-to-end check.
+
+Confident that everything was solid, I committed the code and pushed to GitHub. The push immediately triggered an automated production build on **Cloudflare Pages**.
+
+Ten seconds later, the Cloudflare deployment log threw a hard red error before compiling a single line of code:
+
+\`\`\`text
+12:41:02.104  Executing user command: npm ci
+12:41:04.819  npm error code EUSAGE
+12:41:04.821  npm error The \`npm ci\` command can only install with an existing package-lock.json...
+12:41:04.822  npm error Missing: @emnapi/core@1.11.3 from lock file
+12:41:04.823  npm error Missing: @emnapi/runtime@1.11.3 from lock file
+12:41:04.825  npm error Failed at the npm ci step. Exited with status 1.
+\`\`\`
+
+I stared at the terminal output. My local \`package-lock.json\` was clearly committed in the repository root. \`npm run build\` ran seamlessly on my laptop 30 seconds prior.
+
+Why does a codebase that builds cleanly on a local Windows machine violently explode on a remote Linux runner during \`npm ci\`?
+
+The culprit lies deep within how modern JavaScript frameworks distribute WebAssembly and native Rust bindings—and how npm silently prunes dependencies on Windows.
+
+## The Modern Tooling Shift: The Rise of Native WASI Bindings
+Over the past two years, the JavaScript ecosystem has undergone a massive Rust and WebAssembly renaissance. 
+
+To achieve sub-second build times and instant hot-module replacement, tools like **Astro 5** (utilizing the Rolldown bundler), **Tailwind CSS v4** (powered by the native Oxide engine), **SWC**, and **Biome** have largely abandoned pure JavaScript parsers. Instead, they compile their performance-critical cores directly into native platform binaries (\`.node\`) and **WASI** (WebAssembly System Interface) modules.
+
+To distribute these packages across every operating system without bloating your \`node_modules\` with 200 MB of multi-platform binaries, package maintainers distribute them as **optional platform-specific dependencies**:
+
+- \`@tailwindcss/oxide-win32-x64-msvc\` (for Windows)
+- \`@tailwindcss/oxide-linux-x64-gnu\` (for Linux)
+- \`@astrojs/compiler-binding-wasm32-wasi\` (universal WASI runtime)
+- \`@rolldown/binding-wasm32-wasi\`
+
+These WASI modules in turn depend on bridging packages like \`@emnapi/core\` and \`@emnapi/runtime\`—Node-API emulators that allow C/Rust WebAssembly binaries to communicate with the Node.js V8 runtime.
+
+And that is where the trap is set.
+
+## The Windows Culprit: How npm install Silently Prunes Linux Bindings
+When you initialize a project or run \`npm install\` on a Windows development machine, npm's dependency solver inspects your current operating environment:
+- \`process.platform === 'win32'\`
+- \`process.arch === 'x64'\`
+
+Because you are on Windows, npm's solver classifies the Linux and WASI binding packages as non-matching optional targets. 
+
+In \`package-lock.json\` (specifically under the \`packages\` map in lockfile format v2 and v3), npm records the packages installed for your local machine. However, to save time and disk space, npm silently omits or prunes transitive dependencies of non-matching platforms. 
+
+Specifically, \`@emnapi/core\` and \`@emnapi/runtime\` (sub-dependencies of \`@astrojs/compiler-binding-wasm32-wasi\`) were never downloaded into your Windows \`node_modules\`. Crucially, their download URLs, version pins, and SHA-512 integrity hashes were **omitted from the lockfile tree**.
+
+On Windows, your build never notices. Astro simply loads the Windows native binding or standard compiler, and everything runs smoothly.
+
+## The Cloudflare Pages Trap: Why npm ci Is Unforgiving
+Now, you push your code to Cloudflare Pages. 
+
+Cloudflare Pages build runners boot up inside **Ubuntu Linux container environments** (\`linux-x64\`). 
+
+Unlike a developer running \`npm install\` (which evaluates what's missing and downloads packages dynamically), continuous integration environments enforce \`npm ci\` (**Clean Install**). 
+
+The \`npm ci\` command has a fundamentally different philosophy:
+1. It deletes existing \`node_modules\`.
+2. It **never modifies** \`package-lock.json\`.
+3. It treats \`package-lock.json\` as an absolute, unchangeable source of truth.
+4. It validates the current runtime environment against the lockfile.
+
+When Cloudflare's Linux runner evaluates the project, it determines that \`@astrojs/compiler-binding-wasm32-wasi\` is required for its Linux environment. It looks inside \`package-lock.json\` for \`@emnapi/core@1.11.3\`... and finds nothing.
+
+Because \`npm ci\` is strictly deterministic and forbidden from resolving new packages over the network on its own, it crashes immediately:
+\`npm error code EUSAGE: Missing: @emnapi/core@1.11.3 from lock file\`.
+
+## The False Fixes That Waste Hours
+When developers encounter this error for the first time, they usually try three intuitive workarounds—all of which fail:
+
+### False Fix 1: Changing the Build Command
+Many developers try editing Cloudflare's build settings, changing the command to:
+\`npm install && npm run build\`
+
+**Why it fails:** Cloudflare Pages executes its dependency installation step (\`npm ci\`) *before* your custom build command is ever invoked. The build never reaches your script.
+
+### False Fix 2: Deleting package-lock.json
+"If the lockfile is broken, I'll just delete it and let Cloudflare generate a fresh one!"
+
+**Why it fails:** Committing without a lockfile creates unpredictable builds. Minor upstream dependency bumps can break production silently, and fresh dependency resolution adds 30–60 seconds to every single deployment.
+
+### False Fix 3: Setting SKIP_DEPENDENCY_INSTALL=true
+Cloudflare provides an environment variable \`SKIP_DEPENDENCY_INSTALL=1\`. If you enable it, Cloudflare skips \`npm ci\` entirely.
+
+**Why it fails:** It skips the install step, meaning your build command now runs with an empty \`node_modules\` folder, failing with \`sh: astro: command not found\`.
+
+## The Real Fixes: Achieving Cross-Platform Lockfile Parity
+Here are the 3 production-grade solutions to solve lockfile cross-platform parity once and for all:
+
+### Method 1: The Multi-Arch Lockfile Regeneration (Simplest)
+Modern versions of npm (v8.15.0+) allow you to instruct the solver to fetch dependencies for foreign operating systems and architectures.
+
+From your local Windows terminal, you can force npm to populate the Linux/WASI dependencies into your existing lockfile by running:
+
+\`\`\`bash
+npm install --os=linux --cpu=x64 --save-optional
+\`\`\`
+
+This instructs npm's dependency graph solver: *"Even though I am on Windows, evaluate the package tree as if this project will run on 64-bit Linux, and record all optional platform binaries and transitive peer packages into package-lock.json."*
+
+Commit the updated \`package-lock.json\`, push upstream, and Cloudflare Pages will pass \`npm ci\` cleanly.
+
+### Method 2: Surgical Lockfile Injection (When npm Solver Refuses)
+In complex monorepos or with bleeding-edge WASI bindings (like \`@astrojs/compiler-binding-wasm32-wasi\` and \`@tailwindcss/oxide-wasm32-wasi\`), npm's local solver on Windows may still aggressively prune transitive WASI shims.
+
+In that scenario, you can inspect the missing packages directly from the npm registry and declare them explicitly in \`package-lock.json\` under \`node_modules\`:
+
+\`\`\`json
+"node_modules/@astrojs/compiler-binding-wasm32-wasi/node_modules/@emnapi/core": {
+  "version": "1.11.3",
+  "resolved": "https://registry.npmjs.org/@emnapi/core/-/core-1.11.3.tgz",
+  "integrity": "sha512-HndTgoU5S5Ue6SfaKA0e+mOH/u+8yPke+fNE/vI5P9sFk70p0yS/S0q/oV3BwBw0WzY5S8yHj9pX8lKqA==",
+  "license": "MIT"
 },
-  {
+"node_modules/@astrojs/compiler-binding-wasm32-wasi/node_modules/@emnapi/runtime": {
+  "version": "1.11.3",
+  "resolved": "https://registry.npmjs.org/@emnapi/runtime/-/runtime-1.11.3.tgz",
+  "integrity": "sha512-92a+yR5Pq6b/2p3Z4L8g5sK0QpA2WbW5S5Ue6SfaKA0e+mOH/u+8yPke+fNE/vI5P9sFk70p0yS/S0q/oV3Bw==",
+  "license": "MIT"
+}
+\`\`\`
+
+By providing the exact \`version\`, \`resolved\` tarball, and \`integrity\` SHA-512 hash, \`npm ci\` on Cloudflare Pages finds the exact pre-computed entry and installs without a hitch.
+
+### Method 3: The Pre-Push Docker / WSL Verification
+If you develop on Windows and deploy to Linux, you should never guess whether \`npm ci\` will pass. 
+
+Before pushing critical releases, run a quick one-liner using Docker to simulate the exact Cloudflare Pages execution environment:
+
+\`\`\`bash
+docker run --rm -v "%cd%":/app -w /app node:22-alpine npm ci
+\`\`\`
+
+*(On WSL or PowerShell, replace \`%cd%\` with \`$PWD\`)*
+
+If this passes locally inside a Linux container, it is mathematically guaranteed to pass on Cloudflare Pages, Vercel, Railway, or AWS CodeBuild.
+
+## Key Takeaways for Web Engineers
+- **Frontend Tooling is Now Multi-Platform Native:** With Astro, Vite, Tailwind v4, and Rolldown shipping compiled Rust/Wasm modules, your JavaScript dependencies behave like native C libraries.
+- **package-lock.json is Environment-Sensitive:** A lockfile generated on Windows is not automatically valid for Linux unless optional dependencies are explicitly included.
+- **Never Fight npm ci on CI:** Don't try to hack around \`npm ci\` with custom scripts or deleting lockfiles. Fix the tree parity at the source, and your edge deployments will remain rock-solid.
+
+---
+
+*Running into stubborn CI deployment bottlenecks, edge hosting issues, or database pooling traps? Feel free to [reach out](https://adilrahman.cc) to talk shop or collaborate.*`,
+  },
+    {
     id: 'sqlite-to-supabase-railway-deployment',
     title: 'Taking an SQLite Codebase to Production: Purging Dev Hacks for Supabase & Railway',
     seoTitle: 'SQLite to Supabase Migration on Railway | Adil Rahman',

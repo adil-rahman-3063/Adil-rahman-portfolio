@@ -26,6 +26,7 @@ const githubRepoMap = {
   poshan: 'adil-rahman-3063/poshan_abhiyaan',
   sirr: 'adil-rahman-3063/Sirr',
   cloudagent: 'adil-rahman-3063/cloudagent',
+  fileo: 'adil-rahman-3063/fileo',
 };
 
 // Deep engineering architecture profiles to provide comprehensive technical depth (eliminates thin content)
@@ -105,6 +106,11 @@ const technicalDeepDives = {
     challenges: 'Zero-latency on-site check-in verification without costly database infrastructure. Built a dynamic QR code generator that encodes registration IDs for instant scanner validation.',
     security: 'Admin gate with credential verification, offline check-in capability, and clamped Malayalam numeric selectors to prevent registration tampering.',
   },
+  fileo: {
+    architecture: 'High-speed in-browser file utility and image manipulation platform built on Astro 5, Tailwind CSS v4, and WebAssembly codecs (libheif, mozjpeg). Renders zero client runtime JavaScript for static utility pages, mounting Astro Islands only when interactive processing pipelines are engaged.',
+    challenges: 'Executing heavy multi-megabyte image transcoding, EXIF preservation, and color quantization directly in the browser without UI freezes or memory leaks. Leveraged Web Workers, OffscreenCanvas, and streaming chunk decoders to process files client-side with 0ms server roundtrips.',
+    security: '100% client-side privacy architecture. No user files, images, or documents are ever uploaded to an external server. Engineered zero Cumulative Layout Shift (CLS = 0) with reserved-slot non-obstructive Google AdSense ad units and automated programmatic SEO landing pages.',
+  },
 };
 
 export function getSaasSeoTitle(project) {
@@ -152,6 +158,9 @@ export function getSaasSeoTitle(project) {
   }
   if (project.id === 'issaa') {
     return 'ISSAA Event Portal — Architecture & Specs | Adil Rahman';
+  }
+  if (project.id === 'fileo') {
+    return 'Fileo — File Conversion Architecture & Specs | Adil Rahman';
   }
 
   const candidate = `${project.title} — Tech Specs${brand}`;

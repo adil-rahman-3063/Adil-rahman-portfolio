@@ -7,6 +7,8 @@ const SITE_URL = 'https://adilrahman.cc';
 export async function generateStaticParams() {
   return [
     { category: 'saas' },
+    { category: 'niche-sites' },
+    { category: 'niche-site' },
     { category: 'freelance' },
     { category: 'personal-project' },
     { category: 'personal' },
@@ -15,7 +17,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }) {
   const { category } = await params;
-  const normCategory = category === 'personal' ? 'personal-project' : category;
+  const normCategory = category === 'personal' ? 'personal-project' : (category === 'niche-site' ? 'niche-sites' : category);
   const cat = PROJECT_CATEGORIES[normCategory];
   if (!cat) return {};
 
@@ -55,7 +57,7 @@ export async function generateMetadata({ params }) {
 
 export default async function ProjectCategoryPage({ params }) {
   const { category } = await params;
-  const normCategory = category === 'personal' ? 'personal-project' : category;
+  const normCategory = category === 'personal' ? 'personal-project' : (category === 'niche-site' ? 'niche-sites' : category);
   const cat = PROJECT_CATEGORIES[normCategory];
 
   if (!cat) notFound();

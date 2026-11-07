@@ -26,16 +26,25 @@ export default function WorkArchiveSection({ projects = [], onProjectClick }) {
     return cats.some((c) => typeof c === 'string' && c.toLowerCase().trim() === 'freelance');
   };
 
+  const isNiche = (p) => {
+    if (!p.categories) return false;
+    const cats = Array.isArray(p.categories) ? p.categories : [p.categories];
+    return cats.some((c) => typeof c === 'string' && (c.toLowerCase().trim() === 'niche-sites' || c.toLowerCase().trim() === 'niche-site' || c.toLowerCase().trim() === 'niche'));
+  };
+
   // Filter personal projects (projects in personal category)
   const personalProjects = projects.filter((p) => {
-    if (isFreelance(p) || isSaas(p)) return false;
+    if (isFreelance(p) || isSaas(p) || isNiche(p)) return false;
     if (activeCategory === 'all') return true;
     const cats = Array.isArray(p.categories) ? p.categories : [p.categories];
     return cats.some((c) => typeof c === 'string' && c.toLowerCase().trim() === activeCategory.toLowerCase());
   });
 
-  // Filter SaaS projects (from Supabase: only membership-saas, or any new saas added)
+  // Filter SaaS projects
   const saasProjects = projects.filter(isSaas);
+
+  // Filter Niche Sites projects
+  const nicheProjects = projects.filter(isNiche);
 
   // Filter freelance projects
   const freelanceProjects = projects.filter(isFreelance);
@@ -167,7 +176,52 @@ export default function WorkArchiveSection({ projects = [], onProjectClick }) {
         </>
       )}
 
-      {/* SUBSECTION 3: FREELANCE PROJECTS */}
+      {/* SUBSECTION 3: NICHE SITES & DIGITAL UTILITIES */}
+      {nicheProjects.length > 0 && (
+        <>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px', flexWrap: 'wrap', gap: '10px' }}>
+            <div className="archive-subsection-title" style={{ marginBottom: 0 }}>// NICHE SITES & DIGITAL UTILITIES</div>
+            <Link href="/project/niche-sites" className="view-all-saas-chip">
+              Explore All Niche Sites →
+            </Link>
+          </div>
+          <div className="projects-grid" style={{ marginBottom: '48px' }}>
+            {nicheProjects.map((project) => (
+              <div
+                key={project.id}
+                onClick={() => onProjectClick?.(project)}
+                className="project-card niche-card"
+              >
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+                  <div className="project-status-text" style={{ marginBottom: 0 }}>
+                    {project.status.toUpperCase()} // {project.subtitle.toUpperCase()}
+                  </div>
+                  <span className="niche-badge">NICHE SITE</span>
+                </div>
+                <h3 className="project-card-title">{project.title}</h3>
+                <p className="project-card-desc">{project.tagline}</p>
+                {project.tech && project.tech.length > 0 && (
+                  <div className="project-card-tech-box">
+                    {project.tech.join('; ')}
+                  </div>
+                )}
+                <div className="card-action-bar">
+                  <span className="card-action-quick">Quick View →</span>
+                  <Link
+                    href={`/project/niche-sites/${project.id}`}
+                    className="card-action-direct"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    Architecture & Case Study ↗
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      {/* SUBSECTION 4: FREELANCE PROJECTS */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px', flexWrap: 'wrap', gap: '10px' }}>
         <div className="archive-subsection-title" style={{ marginBottom: 0 }}>// FREELANCE PROJECTS</div>
         <Link href="/project/freelance" className="view-all-saas-chip">
@@ -331,6 +385,25 @@ export default function WorkArchiveSection({ projects = [], onProjectClick }) {
         .saas-card:hover {
           border-color: #8C7355;
           box-shadow: 0 8px 24px rgba(140, 115, 85, 0.22);
+        }
+
+        .niche-card {
+          border-color: rgba(10, 124, 90, 0.35);
+        }
+        .niche-card:hover {
+          border-color: #0A7C5A;
+          box-shadow: 0 10px 24px rgba(10, 124, 90, 0.18);
+        }
+        .niche-badge {
+          font-family: var(--font-mono);
+          font-size: 9px;
+          font-weight: bold;
+          letter-spacing: 1px;
+          color: #0A7C5A;
+          background: rgba(10, 124, 90, 0.15);
+          border: 1px solid rgba(10, 124, 90, 0.4);
+          padding: 2px 7px;
+          border-radius: 4px;
         }
 
         .saas-badge {

@@ -69,6 +69,7 @@ export default function ProjectsHubClient({ initialProjects = [] }) {
   }, []);
 
   const saasProjects = getCategoryProjects('saas', projects);
+  const nicheProjects = getCategoryProjects('niche-sites', projects);
   const freelanceProjects = getCategoryProjects('freelance', projects);
   const personalProjects = getCategoryProjects('personal-project', projects);
 
@@ -101,6 +102,9 @@ export default function ProjectsHubClient({ initialProjects = [] }) {
               <span className="switcher-chip active">All Projects ({projects.length})</span>
               <Link href="/project/saas" className="switcher-chip">
                 SaaS & Cloud Apps ({saasProjects.length})
+              </Link>
+              <Link href="/project/niche-sites" className="switcher-chip">
+                Niche Sites ({nicheProjects.length})
               </Link>
               <Link href="/project/freelance" className="switcher-chip">
                 Freelance & Client ({freelanceProjects.length})
@@ -150,13 +154,36 @@ export default function ProjectsHubClient({ initialProjects = [] }) {
             </section>
           )}
 
-          {/* Category 2: Freelance & Client Work */}
+          {/* Category 2: Niche Sites & Digital Utilities */}
+          {nicheProjects.length > 0 && (
+            <section className="category-tier-section" id="niche-sites">
+              <div className="tier-header">
+                <div className="tier-title-row">
+                  <div>
+                    <span className="tier-badge">CATEGORY 02</span>
+                    <h2 className="tier-heading">// NICHE SITES & DIGITAL UTILITIES</h2>
+                  </div>
+                  <Link href="/project/niche-sites" className="tier-view-all-link">
+                    View All Niche Sites ({nicheProjects.length}) →
+                  </Link>
+                </div>
+                <p className="tier-desc">
+                  In-browser web utilities, privacy-first file converters, and ad-monetized niche platforms engineered with Astro and WebAssembly for zero server costs.
+                </p>
+              </div>
+              <div className="projects-cards-grid">
+                {nicheProjects.map((project) => renderProjectCard(project, 'niche-sites', 'NICHE // UTILITY'))}
+              </div>
+            </section>
+          )}
+
+          {/* Category 3: Freelance & Client Work */}
           {freelanceProjects.length > 0 && (
             <section className="category-tier-section" id="freelance">
               <div className="tier-header">
                 <div className="tier-title-row">
                   <div>
-                    <span className="tier-badge">CATEGORY 02</span>
+                    <span className="tier-badge">CATEGORY 03</span>
                     <h2 className="tier-heading">// FREELANCE & CLIENT SYSTEMS</h2>
                   </div>
                   <Link href="/project/freelance" className="tier-view-all-link">
@@ -173,13 +200,13 @@ export default function ProjectsHubClient({ initialProjects = [] }) {
             </section>
           )}
 
-          {/* Category 3: Personal & Open-Source Projects */}
+          {/* Category 4: Personal & Open-Source Projects */}
           {personalProjects.length > 0 && (
             <section className="category-tier-section" id="personal">
               <div className="tier-header">
                 <div className="tier-title-row">
                   <div>
-                    <span className="tier-badge">CATEGORY 03</span>
+                    <span className="tier-badge">CATEGORY 04</span>
                     <h2 className="tier-heading">// PERSONAL & OPEN-SOURCE PROJECTS</h2>
                   </div>
                   <Link href="/project/personal-project" className="tier-view-all-link">

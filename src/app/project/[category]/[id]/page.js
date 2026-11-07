@@ -24,6 +24,7 @@ const githubRepoMap = {
   poshan: 'adil-rahman-3063/poshan_abhiyaan',
   sirr: 'adil-rahman-3063/Sirr',
   cloudagent: 'adil-rahman-3063/cloudagent',
+  fileo: 'adil-rahman-3063/fileo',
 };
 
 // Deep engineering architecture profiles to provide comprehensive technical depth
@@ -103,6 +104,11 @@ const technicalDeepDives = {
     challenges: 'Zero-latency on-site check-in verification without costly database infrastructure. Built a dynamic QR code generator that encodes registration IDs for instant scanner validation.',
     security: 'Admin gate with credential verification, offline check-in capability, and clamped Malayalam numeric selectors to prevent registration tampering.',
   },
+  fileo: {
+    architecture: 'High-speed in-browser file utility and image manipulation platform built on Astro 5, Tailwind CSS v4, and WebAssembly codecs (libheif, mozjpeg). Renders zero client runtime JavaScript for static utility pages, mounting Astro Islands only when interactive processing pipelines are engaged.',
+    challenges: 'Executing heavy multi-megabyte image transcoding, EXIF preservation, and color quantization directly in the browser without UI freezes or memory leaks. Leveraged Web Workers, OffscreenCanvas, and streaming chunk decoders to process files client-side with 0ms server roundtrips.',
+    security: '100% client-side privacy architecture. No user files, images, or documents are ever uploaded to an external server. Engineered zero Cumulative Layout Shift (CLS = 0) with reserved-slot non-obstructive Google AdSense ad units and automated programmatic SEO landing pages.',
+  },
 };
 
 export function getProjectSeoTitle(project, catName) {
@@ -140,6 +146,9 @@ export function getProjectSeoTitle(project, catName) {
   if (project.id === 'redparrot') {
     return 'Red Parrot — Institutional Scheduler | Adil Rahman';
   }
+  if (project.id === 'fileo') {
+    return 'Fileo – In-Browser File Utility Platform | Adil Rahman';
+  }
 
   const candidate = catName ? `${project.title} — ${catName}${brand}` : `${project.title}${brand}`;
   if (candidate.length <= maxLen) return candidate;
@@ -158,7 +167,7 @@ export async function generateMetadata({ params }) {
   const project = allProjects.find((p) => p.id === id || (id === 'issaa_event' && p.id === 'issaa')) || (await fetchProjectById(id));
   if (!project) return {};
 
-  const normCategory = category === 'personal' ? 'personal-project' : category;
+  const normCategory = category === 'personal' ? 'personal-project' : (category === 'niche-site' ? 'niche-sites' : category);
   const cat = PROJECT_CATEGORIES[normCategory];
   const catName = cat ? cat.name : 'Projects';
 
@@ -266,7 +275,7 @@ export default async function ProjectDetailPage({ params }) {
 
   if (!project) notFound();
 
-  const normCategory = category === 'personal' ? 'personal-project' : category;
+  const normCategory = category === 'personal' ? 'personal-project' : (category === 'niche-site' ? 'niche-sites' : category);
   const cat = PROJECT_CATEGORIES[normCategory];
 
   const deepDive = technicalDeepDives[project.id] || {

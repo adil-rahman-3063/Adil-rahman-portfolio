@@ -18,6 +18,7 @@ export default function ProjectModal({ project, onClose }) {
     sirr: 'adil-rahman-3063/Sirr',
     calert: 'Dayal-Joy/C-Alert',
     poshan: 'adil-rahman-3063/poshan_abhiyaan',
+    fileo: 'adil-rahman-3063/fileo',
   };
 
   const repoPath = githubRepoMap[project.id];

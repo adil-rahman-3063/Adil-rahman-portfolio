@@ -57,6 +57,10 @@
 - **URL:** https://adilrahman.cc/tools/resume-builder
 - **Architecture:** Client-side zero-dependency browser resume builder featuring live WYSIWYG editing, parser-safe single-column ATS export with custom section sequence badges, and instant localStorage persistence. 100% free, zero login, no watermark.
 
+### 6. Fileo — In-Browser File Utilities & Ad Platform
+- **URL:** https://adilrahman.cc/project/niche-sites/fileo (Live: https://fileo.cc)
+- **Architecture:** High-speed in-browser file utility and image manipulation platform built on Astro 5, Tailwind CSS v4, and WebAssembly codecs (libheif, mozjpeg). Renders zero client runtime JavaScript for static utility pages, mounting Astro Islands only when interactive processing pipelines are engaged. 100% client-side privacy architecture with zero server costs, and zero Cumulative Layout Shift (CLS = 0) with reserved-slot non-obstructive Google AdSense ad units.
+
 ---
 
 ## Pricing Guidelines (Calibrated for Freelance Engagements in India)

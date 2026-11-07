@@ -68,11 +68,12 @@ export default function CategoryDirectoryClient({ category, initialProjects = []
     return () => { isMounted = false; };
   }, []);
 
-  const normCategory = category === 'personal' ? 'personal-project' : category;
+  const normCategory = category === 'personal' ? 'personal-project' : (category === 'niche-site' ? 'niche-sites' : category);
   const cat = PROJECT_CATEGORIES[normCategory] || PROJECT_CATEGORIES['personal-project'];
 
   const projects = getCategoryProjects(normCategory, allProjectsList);
   const saasCount = getCategoryProjects('saas', allProjectsList).length;
+  const nicheCount = getCategoryProjects('niche-sites', allProjectsList).length;
   const freelanceCount = getCategoryProjects('freelance', allProjectsList).length;
   const personalCount = getCategoryProjects('personal-project', allProjectsList).length;
 
@@ -114,6 +115,12 @@ export default function CategoryDirectoryClient({ category, initialProjects = []
                 className={`switcher-chip ${normCategory === 'saas' ? 'active' : ''}`}
               >
                 SaaS & Cloud Apps ({saasCount})
+              </Link>
+              <Link
+                href="/project/niche-sites"
+                className={`switcher-chip ${normCategory === 'niche-sites' ? 'active' : ''}`}
+              >
+                Niche Sites ({nicheCount})
               </Link>
               <Link
                 href="/project/freelance"

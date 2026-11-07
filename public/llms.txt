@@ -12,6 +12,7 @@
 - [Edu Amicus Cloud Migration](https://adilrahman.cc/saas/edu-amicus-deployment): SQLite-to-Supabase migration and edge-proxied deployment on Railway & Cloudflare.
 - [ZMR Music](https://adilrahman.cc/saas/zmr): YouTube Music client in Flutter with background isolates and lockscreen playback.
 - [ViewPick](https://adilrahman.cc/saas/viewpick): Swipe-based movie discovery PWA built with Flutter Web and TMDB.
+- [Fileo](https://adilrahman.cc/project/niche-sites/fileo): 100% in-browser, privacy-first file conversion platform built with Astro 5 and WebAssembly (Live: https://fileo.cc).
 - [Free ATS Resume Builder](https://adilrahman.cc/tools/resume-builder): Browser-based ATS resume builder with dual PDF export engines.
 
 ## Machine-Readable Pricing & Engagement

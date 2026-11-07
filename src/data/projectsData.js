@@ -88,6 +88,49 @@ export function normalizeProject(p) {
  */
 export const allProjects = [
   {
+    "id": "fileo",
+    "title": "Fileo",
+    "subtitle": "In-Browser File Utilities & Ad Platform // Astro 5",
+    "status": "Production // Monetized & Live",
+    "tagline": "100% in-browser, privacy-first file conversion and utilities platform monetized with display advertising.",
+    "description": "An ad-monetized, browser-based file conversion and utility platform engineered with Astro 5, Tailwind CSS v4, and client-side WebAssembly. Delivers zero-server image, subtitle, and vector processing directly inside user memory without uploads or server costs.",
+    "features": [
+      "100% In-Browser Processing: Decodes HEIC, WebP, AVIF, and subtitles locally via Canvas, libheif Wasm, and Web Streams with zero server file transfers.",
+      "Universal Auto-Detect Converter: Drag-and-drop input zone that automatically detects file types and generates optimized target formats.",
+      "Client-Side Batch Compression & ZIP: In-browser image compression with real-time size breakdown and multi-file client-zip bundling.",
+      "SVG Vectorizer Engine: Integrated imagetracerjs engine converting bitmap logos, icons, and illustrations into clean SVG paths.",
+      "Optimized AdSense Architecture: High-viewability non-obstructive IAB ad placements (leaderboard, sticky sidebar 300x250) with zero Cumulative Layout Shift (CLS).",
+      "Comprehensive Programmatic SEO: 29 statically compiled routes with JSON-LD structured data (SoftwareApplication, HowTo, FAQPage) and AI agent discovery manifests (llms.txt, pricing.md)."
+    ],
+    "tech": [
+      "Astro 5",
+      "Tailwind CSS v4",
+      "WebAssembly (Wasm)",
+      "Canvas API",
+      "Google AdSense",
+      "Cloudflare Pages",
+      "client-zip",
+      "jspdf"
+    ],
+    "links": [
+      {
+        "text": "Live Site",
+        "url": "https://fileo.cc"
+      },
+      {
+        "text": "GitHub Repository",
+        "url": "https://github.com/adil-rahman-3063/fileo"
+      }
+    ],
+    "categories": [
+      "featured",
+      "niche-sites",
+      "niche",
+      "web-full-stack"
+    ],
+    "order": "1"
+  },
+  {
     "id": "zmr",
     "title": "ZMR Music",
     "subtitle": "Premium YouTube Music Client // Flutter",
@@ -573,6 +616,8 @@ export const allProjects = [
  * Allows adding new projects to Supabase without touching codebase.
  */
 export async function fetchProjectsFromSupabase() {
+  let remoteList = null;
+
   // 1. Try Supabase JS client
   try {
     if (supabase) {
@@ -581,7 +626,7 @@ export async function fetchProjectsFromSupabase() {
         .select('*')
         .order('order', { ascending: true, nullsFirst: false });
       if (!error && Array.isArray(data) && data.length > 0) {
-        return data.map(normalizeProject);
+        remoteList = data.map(normalizeProject);
       }
     }
   } catch (err) {
@@ -589,22 +634,30 @@ export async function fetchProjectsFromSupabase() {
   }
 
   // 2. Direct REST API fallback
-  try {
-    const res = await fetch(SUPABASE_REST_URL, {
-      headers: {
-        apikey: SUPABASE_ANON_KEY,
-        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-      },
-      next: { revalidate: 60 },
-    });
-    if (res.ok) {
-      const data = await res.json();
-      if (Array.isArray(data) && data.length > 0) {
-        return data.map(normalizeProject);
+  if (!remoteList) {
+    try {
+      const res = await fetch(SUPABASE_REST_URL, {
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+        },
+        next: { revalidate: 60 },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) {
+          remoteList = data.map(normalizeProject);
+        }
       }
+    } catch (err) {
+      console.warn('Supabase REST fallback query warning:', err);
     }
-  } catch (err) {
-    console.warn('Supabase REST fallback query warning:', err);
+  }
+
+  if (remoteList && remoteList.length > 0) {
+    const remoteIds = new Set(remoteList.map((p) => p.id));
+    const missingLocal = allProjects.filter((p) => !remoteIds.has(p.id));
+    return [...remoteList, ...missingLocal];
   }
 
   // 3. Static snapshot fallback
@@ -642,10 +695,13 @@ export function projectBelongsToCategory(project, categorySlug) {
     ? project.categories.map((c) => c.toLowerCase().trim())
     : String(project.categories || '').toLowerCase().split(',').map((c) => c.trim());
 
-  const slug = categorySlug === 'personal' ? 'personal-project' : categorySlug;
+  const slug = categorySlug === 'personal' ? 'personal-project' : (categorySlug === 'niche-site' ? 'niche-sites' : categorySlug);
 
   if (slug === 'saas') {
     return cats.includes('saas');
+  }
+  if (slug === 'niche-sites') {
+    return cats.includes('niche-sites') || cats.includes('niche-site') || cats.includes('niche');
   }
   if (slug === 'freelance') {
     return cats.includes('freelance');
@@ -668,6 +724,19 @@ export const PROJECT_CATEGORIES = {
     metaDesc: 'Explore production-ready SaaS platforms and B2B membership management engines engineered by Adil Rahman.',
     get projectIds() {
       return allProjects.filter((p) => projectBelongsToCategory(p, 'saas')).map((p) => p.id);
+    },
+  },
+  'niche-sites': {
+    slug: 'niche-sites',
+    name: 'Niche Sites & Digital Utilities',
+    navLabel: 'Niche Sites',
+    badge: 'NICHE SITES // AD-MONETIZED',
+    tagline: 'High-utility programmatic web tools, privacy-first conversion engines, and ad-monetized niche platforms.',
+    description: 'Explore high-volume digital utility platforms, client-side conversion tools, and ad-monetized niche sites engineered with Astro, WebAssembly, and programmatic SEO.',
+    metaTitle: 'Niche Sites & Digital Utilities | Projects by Adil Rahman',
+    metaDesc: 'Explore high-utility web tools, in-browser conversion engines, and programmatic ad-monetized niche platforms built by Adil Rahman.',
+    get projectIds() {
+      return allProjects.filter((p) => projectBelongsToCategory(p, 'niche-sites')).map((p) => p.id);
     },
   },
   freelance: {
@@ -714,6 +783,7 @@ export function getProjectCategory(projectId, project = null) {
   const target = project || allProjects.find((p) => p.id === projectId || (projectId === 'issaa_event' && p.id === 'issaa'));
   if (target) {
     if (projectBelongsToCategory(target, 'saas')) return 'saas';
+    if (projectBelongsToCategory(target, 'niche-sites')) return 'niche-sites';
     if (projectBelongsToCategory(target, 'freelance')) return 'freelance';
     if (projectBelongsToCategory(target, 'personal-project')) return 'personal-project';
   }
@@ -725,11 +795,16 @@ export function getProjectCategory(projectId, project = null) {
  */
 export function getAllProjectCategoryPaths(list = allProjects) {
   const paths = [];
-  for (const catSlug of ['saas', 'freelance', 'personal-project']) {
+  for (const catSlug of ['saas', 'niche-sites', 'freelance', 'personal-project']) {
     const catList = getCategoryProjects(catSlug, list);
     for (const proj of catList) {
       paths.push({ category: catSlug, id: proj.id });
     }
+  }
+  // Alias 'niche-site' paths for backwards compatibility
+  const nicheList = getCategoryProjects('niche-sites', list);
+  for (const proj of nicheList) {
+    paths.push({ category: 'niche-site', id: proj.id });
   }
   // Alias 'personal' paths for backwards compatibility
   const personalList = getCategoryProjects('personal-project', list);

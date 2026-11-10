@@ -107,3 +107,4 @@ Googlebot already has these pages in its index. Resubmitting your `sitemap.xml` 
 3. **Verify Indexing Status (48–72 Hours)**:
    - Check **Indexing** > **Pages** report.
    - Newly requested URLs typically appear under *"Indexed, not submitted in sitemap"* or *"Submitted and indexed"*.
+

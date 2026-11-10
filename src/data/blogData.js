@@ -2,10 +2,10 @@ export const allBlogs = [
   {
     id: 'zero-cookie-visitor-map-cloudflare-supabase',
     title: 'Building a Zero-Cookie Global Visitor Map with Cloudflare Edge, Supabase & Next.js',
-    seoTitle: 'Zero-Cookie Visitor Map: Cloudflare, Supabase & Next.js | Adil Rahman',
+    seoTitle: 'Zero-Cookie Visitor Map: Cloudflare & Next.js | Adil Rahman',
     date: 'November 10, 2026',
     readTime: '7 min read',
-    excerpt: 'How I built a real-time, GitHub contribution–style world visitor map with zero cookies or invasive tracking—inspired by kprakz/homeflix and powered by Cloudflare edge headers and Supabase.',
+    excerpt: 'Build a real-time GitHub-style world visitor map with zero cookies or tracking using Cloudflare edge headers, Supabase atomic counters, and Next.js.',
     content: `**Category:** Frontend Graphics / Edge Architecture / Privacy Engineering
 **Read Time:** ~7 mins
 

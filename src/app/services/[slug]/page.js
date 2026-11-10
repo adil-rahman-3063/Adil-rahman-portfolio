@@ -1,4 +1,5 @@
 import { allServices } from '../../../data/servicesData';
+import { getProjectCategory } from '../../../data/projectsData';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import SiteFooter from '../../../components/SiteFooter';
@@ -190,7 +191,7 @@ export default async function ServiceDetailPage({ params }) {
                 <div key={idx} className="proof-item">
                   <h3 className="proof-name">{p.name}</h3>
                   <p className="proof-desc">{p.desc}</p>
-                  <Link href={`/saas/${p.id}`} className="proof-link">
+                  <Link href={`/project/${getProjectCategory(p.id)}/${p.id}`} className="proof-link">
                     Explore Architecture & Specs →
                   </Link>
                 </div>

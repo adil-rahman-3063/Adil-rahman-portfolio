@@ -220,6 +220,7 @@ export default function ReviewsPageClient({ initialReviews = [] }) {
 
           {/* ── Reviews Grid ── */}
           <section className="reviews-grid" aria-label="Verified Testimonials">
+            <h2 className="sr-only">Verified Client Testimonials</h2>
             {filteredReviews.length === 0 ? (
               <div className="empty-reviews-state">
                 <p>No reviews found matching this filter.</p>
@@ -441,6 +442,18 @@ export default function ReviewsPageClient({ initialReviews = [] }) {
           font-family: var(--font-mono);
           display: flex;
           flex-direction: column;
+        }
+
+        .sr-only {
+          position: absolute;
+          width: 1px;
+          height: 1px;
+          padding: 0;
+          margin: -1px;
+          overflow: hidden;
+          clip: rect(0, 0, 0, 0);
+          white-space: nowrap;
+          border-width: 0;
         }
 
         /* Nav */

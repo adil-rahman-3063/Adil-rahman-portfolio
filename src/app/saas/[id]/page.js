@@ -5,12 +5,10 @@ import SiteFooter from '../../../components/SiteFooter';
 
 const SITE_URL = 'https://adilrahman.cc';
 
-// Required for next static export — queries only real SaaS projects (AR Membership Manager)
+// Required for next static export — pre-renders all project routes with canonical tags to /project/[category]/[id]
 export async function generateStaticParams() {
   const live = await fetchProjectsFromSupabase();
-  return live
-    .filter((project) => getProjectCategory(project.id, project) === 'saas')
-    .map((project) => ({ id: project.id }));
+  return live.map((project) => ({ id: project.id }));
 }
 
 // GitHub repository mapping for deep repo inspection
@@ -423,12 +421,12 @@ export default async function SaasDetailPage({ params }) {
                   <article key={rel.id} className="related-project-card">
                     <span className="related-status">{rel.status}</span>
                     <h3 className="related-title">
-                      <Link href={`/saas/${rel.id}`} className="related-link">
+                      <Link href={`/project/${getProjectCategory(rel.id, rel)}/${rel.id}`} className="related-link">
                         {rel.title}
                       </Link>
                     </h3>
                     <p className="related-desc">{rel.tagline || rel.description}</p>
-                    <Link href={`/saas/${rel.id}`} className="related-btn">
+                    <Link href={`/project/${getProjectCategory(rel.id, rel)}/${rel.id}`} className="related-btn">
                       System Architecture →
                     </Link>
                   </article>

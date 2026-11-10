@@ -8,7 +8,7 @@ export const metadata = {
     absolute: 'Verified Client Reviews & Testimonials (5.0★) | Adil Rahman',
   },
   description:
-    'Read 100% verified 5-star client reviews for Adil Rahman. Direct feedback from CEOs, founders, and leaders on custom Flutter mobile apps, Shopify storefronts, and Next.js platforms.',
+    'Read verified 5-star client reviews for Adil Rahman. Direct feedback from founders and CEOs on custom Flutter apps, Shopify stores, and Next.js platforms.',
   keywords: [
     'Adil Rahman reviews',
     'Adil Rahman testimonials',

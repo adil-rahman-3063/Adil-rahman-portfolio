@@ -63,7 +63,7 @@ export default function PrivacyClient() {
           <section className="privacy-pillars-grid">
             <div className="pillar-card">
               <div className="pillar-icon">🛡️</div>
-              <h3 className="pillar-title">Zero Tracking Cookies</h3>
+              <h2 className="pillar-title">Zero Tracking Cookies</h2>
               <p className="pillar-desc">
                 No third-party advertising pixels (Meta, TikTok, LinkedIn) or cross-site tracking scripts. No intrusive cookie banners required.
               </p>
@@ -71,7 +71,7 @@ export default function PrivacyClient() {
 
             <div className="pillar-card">
               <div className="pillar-icon">🌐</div>
-              <h3 className="pillar-title">IP-Free Edge Telemetry</h3>
+              <h2 className="pillar-title">IP-Free Edge Telemetry</h2>
               <p className="pillar-desc">
                 Coarse country codes (<code className="code-span">cf-ipcountry</code>) are evaluated in volatile RAM by Cloudflare edge nodes. Raw IP addresses are discarded immediately.
               </p>
@@ -79,7 +79,7 @@ export default function PrivacyClient() {
 
             <div className="pillar-card">
               <div className="pillar-icon">⚡</div>
-              <h3 className="pillar-title">100% In-Browser Utilities</h3>
+              <h2 className="pillar-title">100% In-Browser Utilities</h2>
               <p className="pillar-desc">
                 Tools like our ATS Resume Builder and Fileo process files and text purely in client device memory via WebAssembly and Canvas. Zero server uploads.
               </p>
@@ -87,7 +87,7 @@ export default function PrivacyClient() {
 
             <div className="pillar-card">
               <div className="pillar-icon">🔒</div>
-              <h3 className="pillar-title">Statutory Compliance</h3>
+              <h2 className="pillar-title">Statutory Compliance</h2>
               <p className="pillar-desc">
                 Engineered for full compliance with the European Union GDPR, California CCPA/CPRA, UK Data Protection Act, and the Indian DPDP Act 2023.
               </p>

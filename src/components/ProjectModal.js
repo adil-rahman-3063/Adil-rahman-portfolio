@@ -1,11 +1,12 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 
 export default function ProjectModal({ project, onClose }) {
   const [activeTab, setActiveTab] = useState('notes'); // notes | readme | preview
   const [readme, setReadme] = useState('');
   const [loadingReadme, setLoadingReadme] = useState(false);
+  const dialogRef = useRef(null);
 
   // GitHub repository path mapping
   const githubRepoMap = {
@@ -27,13 +28,25 @@ export default function ProjectModal({ project, onClose }) {
   const isShopify = liveUrl && liveUrl.includes('myshopify.com');
 
   useEffect(() => {
-    // Disable body scroll when modal is open
-    document.body.style.overflow = 'hidden';
+    const dialog = dialogRef.current;
+    if (dialog && !dialog.open) {
+      dialog.showModal();
+    }
+
+    const handleCancel = (e) => {
+      e.preventDefault();
+      onClose();
+    };
+
+    dialog?.addEventListener('cancel', handleCancel);
 
     return () => {
-      document.body.style.overflow = 'unset';
+      dialog?.removeEventListener('cancel', handleCancel);
+      if (dialog?.open) {
+        dialog.close();
+      }
     };
-  }, []);
+  }, [onClose]);
 
   useEffect(() => {
     if (activeTab === 'readme' && repoPath && !readme) {
@@ -61,7 +74,14 @@ export default function ProjectModal({ project, onClose }) {
   }, [activeTab, repoPath, readme]);
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <dialog
+      ref={dialogRef}
+      aria-labelledby="project-modal-title"
+      className="modal-dialog-root"
+      onClick={(e) => {
+        if (e.target === dialogRef.current) onClose();
+      }}
+    >
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         {/* Modal Header containing Tabs & Close button */}
         <div className="modal-header">
@@ -89,7 +109,7 @@ export default function ProjectModal({ project, onClose }) {
               </button>
             )}
           </div>
-          <button className="modal-close-btn" onClick={onClose}>×</button>
+          <button type="button" aria-label="Close project modal" className="modal-close-btn" onClick={onClose}>×</button>
         </div>
 
         {/* Modal Body */}
@@ -98,7 +118,7 @@ export default function ProjectModal({ project, onClose }) {
             <div className="notes-tab">
               {/* Title Section */}
               <div className="title-section">
-                <h2 className="project-title-handwritten">{project.title}</h2>
+                <h2 id="project-modal-title" className="project-title-handwritten">{project.title}</h2>
                 <div className="project-subtitle-mono">{project.subtitle} // {project.status}</div>
               </div>
 
@@ -191,19 +211,29 @@ export default function ProjectModal({ project, onClose }) {
       </div>
 
       <style jsx global>{`
-        .modal-overlay {
+        dialog.modal-dialog-root {
           position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background-color: rgba(35, 21, 19, 0.6); /* Warm overlay tint */
-          backdrop-filter: blur(4px);
+          inset: 0;
+          width: 100vw;
+          height: 100vh;
+          max-width: none;
+          max-height: none;
+          background: transparent;
+          border: none;
+          padding: 24px;
           display: flex;
           align-items: center;
           justify-content: center;
-          z-index: 99999 !important; /* Ensure it floats above the cozy nav capsule */
-          padding: 24px;
+          overscroll-behavior: contain;
+          margin: 0;
+          z-index: 99999;
+        }
+
+        dialog.modal-dialog-root::backdrop {
+          overflow: hidden;
+          overscroll-behavior: contain;
+          background-color: rgba(35, 21, 19, 0.6);
+          backdrop-filter: blur(4px);
         }
 
         .modal-content {
@@ -507,6 +537,6 @@ export default function ProjectModal({ project, onClose }) {
           line-height: 1.5;
         }
       `}</style>
-    </div>
+    </dialog>
   );
 }

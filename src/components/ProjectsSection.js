@@ -84,6 +84,8 @@ export default function ProjectsSection({ projects = [], onProjectClick }) {
           margin-bottom: 32px;
           overflow-x: auto;
           padding-bottom: 8px;
+          scrollbar-width: thin;
+          scrollbar-color: #8C7355 transparent;
         }
         .tabs-container::-webkit-scrollbar {
           height: 4px;

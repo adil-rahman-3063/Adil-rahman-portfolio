@@ -1,27 +1,55 @@
 'use client';
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 
 export default function BlogModal({ blog, onClose }) {
+  const dialogRef = useRef(null);
+
   useEffect(() => {
-    // Disable body scroll when blog modal is open
-    document.body.style.overflow = 'hidden';
+    const dialog = dialogRef.current;
+    if (dialog && !dialog.open) {
+      dialog.showModal();
+    }
+
+    const handleCancel = (e) => {
+      e.preventDefault();
+      onClose();
+    };
+
+    dialog?.addEventListener('cancel', handleCancel);
 
     return () => {
-      document.body.style.overflow = 'unset';
+      dialog?.removeEventListener('cancel', handleCancel);
+      if (dialog?.open) {
+        dialog.close();
+      }
     };
-  }, []);
+  }, [onClose]);
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <dialog
+      ref={dialogRef}
+      aria-labelledby="blog-modal-title"
+      className="modal-dialog-root"
+      onClick={(e) => {
+        if (e.target === dialogRef.current) onClose();
+      }}
+    >
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         {/* Modal Header */}
         <div className="modal-header">
           <div>
             <span className="modal-meta">{blog.date} • {blog.readTime}</span>
-            <h3 className="modal-title-handwritten">{blog.title}</h3>
+            <h3 id="blog-modal-title" className="modal-title-handwritten">{blog.title}</h3>
           </div>
-          <button className="modal-close-btn" onClick={onClose}>×</button>
+          <button
+            type="button"
+            aria-label="Close blog modal"
+            className="modal-close-btn"
+            onClick={onClose}
+          >
+            ×
+          </button>
         </div>
 
         {/* Modal Body */}
@@ -33,19 +61,29 @@ export default function BlogModal({ blog, onClose }) {
       </div>
 
       <style jsx global>{`
-        .modal-overlay {
+        dialog.modal-dialog-root {
           position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background-color: rgba(35, 21, 19, 0.6); /* Warm overlay tint */
-          backdrop-filter: blur(4px);
+          inset: 0;
+          width: 100vw;
+          height: 100vh;
+          max-width: none;
+          max-height: none;
+          background: transparent;
+          border: none;
+          padding: 24px;
           display: flex;
           align-items: center;
           justify-content: center;
-          z-index: 99999 !important;
-          padding: 24px;
+          overscroll-behavior: contain;
+          margin: 0;
+          z-index: 99999;
+        }
+
+        dialog.modal-dialog-root::backdrop {
+          overflow: hidden;
+          overscroll-behavior: contain;
+          background-color: rgba(35, 21, 19, 0.6);
+          backdrop-filter: blur(4px);
         }
 
         .modal-content {
@@ -109,6 +147,9 @@ export default function BlogModal({ blog, onClose }) {
           overflow-x: hidden;
           flex-grow: 1;
           background-color: #F4EFEA;
+          scrollbar-width: thin;
+          scrollbar-color: #8D6E63 transparent;
+          overscroll-behavior: contain;
         }
 
         /* Markdown body styles in light mode */
@@ -163,7 +204,7 @@ export default function BlogModal({ blog, onClose }) {
         }
 
         @media (max-width: 768px) {
-          .modal-overlay {
+          dialog.modal-dialog-root {
             padding: 12px;
           }
           .modal-header {
@@ -181,6 +222,6 @@ export default function BlogModal({ blog, onClose }) {
           }
         }
       `}</style>
-    </div>
+    </dialog>
   );
 }

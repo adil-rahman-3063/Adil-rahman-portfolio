@@ -271,49 +271,49 @@ export default function Home() {
           </div>
 
           {/* Section 4: Work Archive */}
-          <div ref={sectionRefs[4]} className="section-wrapper">
+          <div ref={sectionRefs[4]} className="section-wrapper section-deferred">
             <ScrollReveal delay={80}>
               <WorkArchiveSection projects={projects} onProjectClick={handleOpenProject} />
             </ScrollReveal>
           </div>
 
           {/* Section 5: Tools */}
-          <div ref={sectionRefs[5]} className="section-wrapper">
+          <div ref={sectionRefs[5]} className="section-wrapper section-deferred">
             <ScrollReveal delay={80}>
               <ToolsSection />
             </ScrollReveal>
           </div>
 
           {/* Section 6: Live Workspace */}
-          <div ref={sectionRefs[6]} className="section-wrapper">
+          <div ref={sectionRefs[6]} className="section-wrapper section-deferred">
             <ScrollReveal delay={80}>
               <LiveWorkspaceSection projects={projects} />
             </ScrollReveal>
           </div>
 
           {/* Section 7: Blog */}
-          <div ref={sectionRefs[7]} className="section-wrapper">
+          <div ref={sectionRefs[7]} className="section-wrapper section-deferred">
             <ScrollReveal delay={80}>
               <BlogSection onBlogClick={handleOpenBlog} />
             </ScrollReveal>
           </div>
 
           {/* Section 8: Reviews */}
-          <div ref={sectionRefs[8]} className="section-wrapper">
+          <div ref={sectionRefs[8]} className="section-wrapper section-deferred">
             <ScrollReveal delay={80}>
               <ReviewsSection projects={projects} onProjectClick={handleOpenProject} />
             </ScrollReveal>
           </div>
 
           {/* Section 9: Global Network / World Map */}
-          <div ref={sectionRefs[9]} className="section-wrapper">
+          <div ref={sectionRefs[9]} className="section-wrapper section-deferred">
             <ScrollReveal delay={80}>
               <WorldMapSection />
             </ScrollReveal>
           </div>
 
           {/* Section 10: Contact */}
-          <div ref={sectionRefs[10]} className="section-wrapper">
+          <div ref={sectionRefs[10]} className="section-wrapper section-deferred">
             <ScrollReveal delay={80}>
               <ContactSection onGetQuote={handleGetQuote} />
             </ScrollReveal>
@@ -423,6 +423,12 @@ export default function Home() {
         .section-wrapper {
           padding: 50px 0;
           width: 100%;
+        }
+
+        /* Modern Web Guidance: Defer off-screen section layout/paint with intrinsic size placeholder */
+        .section-wrapper.section-deferred {
+          content-visibility: auto;
+          contain-intrinsic-size: auto none auto 600px;
         }
 
         .hero-wrapper {

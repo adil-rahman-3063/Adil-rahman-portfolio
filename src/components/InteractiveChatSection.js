@@ -92,6 +92,10 @@ export default function InteractiveChatSection({ onGetQuote, onAccessProjects, o
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
+      // Block submission if composing natively with an IME or if keyCode is 229 (e.g. Japanese/Chinese/Korean character selection)
+      if (e.isComposing || e.keyCode === 229) {
+        return;
+      }
       handleSendMessage();
     }
   };

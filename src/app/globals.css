@@ -76,17 +76,28 @@ body {
   margin: 0;
 }
 
-/* Hide default scrollbars for customized layout if needed */
-::-webkit-scrollbar {
-  width: 8px;
+/* Standard Scrollbars */
+:root {
+  --scrollbar-thumb: var(--accent-gold);
+  --scrollbar-track: var(--bg-dark);
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+  scrollbar-width: thin;
 }
-::-webkit-scrollbar-track {
-  background: var(--bg-dark);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--accent-gold);
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--accent-brown);
+
+/* Legacy fallback for WebKit/Blink browsers without standard scrollbar-color */
+@supports not (scrollbar-color: auto) {
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--bg-dark);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--accent-gold);
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-brown);
+  }
 }

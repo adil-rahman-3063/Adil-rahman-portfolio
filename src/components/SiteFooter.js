@@ -59,6 +59,10 @@ export default function SiteFooter({
           <Link href="/services" className="footer-link">Services</Link>
           <span className="footer-sep">·</span>
           <Link href="/blog" className="footer-link">Blog</Link>
+          <span className="footer-sep">·</span>
+          <Link href="/reviews" className="footer-link">Reviews</Link>
+          <span className="footer-sep">·</span>
+          <Link href="/privacy" className="footer-link">Privacy</Link>
         </nav>
         <p className="footer-copy">© 2026 Adil Rahman | Engineered with Next.js, Supabase & Cloudflare</p>
       </footer>

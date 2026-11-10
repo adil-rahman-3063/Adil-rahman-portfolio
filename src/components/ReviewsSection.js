@@ -1,50 +1,42 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
+import Link from 'next/link';
+import { supabase } from '../lib/supabaseClient';
 import { reviewsApiUrl, allProjects } from '../data/projectsData';
 
-const defaultReviews = [
-  {
-    name: 'aslambinkader',
-    role: 'CEO',
-    rating: 5,
-    review: 'I had a great experience working with Adil Rehman on the T2 Autohaus website. From the beginning, he understood the vision of creating a professional automotive brand and delivered a clean, modern Shopify store that reflects our business well. He was responsive, patient with revisions, and always willing to implement changes until everything matched what we wanted. The website is well-structured, easy to navigate, and provides a solid foundation for our growing business. I appreciate his professionalism, communication, and commitment throughout the project. I would confidently recommend Adil Rehman to anyone looking for a reliable Shopify website developer. Thank you, Adil, for helping bring the T2 Autohaus vision to life. I wish you continued success.',
-    project: 'shopify',
-  },
-  {
-    name: 'Mohamed Musthafa',
-    role: 'Retired Teacher (Govt)',
-    rating: 5,
-    review: 'Wonderful Excellent',
-    project: 'issaa',
-  },
-  {
-    name: 'Basil',
-    role: 'Merchant navy',
-    rating: 5,
-    review: 'A huge congratulations and heartfelt thanks for creating the registration app for our Alumni Program!\n\nThe effort you put into developing this app, along with your innovative ideas and smooth implementation, made the entire registration process seamless and impressive. It’s truly commendable to see someone of your age take such initiative and execute it so brilliantly.\n\nKeep shining, keep innovating, and continue setting the bar high! Wishing you all the best for your future endeavors.',
-    project: 'issaa',
-  }
-];
-
 export default function ReviewsSection({ projects = allProjects, onProjectClick }) {
-  const [reviews, setReviews] = useState(defaultReviews);
+  const [reviews, setReviews] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
 
-  const fetchReviews = async (retries = 3, delay = 500) => {
+  const fetchReviews = async (retries = 2, delay = 500) => {
     try {
+      // 1. Query Supabase directly for approved reviews
+      const { data, error } = await supabase
+        .from('reviews')
+        .select('*')
+        .eq('approved', true)
+        .order('created_at', { ascending: false });
+
+      if (!error && Array.isArray(data) && data.length > 0) {
+        setReviews(data);
+        localStorage.setItem('cached_reviews', JSON.stringify(data));
+        return;
+      }
+
+      // 2. Fallback to API gateway
       const res = await fetch(reviewsApiUrl);
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-      const data = await res.json();
-      const list = Array.isArray(data) ? data : (data.data || []);
+      const apiData = await res.json();
+      const list = Array.isArray(apiData) ? apiData : (apiData.data || []);
       
       if (list.length > 0) {
         setReviews(list);
         localStorage.setItem('cached_reviews', JSON.stringify(list));
       }
     } catch (e) {
-      console.error('Failed to fetch reviews:', e);
+      console.warn('Review sync notice:', e);
       if (retries > 0) {
         setTimeout(() => fetchReviews(retries - 1, delay * 2), delay);
       } else {
@@ -92,12 +84,17 @@ export default function ReviewsSection({ projects = allProjects, onProjectClick 
           </h2>
         </div>
 
-        <button onClick={() => {
-            window.history.pushState(null, '', '?review=true');
-            setShowModal(true);
-          }} className="leave-review-btn">
-          Leave a Review
-        </button>
+        <div className="reviews-header-actions">
+          <Link href="/reviews" className="view-all-reviews-btn">
+            Full Reviews &amp; Schema ↗
+          </Link>
+          <button onClick={() => {
+              window.history.pushState(null, '', '?review=true');
+              setShowModal(true);
+            }} className="leave-review-btn">
+            Leave a Review
+          </button>
+        </div>
       </div>
 
       {isLoading ? (
@@ -752,18 +749,29 @@ export function ReviewFormModal({ projects = allProjects, onClose }) {
     if (!name || !role || !review) return;
     setLoading(true);
     setErrorMsg(null);
+
+    const payload = {
+      name: name.trim(),
+      role: role.trim(),
+      rating: Number(rating),
+      review: review.trim(),
+      approved: true,
+    };
+
     try {
-      const res = await fetch(reviewsApiUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: name.trim(),
-          role: role.trim(),
-          rating,
-          review: review.trim(),
-        }),
-      });
-      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+      // 1. Direct write to Supabase reviews table
+      const { error: dbErr } = await supabase.from('reviews').insert([payload]);
+
+      if (dbErr) {
+        // Fallback to worker API gateway
+        const res = await fetch(reviewsApiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+      }
+
       setSuccess(true);
     } catch (err) {
       setErrorMsg('Submission failed. Check your internet connection.');

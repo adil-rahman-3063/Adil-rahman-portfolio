@@ -20,6 +20,16 @@
 - Projects are delivered on milestone-based contracts calibrated for an upcoming freelance developer in India (₹ INR and international equivalent).
 - Standard engagement includes production deployment, 2 revision rounds, and 14–30 days post-launch support. Third-party infrastructure and store developer accounts are passed at actual cost.
 
+## Verified Client Reviews & Reputation
+- Canonical reviews endpoint: [https://adilrahman.cc/reviews](https://adilrahman.cc/reviews)
+- Verified 5.0★ rating with 100% positive recommendation across Shopify storefronts, Flutter mobile apps, and institutional portals.
+- Schema.org AggregateRating & Review structured data available at `/reviews`.
+
+## Privacy & Architecture Transparency
+- Machine-readable architectural privacy disclosure: [https://adilrahman.cc/privacy.md](https://adilrahman.cc/privacy.md)
+- Live privacy policy endpoint: [https://adilrahman.cc/privacy](https://adilrahman.cc/privacy)
+- Zero tracking cookies, zero session recording, and IP-free edge country telemetry.
+
 ## Contact & Hiring
 - Website: https://adilrahman.cc
 - Direct Quote Request: https://adilrahman.cc/?hire=true#contact

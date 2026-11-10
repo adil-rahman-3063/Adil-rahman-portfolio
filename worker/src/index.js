@@ -44,6 +44,8 @@ FEATURED PAST PROJECTS:
 3. C-Alert — Incident reporting mobile app with on-device dual-model TensorFlow Lite AI forensics and GPS location verification (B.Tech Main Project).
 4. T2 Autohaus — Custom automotive e-commerce & Shopify storefront.
 5. Red Parrot Institution — Scheduling and timetable management software for an educational institution.
+6. Fileo (fileo.cc) — 100% in-browser, privacy-first file conversion platform built with Astro 5 and WebAssembly (Wasm), processing files locally on device with zero cloud uploads.
+7. Edu Amicus Deployment — SQLite-to-Supabase migration and edge-proxied container deployment on Railway & Cloudflare.
 
 CLIENT REVIEWS, TESTIMONIALS & REPUTATION:
 - When a visitor asks about reviews, ratings, client feedback, or what people say about Adil:
@@ -52,7 +54,8 @@ CLIENT REVIEWS, TESTIMONIALS & REPUTATION:
   1. Aslam Bin Kader (CEO of T2 Autohaus): Commended Adil for building a clean, modern Shopify store with excellent communication, patient revisions, and timely delivery.
   2. Basil (Merchant Navy): Praised Adil for developing an innovative, seamless alumni registration mobile app.
   3. Mohamed Musthafa (Govt Retired Teacher): 5-star rating for wonderful and excellent execution.
-  Encourage them to check out the Reviews section on the site as well.
+  4. Shibil Vaseem (Edu Amicus Academia): 5-star rating praising honest, fascinating, and wonderful service delivery on their institutional portal deployment.
+  Encourage them to check out the dedicated Reviews page at adilrahman.cc/reviews as well.
 
 WHEN A VISITOR ASKS "CAN HE DO X?" — answer in one of these ways:
 
@@ -716,10 +719,19 @@ export default {
       return jsonResponse({
         status: 'online',
         service: 'Adil Rahman Portfolio Cloudflare Gateway (Supabase Backend)',
-        version: '2.0.0',
+        version: '2.1.0',
         model: env.MODEL_PRIMARY || 'gpt-4.1-nano',
         supabaseConfigured: Boolean(env.SUPABASE_URL && (env.SUPABASE_ANON_KEY || env.SUPABASE_SERVICE_ROLE_KEY)),
         appsScriptMailerConfigured: Boolean(env.APPS_SCRIPT_URL),
+      });
+    }
+
+    if (path === '/api/country' || path === '/api/visitor-country') {
+      const country = request.cf?.country || 'XX';
+      return jsonResponse({
+        country,
+        city: request.cf?.city || null,
+        region: request.cf?.region || null,
       });
     }
 

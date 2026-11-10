@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 const labels = [
   'HOME',
@@ -11,21 +11,94 @@ const labels = [
   'WORKSPACE',
   'BLOG',
   'REVIEWS',
+  'NETWORK',
   'CONTACT',
 ];
 
 export default function CozyNav({ currentIndex, onTap }) {
   const [hoveredIndex, setHoveredIndex] = useState(null);
+  const [isVisible, setIsVisible] = useState(true);
+  const lastScrollYRef = useRef(0);
+
+  // Auto-hide header when scrolling down, reshow when scrolling up
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    lastScrollYRef.current = window.scrollY;
+    let ticking = false;
+
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const currentScrollY = window.scrollY;
+          const lastScrollY = lastScrollYRef.current;
+
+          // Always keep header visible at the top of the page
+          if (currentScrollY <= 50) {
+            setIsVisible(true);
+            lastScrollYRef.current = currentScrollY;
+            ticking = false;
+            return;
+          }
+
+          // Ignore elastic overscroll beyond page bottom (iOS / Safari)
+          const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+          if (currentScrollY > maxScroll) {
+            ticking = false;
+            return;
+          }
+
+          const diff = currentScrollY - lastScrollY;
+
+          // Only react if scroll delta passes threshold to prevent micro-jitter
+          if (Math.abs(diff) >= 8) {
+            if (diff > 0) {
+              // Scrolling down -> hide header
+              setIsVisible(false);
+            } else {
+              // Scrolling up -> show header
+              setIsVisible(true);
+            }
+            lastScrollYRef.current = currentScrollY;
+          }
+
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    const handleMouseMove = (e) => {
+      // Reveal header if cursor moves within top 20px of the viewport
+      if (e.clientY <= 20) {
+        setIsVisible(true);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, []);
+
+  const handleNavClick = (idx) => {
+    setIsVisible(true);
+    onTap(idx);
+  };
 
   const handleContactClick = (e) => {
     e.preventDefault();
+    setIsVisible(true);
     onTap(labels.length - 1);
   };
 
   return (
     <>
       {/* Desktop Navigation */}
-      <nav className="desktop-nav">
+      <nav className={`desktop-nav ${isVisible ? 'nav-visible' : 'nav-hidden'}`}>
         <div className="nav-container">
           <div className="logo-section">
             <img
@@ -48,7 +121,7 @@ export default function CozyNav({ currentIndex, onTap }) {
               return (
                 <button
                   key={label}
-                  onClick={() => onTap(idx)}
+                  onClick={() => handleNavClick(idx)}
                   onMouseEnter={() => setHoveredIndex(idx)}
                   onMouseLeave={() => setHoveredIndex(null)}
                   className="nav-link-btn"
@@ -71,7 +144,7 @@ export default function CozyNav({ currentIndex, onTap }) {
       </nav>
 
       {/* Mobile Navigation */}
-      <nav className="mobile-nav">
+      <nav className={`mobile-nav ${isVisible ? 'nav-visible' : 'nav-hidden'}`}>
         <div className="mobile-nav-container">
           {labels.map((label, idx) => {
             const isActive = currentIndex === idx;
@@ -84,7 +157,7 @@ export default function CozyNav({ currentIndex, onTap }) {
             return (
               <button
                 key={label}
-                onClick={() => onTap(idx)}
+                onClick={() => handleNavClick(idx)}
                 onMouseEnter={() => setHoveredIndex(idx)}
                 onMouseLeave={() => setHoveredIndex(null)}
                 className="mobile-nav-link-btn"
@@ -114,6 +187,20 @@ export default function CozyNav({ currentIndex, onTap }) {
           backdrop-filter: blur(10px);
           -webkit-backdrop-filter: blur(10px);
           border-bottom: 1px solid rgba(232, 223, 208, 0.1); /* paperBorder with opacity */
+          transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+          will-change: transform;
+        }
+
+        .desktop-nav.nav-hidden {
+          transform: translateY(-100%);
+          opacity: 0;
+          pointer-events: none;
+        }
+
+        .desktop-nav.nav-visible {
+          transform: translateY(0);
+          opacity: 1;
+          pointer-events: auto;
         }
 
         @media (min-width: 1100px) {
@@ -208,6 +295,19 @@ export default function CozyNav({ currentIndex, onTap }) {
           right: 0;
           z-index: 1000;
           pointer-events: none;
+          transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+          will-change: transform;
+        }
+
+        .mobile-nav.nav-hidden {
+          transform: translateY(calc(100% + 24px));
+          opacity: 0;
+          pointer-events: none;
+        }
+
+        .mobile-nav.nav-visible {
+          transform: translateY(0);
+          opacity: 1;
         }
 
         @media (min-width: 1100px) {

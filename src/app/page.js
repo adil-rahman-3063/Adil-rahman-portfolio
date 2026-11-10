@@ -15,6 +15,7 @@ import ToolsSection from '../components/ToolsSection';
 import LiveWorkspaceSection from '../components/LiveWorkspaceSection';
 import BlogSection from '../components/BlogSection';
 import ReviewsSection, { ReviewFormModal } from '../components/ReviewsSection';
+import WorldMapSection from '../components/WorldMapSection';
 import ContactSection, { RequirementFormModal } from '../components/ContactSection';
 import { allProjects, fetchProjectsFromSupabase } from '../data/projectsData';
 import { allBlogs } from '../data/blogData';
@@ -43,7 +44,8 @@ export default function Home() {
     useRef(null), // 6: Live Workspace
     useRef(null), // 7: Blog
     useRef(null), // 8: Reviews
-    useRef(null), // 9: Contact
+    useRef(null), // 9: Network / World Map
+    useRef(null), // 10: Contact
   ];
 
   // Redirect admin subdomain to /admin
@@ -241,7 +243,7 @@ export default function Home() {
             scrollOffset={scrollOffset}
             onNavigateSection={(idx) => scrollToSection(idx)}
             onAccessProjects={() => scrollToSection(4)}
-            onContactMe={() => scrollToSection(9)}
+            onContactMe={() => scrollToSection(10)}
             onGetQuote={handleGetQuote}
           />
         </div>
@@ -303,8 +305,15 @@ export default function Home() {
             </ScrollReveal>
           </div>
 
-          {/* Section 9: Contact */}
+          {/* Section 9: Global Network / World Map */}
           <div ref={sectionRefs[9]} className="section-wrapper">
+            <ScrollReveal delay={80}>
+              <WorldMapSection />
+            </ScrollReveal>
+          </div>
+
+          {/* Section 10: Contact */}
+          <div ref={sectionRefs[10]} className="section-wrapper">
             <ScrollReveal delay={80}>
               <ContactSection onGetQuote={handleGetQuote} />
             </ScrollReveal>
@@ -329,13 +338,17 @@ export default function Home() {
               <span className="footer-sep">·</span>
               <Link href="/blog" className="footer-link">Blog</Link>
               <span className="footer-sep">·</span>
+              <Link href="/reviews" className="footer-link">Reviews</Link>
+              <span className="footer-sep">·</span>
+              <Link href="/privacy" className="footer-link">Privacy</Link>
+              <span className="footer-sep">·</span>
               <button type="button" onClick={() => scrollToSection(1)} className="footer-link-btn">About</button>
               <span className="footer-sep">·</span>
               <button type="button" onClick={() => scrollToSection(4)} className="footer-link-btn">Projects</button>
               <span className="footer-sep">·</span>
               <button type="button" onClick={() => scrollToSection(5)} className="footer-link-btn">Tools</button>
               <span className="footer-sep">·</span>
-              <button type="button" onClick={() => scrollToSection(9)} className="footer-link-btn">Contact</button>
+              <button type="button" onClick={() => scrollToSection(10)} className="footer-link-btn">Contact</button>
             </nav>
             <p className="footer-copyright">© 2026 Adil Rahman | All Rights Reserved</p>
             <p className="footer-version">MADE AND DEPLOYED BY ME // PORTFOLIO v3.0.0</p>

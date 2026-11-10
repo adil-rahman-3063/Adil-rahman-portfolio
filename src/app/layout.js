@@ -7,12 +7,14 @@ const specialElite = Special_Elite({
   variable: "--font-special-elite",
   weight: "400",
   subsets: ["latin"],
+  display: "swap",
 });
 
 const laBelleAurore = La_Belle_Aurore({
   variable: "--font-la-belle-aurore",
   weight: "400",
   subsets: ["latin"],
+  display: "swap",
 });
 
 const SITE_URL = "https://adilrahman.cc";
@@ -202,11 +204,13 @@ export default function RootLayout({ children }) {
         <link rel="alternate" type="text/markdown" href="/llms.txt" title="LLM Context" />
         <link rel="author" href="https://adilrahman.cc" />
 
-        {/* Preload LCP hero image so browser fetches it immediately */}
+        {/* Preload LCP hero image with high priority */}
         <link
           rel="preload"
           as="image"
-          href="/assets/Filipino_Freelance_Graphic_Designer_Instagram_Post-removebg-preview.png"
+          type="image/webp"
+          href="/assets/Filipino_Freelance_Graphic_Designer_Instagram_Post-removebg-preview.webp"
+          fetchPriority="high"
         />
 
         {/* Instant Subdomain Router for admin.adilrahman.cc */}
@@ -234,14 +238,14 @@ export default function RootLayout({ children }) {
         {/* Zero-Cookie Privacy-First Global Visitor Telemetry (All Endpoints) */}
         <VisitorTelemetry />
 
-        {/* Google Analytics (gtag.js) */}
+        {/* Google Analytics (gtag.js) - loaded during browser idle time to prevent TBT spikes */}
         <Script
-          strategy="afterInteractive"
+          strategy="lazyOnload"
           src="https://www.googletagmanager.com/gtag/js?id=G-9BERHTPL4Q"
         />
         <Script
           id="google-analytics"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
           dangerouslySetInnerHTML={{
             __html: `
               window.dataLayer = window.dataLayer || [];

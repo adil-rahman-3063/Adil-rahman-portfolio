@@ -156,7 +156,7 @@ export default function HeroSection({ onAccessProjects, onContactMe, onGetQuote,
         <div className="hero-content-wrapper">
           <div className="hero-avatar">
             <img
-              src="/assets/Filipino_Freelance_Graphic_Designer_Instagram_Post-removebg-preview.png"
+              src="/assets/Filipino_Freelance_Graphic_Designer_Instagram_Post-removebg-preview.webp"
               alt="Adil Rahman Portrait"
               className="hero-avatar-img"
               fetchPriority="high"
@@ -510,7 +510,7 @@ export default function HeroSection({ onAccessProjects, onContactMe, onGetQuote,
         .hero-description {
           font-family: var(--font-mono);
           font-size: 13px;
-          color: #BCAAA4;
+          color: #D7CCC8;
           line-height: 1.65;
           margin: 0 0 28px 0;
           max-width: 580px;
@@ -530,7 +530,7 @@ export default function HeroSection({ onAccessProjects, onContactMe, onGetQuote,
         }
 
         .hero-btn-primary {
-          background-color: #8D6E63;
+          background-color: #6D4C41;
           color: #FAF6EE;
           border: none;
           border-radius: 30px;
@@ -619,7 +619,7 @@ export default function HeroSection({ onAccessProjects, onContactMe, onGetQuote,
         .services-subtitle {
           font-family: var(--font-mono);
           font-size: 13px;
-          color: #BCAAA4;
+          color: #D7CCC8;
           line-height: 1.55;
           max-width: 720px;
           margin: 0 auto 36px auto;
@@ -698,7 +698,7 @@ export default function HeroSection({ onAccessProjects, onContactMe, onGetQuote,
         .service-card-desc {
           font-family: var(--font-mono);
           font-size: 12px;
-          color: #BCAAA4;
+          color: #D7CCC8;
           line-height: 1.5;
           margin: 0 0 22px 0;
           flex-grow: 1;
@@ -715,7 +715,7 @@ export default function HeroSection({ onAccessProjects, onContactMe, onGetQuote,
         .service-details-link {
           font-family: var(--font-mono);
           font-size: 11px;
-          color: #BCAAA4;
+          color: #D7CCC8;
           text-decoration: none;
           text-align: center;
           padding: 6px 0;

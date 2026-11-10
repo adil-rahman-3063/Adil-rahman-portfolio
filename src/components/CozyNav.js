@@ -102,9 +102,12 @@ export default function CozyNav({ currentIndex, onTap }) {
         <div className="nav-container">
           <div className="logo-section">
             <img
-              src="/assets/Gemini_Generated_Image_cfgv0jcfgv0jcfgv-removebg-preview.png"
+              src="/assets/Gemini_Generated_Image_cfgv0jcfgv0jcfgv-removebg-preview.webp"
               alt="Adil Rahman — Full-Stack Developer Logo"
               className="logo-img"
+              width="36"
+              height="36"
+              fetchPriority="high"
             />
             <span className="signature">Adil Rahman</span>
           </div>

@@ -8,7 +8,7 @@ export default function LiveWorkspaceSection({ projects = [] }) {
     p.links.some((l) => l.url.startsWith('http') && !l.url.includes('github.com'))
   );
 
-  const [selectedProject, setSelectedProject] = useState(null);
+  const [selectedProject, setSelectedProject] = useState(() => (webProjects.length > 0 ? webProjects[0] : null));
 
   React.useEffect(() => {
     if (!selectedProject && webProjects.length > 0) {

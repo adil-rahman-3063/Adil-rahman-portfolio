@@ -25,8 +25,54 @@ export const metadata = {
 };
 
 export default function BlogIndexPage() {
+  const collectionSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: 'Engineering Stories & Notes by Adil Rahman',
+    description: 'Technical articles, engineering insights, and development deep-dives by Adil Rahman covering Flutter, PWAs, full-stack web, and hardware workarounds.',
+    url: `${SITE_URL}/blog`,
+    author: {
+      '@type': 'Person',
+      name: 'Adil Rahman',
+      url: SITE_URL,
+    },
+    mainEntity: {
+      '@type': 'ItemList',
+      itemListElement: allBlogs.map((post, idx) => ({
+        '@type': 'ListItem',
+        position: idx + 1,
+        url: `${SITE_URL}/blog/${post.id}`,
+        name: post.title,
+      })),
+    },
+  };
+
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: SITE_URL,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Blog',
+        item: `${SITE_URL}/blog`,
+      },
+    ],
+  };
+
   return (
-    <div className="blog-index-page">
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify([collectionSchema, breadcrumbSchema]) }}
+      />
+      <div className="blog-index-page">
       {/* ── Navigation ── */}
       <nav className="blog-nav">
         <Link href="/" className="blog-back-link">
@@ -530,6 +576,7 @@ export default function BlogIndexPage() {
           }
         }
       `}</style>
-    </div>
+      </div>
+    </>
   );
 }

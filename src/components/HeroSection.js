@@ -157,7 +157,7 @@ export default function HeroSection({ onAccessProjects, onContactMe, onGetQuote,
           <div className="hero-avatar">
             <img
               src="/assets/Filipino_Freelance_Graphic_Designer_Instagram_Post-removebg-preview.webp"
-              alt="Adil Rahman Portrait"
+              alt="Adil Rahman — Freelance Full-Stack, Flutter & Shopify Developer"
               className="hero-avatar-img"
               fetchPriority="high"
               width="420"
@@ -177,12 +177,28 @@ export default function HeroSection({ onAccessProjects, onContactMe, onGetQuote,
               Building high-performance mobile apps, scalable Next.js web applications, and custom Shopify storefronts for startups and businesses worldwide. Fast turnaround, production-tested architectures, and clean code.
             </p>
             <div className="hero-cta-buttons">
-              <button onClick={onContactMe} className="hero-btn-primary">
+              <a
+                href="#contact"
+                onClick={(e) => {
+                  e.preventDefault();
+                  onContactMe?.();
+                }}
+                className="hero-btn-primary"
+              >
                 Contact me
-              </button>
-              <button onClick={onAccessProjects} className="hero-btn-link">
+              </a>
+              <Link
+                href="/project"
+                onClick={(e) => {
+                  if (onAccessProjects) {
+                    e.preventDefault();
+                    onAccessProjects();
+                  }
+                }}
+                className="hero-btn-link"
+              >
                 View projects
-              </button>
+              </Link>
             </div>
           </div>
         </div>
@@ -245,7 +261,11 @@ export default function HeroSection({ onAccessProjects, onContactMe, onGetQuote,
                 <p className="service-card-desc">{s.desc}</p>
                 <div className="service-card-actions">
                   <Link href={`/services/${s.slug}`} className="service-details-link">
-                    Deliverables & Tech →
+                    {s.slug === 'flutter-developer'
+                      ? 'Flutter App Services & Deliverables →'
+                      : s.slug === 'shopify-developer'
+                      ? 'Shopify Storefront Services & Deliverables →'
+                      : 'Next.js Web Services & Deliverables →'}
                   </Link>
                   <button
                     onClick={() => onGetQuote?.(s.quote)}

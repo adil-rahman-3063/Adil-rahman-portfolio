@@ -14,7 +14,7 @@ export default function robots() {
       {
         userAgent: "*",
         allow: "/",
-        // Disallow nothing — the whole portfolio should be indexed.
+        disallow: ["/admin", "/api/"],
       },
     ],
     sitemap: `${SITE_URL}/sitemap.xml`,

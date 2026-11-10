@@ -104,8 +104,20 @@ export const metadata = {
   },
 };
 
-// ── JSON-LD Structured Data (Person, ProfessionalService & FAQPage) ─────────
+// ── JSON-LD Structured Data (WebSite, Person, ProfessionalService & FAQPage) ─────────
 const structuredSchemas = [
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "Adil Rahman",
+    alternateName: [
+      "Adil Rahman Portfolio",
+      "Adil Rahman Dev",
+      "Adil Rahman Full-Stack Developer",
+    ],
+    url: SITE_URL,
+    description: "Verified 5.0★ full-stack, Flutter, and Shopify developer building high-performance web and mobile apps worldwide.",
+  },
   {
     "@context": "https://schema.org",
     "@type": "ProfessionalService",

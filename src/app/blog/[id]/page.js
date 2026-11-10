@@ -123,17 +123,21 @@ function renderMarkdown(md) {
   return elements;
 }
 
-// ── JSON-LD Article Schema ───────────────────────────────────────────────────
+// ── JSON-LD Article & Breadcrumb Schema ───────────────────────────────────────
 function ArticleJsonLd({ post }) {
-  const schema = {
+  const articleSchema = {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
     headline: post.title,
     description: post.excerpt,
+    image: [
+      post.image || `${SITE_URL}/assets/og-image.png`,
+    ],
     author: {
       '@type': 'Person',
       name: 'Adil Rahman',
       url: SITE_URL,
+      jobTitle: 'Full-Stack Developer, Flutter Engineer & Shopify Expert',
     },
     publisher: {
       '@type': 'Person',
@@ -141,13 +145,43 @@ function ArticleJsonLd({ post }) {
       url: SITE_URL,
     },
     datePublished: post.date,
+    dateModified: post.dateModified || post.date,
     url: `${SITE_URL}/blog/${post.id}`,
-    mainEntityOfPage: `${SITE_URL}/blog/${post.id}`,
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': `${SITE_URL}/blog/${post.id}`,
+    },
   };
+
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: SITE_URL,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Blog',
+        item: `${SITE_URL}/blog`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: post.title,
+        item: `${SITE_URL}/blog/${post.id}`,
+      },
+    ],
+  };
+
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      dangerouslySetInnerHTML={{ __html: JSON.stringify([articleSchema, breadcrumbSchema]) }}
     />
   );
 }

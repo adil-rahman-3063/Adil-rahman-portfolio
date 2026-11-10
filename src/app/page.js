@@ -336,6 +336,12 @@ export default function Home() {
               <span className="footer-sep">·</span>
               <Link href="/services" className="footer-link">Services</Link>
               <span className="footer-sep">·</span>
+              <Link href="/services/flutter-developer" className="footer-link">Flutter Developer</Link>
+              <span className="footer-sep">·</span>
+              <Link href="/services/nextjs-developer" className="footer-link">Next.js Developer</Link>
+              <span className="footer-sep">·</span>
+              <Link href="/services/shopify-developer" className="footer-link">Shopify Developer</Link>
+              <span className="footer-sep">·</span>
               <Link href="/blog" className="footer-link">Blog</Link>
               <span className="footer-sep">·</span>
               <Link href="/reviews" className="footer-link">Reviews</Link>

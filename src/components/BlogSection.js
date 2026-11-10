@@ -41,7 +41,20 @@ export default function BlogSection({ onBlogClick }) {
             className="blog-card"
           >
             <span className="blog-date">{blog.date} • {blog.readTime}</span>
-            <h3 className="blog-title">{blog.title}</h3>
+            <h3 className="blog-title">
+              <Link
+                href={`/blog/${blog.id}`}
+                onClick={(e) => {
+                  if (onBlogClick) {
+                    e.preventDefault();
+                    onBlogClick(blog);
+                  }
+                }}
+                className="blog-title-link"
+              >
+                {blog.title}
+              </Link>
+            </h3>
             <p className="blog-excerpt">{blog.excerpt}</p>
             <div className="blog-action-row">
               <span className="blog-read-more">Read in Modal →</span>
@@ -49,8 +62,9 @@ export default function BlogSection({ onBlogClick }) {
                 href={`/blog/${blog.id}`}
                 className="blog-direct-link"
                 onClick={(e) => e.stopPropagation()}
+                aria-label={`Read complete article: ${blog.title}`}
               >
-                Full Page ↗
+                Read Article ↗
               </Link>
             </div>
           </div>
@@ -97,6 +111,16 @@ export default function BlogSection({ onBlogClick }) {
           color: #3E2723;
           font-weight: bold;
           margin: 0 0 12px 0;
+        }
+
+        .blog-title-link,
+        .blog-title-link:visited {
+          color: inherit;
+          text-decoration: none;
+        }
+
+        .blog-title-link:hover {
+          color: #8D6E63;
         }
 
         .blog-excerpt {

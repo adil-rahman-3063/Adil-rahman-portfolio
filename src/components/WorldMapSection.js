@@ -18,13 +18,32 @@ export default function WorldMapSection() {
   const [gridData, setGridData] = useState(null);
   const [isLoadingGrid, setIsLoadingGrid] = useState(true);
   const [isStarted, setIsStarted] = useState(false);
+  const [isInView, setIsInView] = useState(false);
 
   const containerRef = useRef(null);
   const svgRef = useRef(null);
   const tooltipRef = useRef(null);
 
-  // 1. Fetch grid topology from static assets
+  // 0. Viewport Proximity Observer: Defers 6,720 SVG nodes and Realtime WebSocket until scrolling near section
   useEffect(() => {
+    if (!containerRef.current) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          setIsInView(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '400px' }
+    );
+
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  // 1. Fetch grid topology from static assets ONLY when near viewport
+  useEffect(() => {
+    if (!isInView) return;
     let isMounted = true;
     fetch('/data/world-grid.json')
       .then((res) => {
@@ -43,10 +62,11 @@ export default function WorldMapSection() {
       });
 
     return () => { isMounted = false; };
-  }, []);
+  }, [isInView]);
 
-  // 2. Fetch live country counts & subscribe to Supabase Realtime
+  // 2. Fetch live country counts & subscribe to Supabase Realtime ONLY when near viewport
   useEffect(() => {
+    if (!isInView) return;
     let isMounted = true;
 
     async function loadCounts() {
@@ -101,7 +121,7 @@ export default function WorldMapSection() {
       isMounted = false;
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [isInView]);
 
   // 3. Detect visitor country via edge headers (Cloudflare trace) without storing IP
   // Enforces:

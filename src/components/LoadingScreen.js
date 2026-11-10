@@ -5,10 +5,10 @@ export default function LoadingScreen() {
   const [phase, setPhase] = useState('show'); // 'show' | 'fade' | 'done'
 
   useEffect(() => {
-    // Start fading after 1.1s
-    const fadeTimer = setTimeout(() => setPhase('fade'), 1100);
-    // Unmount after fade completes (0.6s transition)
-    const doneTimer = setTimeout(() => setPhase('done'), 1700);
+    // Start fast sleek fade after 250ms
+    const fadeTimer = setTimeout(() => setPhase('fade'), 250);
+    // Unmount after fade completes (0.35s transition)
+    const doneTimer = setTimeout(() => setPhase('done'), 600);
     return () => { clearTimeout(fadeTimer); clearTimeout(doneTimer); };
   }, []);
 
@@ -28,7 +28,7 @@ export default function LoadingScreen() {
         justifyContent: 'center',
         gap: '24px',
         opacity: phase === 'fade' ? 0 : 1,
-        transition: 'opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+        transition: 'opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
         pointerEvents: phase === 'fade' ? 'none' : 'all',
       }}
     >

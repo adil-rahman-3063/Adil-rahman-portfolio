@@ -23,13 +23,13 @@ Here is the architectural breakdown and step-by-step implementation of how I ada
 
 ---
 
-## The Problem with Modern Visitor Analytics
+## Why a Dedicated Edge Pipeline for a Public Map?
 
-Most developers default to Google Analytics, PostHog, or Mixpanel when they want to see where their traffic is coming from. While powerful, they introduce severe drawbacks for personal portfolios:
+While I use Google Analytics behind the scenes for private dashboard reporting, powering a **public, real-time visual map** directly on the portfolio UI requires a completely different architecture:
 
-1. **Script Bloat & Network Overhead:** 40KB–90KB of external JavaScript loaded on every single page view, degrading Core Web Vitals (LCP and INP).
-2. **The Obnoxious Cookie Banner:** To comply with GDPR, ePrivacy, and PECR laws, tracking cookies require persistent consent modals. A full-screen privacy popup immediately destroys a visitor's first impression.
-3. **Black Box Privacy Liabilities:** Storing raw IP addresses, session fingerprints, and screen resolutions turns your simple portfolio into a data liability.
+1. **Client-Facing Privacy:** Google Analytics data is private to the site owner. Querying it on every frontend page load would require backend proxies and token exposure.
+2. **Zero-Cookie Widget:** We wanted this public UI element to be 100% self-contained, lightweight, and zero-cookie—extracting only country metrics without tracking individuals.
+3. **Sub-Second Realtime Updates:** By decoupling public visitor presence from private analytics, the map updates live via Supabase WebSockets the moment a visitor arrives.
 
 ### The Zero-Cookie Edge Alternative
 What if we never record the visitor's IP address? What if we never drop a tracking cookie? 

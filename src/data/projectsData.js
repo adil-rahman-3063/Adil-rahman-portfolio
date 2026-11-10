@@ -801,19 +801,5 @@ export function getAllProjectCategoryPaths(list = allProjects) {
       paths.push({ category: catSlug, id: proj.id });
     }
   }
-  // Alias 'niche-site' paths for backwards compatibility
-  const nicheList = getCategoryProjects('niche-sites', list);
-  for (const proj of nicheList) {
-    paths.push({ category: 'niche-site', id: proj.id });
-  }
-  // Alias 'personal' paths for backwards compatibility
-  const personalList = getCategoryProjects('personal-project', list);
-  for (const proj of personalList) {
-    paths.push({ category: 'personal', id: proj.id });
-  }
-
-  // Also include issaa_event alias for backwards compatibility
-  paths.push({ category: 'freelance', id: 'issaa_event' });
-
   return paths;
 }

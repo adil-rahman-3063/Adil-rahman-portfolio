@@ -8,10 +8,8 @@ export async function generateStaticParams() {
   return [
     { category: 'saas' },
     { category: 'niche-sites' },
-    { category: 'niche-site' },
     { category: 'freelance' },
     { category: 'personal-project' },
-    { category: 'personal' },
   ];
 }
 

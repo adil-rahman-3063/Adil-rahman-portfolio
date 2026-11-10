@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * WorldMapSection.js
+ * Interactive GitHub-style world grid visitor telemetry map.
+ * Grid topology & visual concept inspired by Prakhar's open-source Homeflix:
+ * https://github.com/kprakz/homeflix
+ */
+
 import React, { useEffect, useRef, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
 
@@ -9,6 +16,7 @@ export default function WorldMapSection() {
   const [countryCount, setCountryCount] = useState(0);
   const [myCountry, setMyCountry] = useState(null);
   const [gridData, setGridData] = useState(null);
+  const [isLoadingGrid, setIsLoadingGrid] = useState(true);
   const [isStarted, setIsStarted] = useState(false);
 
   const containerRef = useRef(null);
@@ -24,14 +32,20 @@ export default function WorldMapSection() {
         return res.json();
       })
       .then((data) => {
-        if (isMounted) setGridData(data);
+        if (isMounted) {
+          setGridData(data);
+          setIsLoadingGrid(false);
+        }
       })
-      .catch((err) => console.warn('World grid load notice:', err));
+      .catch((err) => {
+        console.warn('World grid load notice:', err);
+        if (isMounted) setIsLoadingGrid(false);
+      });
 
     return () => { isMounted = false; };
   }, []);
 
-  // 2. Fetch live country counts from Supabase table `visitor_countries`
+  // 2. Fetch live country counts & subscribe to Supabase Realtime
   useEffect(() => {
     let isMounted = true;
 
@@ -59,37 +73,99 @@ export default function WorldMapSection() {
     }
 
     loadCounts();
-    return () => { isMounted = false; };
+
+    // ── Supabase Realtime Subscription ──
+    const channel = supabase
+      .channel('visitor_countries_live_feed')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'visitor_countries',
+        },
+        (payload) => {
+          if (payload.new && payload.new.country_code) {
+            const code = payload.new.country_code.toUpperCase().trim();
+            const n = Number(payload.new.count) || 1;
+            setCounts((prev) => ({
+              ...prev,
+              [code]: n,
+            }));
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      isMounted = false;
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   // 3. Detect visitor country via edge headers (Cloudflare trace) without storing IP
+  // Enforces:
+  // - Only log visits when hosted on production domain (adilrahman.cc / www.adilrahman.cc)
+  // - Strict 1 visit per device per day rate-limiting via localStorage (no duplicate hits on refresh or tab switch)
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    const sessionKey = 'ar_visitor_logged_code';
-    const cachedCode = sessionStorage.getItem(sessionKey);
-    if (cachedCode) {
-      setMyCountry(cachedCode);
+    const STORAGE_DATE_KEY = 'ar_visit_logged_date';
+    const STORAGE_COUNTRY_KEY = 'ar_visit_logged_country';
+
+    const getStorage = (key) => {
+      try {
+        return localStorage.getItem(key);
+      } catch (_) {
+        return null;
+      }
+    };
+
+    const setStorage = (key, val) => {
+      try {
+        localStorage.setItem(key, val);
+      } catch (_) {}
+    };
+
+    const today = new Date().toISOString().slice(0, 10); // Format: YYYY-MM-DD
+    const lastLoggedDate = getStorage(STORAGE_DATE_KEY);
+    const cachedCountry = getStorage(STORAGE_COUNTRY_KEY);
+
+    if (cachedCountry) {
+      setMyCountry(cachedCountry);
+    }
+
+    // Rule 1: A device is marked only 1 time per day. Skip if already logged today.
+    if (lastLoggedDate === today) {
+      return;
+    }
+
+    // Rule 2: Only mark visits when visited on the live production domain (adilrahman.cc)
+    // Never record visits on localhost, 127.0.0.1, or preview deployments
+    const hostname = window.location.hostname;
+    const isProductionHost = hostname === 'adilrahman.cc' || hostname === 'www.adilrahman.cc';
+
+    if (!isProductionHost) {
+      // For local development visual preview only: highlight default without logging to database
+      if (!cachedCountry) {
+        setMyCountry('IN');
+      }
       return;
     }
 
     async function detectAndLog() {
       let code = null;
-      const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
-      // On production behind Cloudflare, extract from local edge trace
-      if (!isLocal) {
-        try {
-          const res = await fetch('/cdn-cgi/trace', { cache: 'no-store' });
-          if (res.ok) {
-            const text = await res.text();
-            const match = text.match(/loc=([A-Za-z]{2})/);
-            if (match && match[1]) code = match[1].toUpperCase();
-          }
-        } catch (_) {}
-      }
+      try {
+        const res = await fetch('/cdn-cgi/trace', { cache: 'no-store' });
+        if (res.ok) {
+          const text = await res.text();
+          const match = text.match(/loc=([A-Za-z]{2})/);
+          if (match && match[1]) code = match[1].toUpperCase();
+        }
+      } catch (_) {}
 
-      // Fallback for local development or direct access
+      // Fallback edge trace if internal path was proxied
       if (!code) {
         try {
           const res = await fetch('https://cloudflare.com/cdn-cgi/trace', { cache: 'no-store' });
@@ -101,14 +177,12 @@ export default function WorldMapSection() {
         } catch (_) {}
       }
 
-      // Default fallback for dev environment if network trace is unreachable
-      if (!code && isLocal) {
-        code = 'IN';
-      }
-
       if (code && code !== 'XX') {
         setMyCountry(code);
-        sessionStorage.setItem(sessionKey, code);
+
+        // Save daily lock immediately to prevent duplicate hits from rapid navigation or multiple tabs
+        setStorage(STORAGE_DATE_KEY, today);
+        setStorage(STORAGE_COUNTRY_KEY, code);
 
         // Optimistically increment local count
         setCounts((prev) => ({
@@ -118,21 +192,25 @@ export default function WorldMapSection() {
 
         // Atomic update in Supabase
         try {
-          // Try RPC function first
           const { error: rpcErr } = await supabase.rpc('increment_country', { c_code: code });
           if (rpcErr) {
-            // Fallback direct upsert if RPC is not registered yet
+            // Fallback direct upsert
             const currentCount = counts[code] || 0;
-            await supabase.from('visitor_countries').upsert([
+            const { error: upErr } = await supabase.from('visitor_countries').upsert([
               { country_code: code, count: currentCount + 1, last_visited: new Date() }
             ]);
+            if (upErr) {
+              console.warn('Supabase visitor record notice (RLS policy check needed):', upErr);
+            }
           }
-        } catch (_) {}
+        } catch (err) {
+          console.warn('Supabase visitor log catch:', err);
+        }
       }
     }
 
     detectAndLog();
-  }, [counts]);
+  }, []);
 
   // 4. Calculate total visits, unique active countries, and highest count
   const maxCount = Object.values(counts).reduce((acc, n) => Math.max(acc, Number(n) || 0), 0);
@@ -278,6 +356,21 @@ export default function WorldMapSection() {
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
       >
+        {/* Loading Indicator Overlay */}
+        {isLoadingGrid && (
+          <div className="map-loading-overlay">
+            <div className="radar-loader">
+              <span className="radar-spinner" />
+              <div className="radar-wave" />
+            </div>
+            <div className="map-loading-text">
+              <span className="terminal-prefix">// TELEMETRY CALIBRATION</span>
+              <p className="loading-title">INITIALIZING 120×56 TOPOLOGICAL WORLD MATRIX...</p>
+              <p className="loading-sub">Connecting edge nodes &amp; synchronizing global sessions</p>
+            </div>
+          </div>
+        )}
+
         <svg ref={svgRef} id="mapSvg" role="img" aria-label="Interactive global visitor telemetry map" />
 
         {/* Hover Tooltip */}
@@ -435,17 +528,99 @@ export default function WorldMapSection() {
         .map-card {
           position: relative;
           width: 100%;
+          min-height: 280px;
           background: #180D0A;
           border: 1px solid rgba(141, 110, 99, 0.3);
           border-radius: 12px;
           padding: 24px 20px 16px;
           overflow: hidden;
           box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
-          --m0: #261612;
-          --m1: #4A2218;
-          --m2: #843922;
-          --m3: #C2562E;
-          --m4: #E87A47;
+          --m0: #321B15;
+          --m1: #5A271C;
+          --m2: #8D3A24;
+          --m3: #C8532A;
+          --m4: #FA7942;
+        }
+
+        .map-loading-overlay {
+          position: absolute;
+          inset: 0;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          background: rgba(24, 13, 10, 0.94);
+          backdrop-filter: blur(4px);
+          z-index: 10;
+          gap: 16px;
+          padding: 24px;
+          text-align: center;
+        }
+
+        .radar-loader {
+          position: relative;
+          width: 50px;
+          height: 50px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .radar-spinner {
+          width: 44px;
+          height: 44px;
+          border-radius: 50%;
+          border: 2px solid rgba(140, 115, 85, 0.2);
+          border-top-color: #8C7355;
+          border-right-color: #C8532A;
+          animation: radarSpin 1.1s linear infinite;
+        }
+
+        .radar-wave {
+          position: absolute;
+          width: 22px;
+          height: 22px;
+          border-radius: 50%;
+          background: rgba(200, 83, 42, 0.25);
+          animation: radarPulse 1.6s ease-out infinite;
+        }
+
+        @keyframes radarSpin {
+          to { transform: rotate(360deg); }
+        }
+
+        @keyframes radarPulse {
+          0% { transform: scale(0.6); opacity: 1; }
+          100% { transform: scale(2.4); opacity: 0; }
+        }
+
+        .map-loading-text {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+        }
+
+        .terminal-prefix {
+          font-family: var(--font-mono);
+          font-size: 10px;
+          color: #8C7355;
+          letter-spacing: 1.5px;
+          font-weight: bold;
+        }
+
+        .loading-title {
+          font-family: var(--font-mono);
+          font-size: 12px;
+          color: #FAF6EE;
+          letter-spacing: 1px;
+          margin: 0;
+        }
+
+        .loading-sub {
+          font-family: var(--font-mono);
+          font-size: 11px;
+          color: #BCAAA4;
+          margin: 0;
         }
 
         .map-card svg {

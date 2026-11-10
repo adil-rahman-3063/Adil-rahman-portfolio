@@ -5,12 +5,12 @@ import SiteFooter from '../../../components/SiteFooter';
 
 const SITE_URL = 'https://adilrahman.cc';
 
-// Required for next static export — queries Supabase for all active project routes
+// Required for next static export — queries only real SaaS projects (AR Membership Manager)
 export async function generateStaticParams() {
   const live = await fetchProjectsFromSupabase();
-  const paths = live.map((project) => ({ id: project.id }));
-  paths.push({ id: 'issaa_event' });
-  return paths;
+  return live
+    .filter((project) => getProjectCategory(project.id, project) === 'saas')
+    .map((project) => ({ id: project.id }));
 }
 
 // GitHub repository mapping for deep repo inspection

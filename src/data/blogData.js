@@ -1,5 +1,266 @@
 export const allBlogs = [
   {
+    id: 'zero-cookie-visitor-map-cloudflare-supabase',
+    title: 'Building a Zero-Cookie Global Visitor Map with Cloudflare Edge, Supabase & Next.js',
+    seoTitle: 'Zero-Cookie Visitor Map: Cloudflare, Supabase & Next.js | Adil Rahman',
+    date: 'November 10, 2026',
+    readTime: '7 min read',
+    excerpt: 'How I built a real-time, GitHub contribution–style world visitor map with zero cookies or invasive tracking—inspired by kprakz/homeflix and powered by Cloudflare edge headers and Supabase.',
+    content: `**Category:** Frontend Graphics / Edge Architecture / Privacy Engineering
+**Read Time:** ~7 mins
+
+## Introduction: The Spark of Inspiration
+
+A few days ago, while browsing GitHub, I came across Prakhar's open-source project [homeflix](https://github.com/kprakz/homeflix). 
+
+One particular interface element immediately caught my eye: a **GitHub contribution graph–style world map**. Instead of the usual vector paths or generic Google Map embeds, it rendered the entire planet as a discrete matrix of tiny, tactile SVG squares that radiated with ripple animations whenever a country recorded traffic.
+
+I loved the aesthetic. It felt retro, responsive, and completely distinct from standard developer portfolios. 
+
+But looking at how most visitor tracking works today, I wanted to solve a deeper engineering challenge: **Can we power a live global visitor map on a 100% statically exported Next.js site with zero cookies, zero third-party tracking scripts, and zero GDPR consent banners?**
+
+Here is the architectural breakdown and step-by-step implementation of how I adapted the visual concept from [kprakz/homeflix](https://github.com/kprakz/homeflix), hooked it up to Cloudflare edge telemetry, and persisted live sessions with Supabase atomic counters.
+
+---
+
+## The Problem with Modern Visitor Analytics
+
+Most developers default to Google Analytics, PostHog, or Mixpanel when they want to see where their traffic is coming from. While powerful, they introduce severe drawbacks for personal portfolios:
+
+1. **Script Bloat & Network Overhead:** 40KB–90KB of external JavaScript loaded on every single page view, degrading Core Web Vitals (LCP and INP).
+2. **The Obnoxious Cookie Banner:** To comply with GDPR, ePrivacy, and PECR laws, tracking cookies require persistent consent modals. A full-screen privacy popup immediately destroys a visitor's first impression.
+3. **Black Box Privacy Liabilities:** Storing raw IP addresses, session fingerprints, and screen resolutions turns your simple portfolio into a data liability.
+
+### The Zero-Cookie Edge Alternative
+What if we never record the visitor's IP address? What if we never drop a tracking cookie? 
+
+When a user connects to a site proxied by **Cloudflare**, Cloudflare's edge server terminates the incoming TCP handshake and automatically inspects the IP to determine geographical origin. It attaches the 2-letter ISO country code (e.g., \`IN\`, \`US\`, \`DE\`, \`GB\`) to the request headers (\`cf-ipcountry\` or the internal \`/cdn-cgi/trace\` endpoint).
+
+By extracting this ISO code in-memory at the edge and immediately discarding the raw IP, we can track global country distributions with **100% anonymity and zero cookies**.
+
+---
+
+## Step 1: The 120×56 World Grid Topology
+
+To build a contribution graph–style map, we cannot use continuous SVG path polygons. Instead, the globe must be quantized into a fixed discrete grid.
+
+In [kprakz/homeflix](https://github.com/kprakz/homeflix), this was achieved using a precomputed matrix generated with **d3-geo** and the Natural Earth projection:
+
+- **Grid Dimensions:** 120 columns by 56 rows (6,720 coordinate points).
+- **Cell Definition:** Each entry is a tuple \`[col, row, country_code]\`.
+- **Centroids:** A dictionary mapping ISO country codes to their exact geographical center coordinate \`[centerCol, centerRow]\`.
+
+This precomputed dataset (stored as \`world-grid.json\`) weighs only ~24KB. By loading it statically on the client, we render the entire planet in pure SVG without requiring heavy D3 runtime libraries in our client bundle.
+
+---
+
+## Step 2: The Supabase Atomic Counter Schema
+
+Next, we need a lightweight database table to persist cumulative sessions per country. Storing raw access logs would quickly balloon our database row limits. Instead, we store a single aggregate row per country.
+
+Create the table in PostgreSQL via Supabase:
+
+\`\`\`sql
+CREATE TABLE IF NOT EXISTS public.visitor_countries (
+  country_code VARCHAR(2) PRIMARY KEY,
+  count BIGINT NOT NULL DEFAULT 1,
+  last_visited TIMESTAMPTZ DEFAULT TIMEZONE('utc'::text, NOW())
+);
+
+-- Enable Row Level Security (RLS)
+ALTER TABLE public.visitor_countries ENABLE ROW LEVEL SECURITY;
+
+-- Allow public read access so the map can render live counts
+CREATE POLICY "Public can view country visitor counts"
+  ON public.visitor_countries FOR SELECT
+  USING (true);
+\`\`\`
+
+### Preventing Race Conditions with Atomic RPC
+If multiple visitors from the same country arrive simultaneously, traditional read-then-write updates will cause race conditions and dropped counts. We prevent this using a PostgreSQL atomic increment function:
+
+\`\`\`sql
+CREATE OR REPLACE FUNCTION public.increment_country(c_code TEXT)
+RETURNS VOID
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  INSERT INTO public.visitor_countries (country_code, count, last_visited)
+  VALUES (UPPER(c_code), 1, NOW())
+  ON CONFLICT (country_code)
+  DO UPDATE SET
+    count = public.visitor_countries.count + 1,
+    last_visited = NOW();
+END;
+$$;
+\`\`\`
+
+---
+
+## Step 3: Production Domain Gating & Daily Device Rate-Limiting
+
+On the client side, we detect the visitor's country without annoying consent popups. However, in real-world deployments three critical safeguards are required:
+
+1. **Domain Gating:** We only want to log visits when users browse our live production domain (\`adilrahman.cc\`). Any visits on \`localhost\`, \`127.0.0.1\`, staging, or preview deployments must never touch the database.
+2. **Once-Per-Day Device Rate Limiting:** Visitors frequently refresh or switch between pages. Using \`localStorage\` keyed by today's UTC date (\`YYYY-MM-DD\`), we guarantee that a device only increments the visit counter **once per day**.
+3. **Global Endpoint Coverage (Root Layout):** Visitors often arrive directly on deep links from Google or social media (e.g., \`/reviews\`, \`/blog/...\`, \`/saas/...\`). By mounting our telemetry inside a lightweight headless client component (\`VisitorTelemetry\`) within the root layout (\`src/app/layout.js\`), all entry points are captured uniformly.
+
+\`\`\`javascript
+useEffect(() => {
+  if (typeof window === 'undefined') return;
+
+  const STORAGE_DATE_KEY = 'ar_visit_logged_date';
+  const STORAGE_COUNTRY_KEY = 'ar_visit_logged_country';
+
+  const today = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
+  const lastLoggedDate = localStorage.getItem(STORAGE_DATE_KEY);
+  const cachedCountry = localStorage.getItem(STORAGE_COUNTRY_KEY);
+
+  if (cachedCountry) setMyCountry(cachedCountry);
+
+  // 1. Only mark a device 1 time per day
+  if (lastLoggedDate === today) return;
+
+  // 2. Only mark visits on the production domain (adilrahman.cc)
+  const hostname = window.location.hostname;
+  const isProd = hostname === 'adilrahman.cc' || hostname === 'www.adilrahman.cc';
+  if (!isProd) {
+    if (!cachedCountry) setMyCountry('IN'); // Preview fallback for dev
+    return;
+  }
+
+  async function detectAndLog() {
+    let code = null;
+
+    try {
+      const res = await fetch('/cdn-cgi/trace', { cache: 'no-store' });
+      if (res.ok) {
+        const text = await res.text();
+        const match = text.match(/loc=([A-Za-z]{2})/);
+        if (match && match[1]) code = match[1].toUpperCase();
+      }
+    } catch (_) {}
+
+    if (code && code !== 'XX') {
+      setMyCountry(code);
+
+      // Lock today's visit on this device immediately
+      localStorage.setItem(STORAGE_DATE_KEY, today);
+      localStorage.setItem(STORAGE_COUNTRY_KEY, code);
+
+      // Atomic increment in Supabase
+      try {
+        await supabase.rpc('increment_country', { c_code: code });
+      } catch (_) {}
+    }
+  }
+
+  detectAndLog();
+}, []);
+\`\`\`
+
+---
+
+## Step 4: Rendering the SVG & The Ripple Math
+
+Once both \`world-grid.json\` and the Supabase \`visitor_countries\` data resolve, we construct the SVG elements dynamically.
+
+### 1. Logarithmic Color Shading
+A linear color scale fails in real-world traffic scenarios. If the United States has 1,200 visits and Germany has 15, a linear scale will render Germany in the faintest unnoticeable shade.
+
+By applying a **logarithmic scale**, every increment from 1 to the maximum count receives clear visual representation:
+
+\`\`\`javascript
+const shade = (n) => {
+  if (n <= 0 || max <= 0) return 0;
+  return Math.min(4, 1 + Math.floor((Math.log(n + 1) / Math.log(max + 1)) * 3.999));
+};
+\`\`\`
+
+This maps each country count into 5 distinct CSS variables (\`--m0\` through \`--m4\`).
+
+### 2. Centroid-Radiating Ripple Physics
+When the user scrolls the map into view, we don't want all squares to pop up simultaneously. 
+
+Using the precomputed country centroids, we calculate the Euclidean distance from the country's center to each individual cell using \`Math.hypot()\`. This generates a hypnotic ripple wave expanding outwards from the country's geometric heart:
+
+\`\`\`javascript
+const [cc, cr] = gridData.centres[code] || [col, row];
+const distance = Math.hypot(col - cc, row - cr);
+
+// Stagger delay based on country rank + geometric distance from center
+const delay = (rank.get(code) || 0) * 320 + distance * 65;
+\`\`\`
+
+In CSS, the keyframe scales each square from the center:
+
+\`\`\`css
+@keyframes spread {
+  from {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+\`\`\`
+
+### 3. Live WebSocket Updates via Supabase Realtime
+To ensure the map updates live whenever a new country logs in without requiring a manual page refresh, we subscribe to PostgreSQL changes via Supabase Realtime:
+
+\`\`\`javascript
+const channel = supabase
+  .channel('visitor_countries_live_feed')
+  .on(
+    'postgres_changes',
+    { event: '*', schema: 'public', table: 'visitor_countries' },
+    (payload) => {
+      if (payload.new?.country_code) {
+        const code = payload.new.country_code.toUpperCase().trim();
+        const n = Number(payload.new.count) || 1;
+        setCounts((prev) => ({ ...prev, [code]: n }));
+      }
+    }
+  )
+  .subscribe();
+\`\`\`
+
+Paired with a rotating radar sweep indicator while the SVG topology initializes, the terminal feels alive and reactive.
+
+---
+
+## Step 5: Next.js Static Export & Cloudflare Pages Pitfalls
+
+Deploying this on Cloudflare Pages with Next.js \`output: 'export'\` brought an interesting hurdle.
+
+Next.js provides an internal \`src/middleware.js\` convention. However, running \`next build\` with static exports threw:
+
+\`\`\`text
+⨯ Middleware cannot be used with "output: export".
+\`\`\`
+
+Because static exports produce purely static HTML/CSS files without a persistent Node.js server, Next.js blocks its internal middleware.
+
+The solution was utilizing **Cloudflare Pages Functions native middleware** (\`functions/_middleware.js\`). Cloudflare Pages executes this script directly on the V8 edge runtime before serving static files, allowing custom subdomain routing without breaking the static build.
+
+---
+
+## Summary & Open Source Credit
+
+By combining precomputed topological grids with edge-native request inspection and serverless PostgreSQL, we achieved:
+- **Zero Cookies & Zero Tracking Scripts:** 100% compliant with GDPR/PECR without annoying consent banners.
+- **Sub-Second Performance:** Only 24KB of static JSON, with zero impact on initial page load.
+- **Engaging Visual Telemetry:** Visitors can see their own presence illuminate the global map in real time.
+
+Special thanks again to **Prakhar** ([kprakz/homeflix](https://github.com/kprakz/homeflix)) for open-sourcing the world grid concept and inspiring this implementation!
+
+You can see this live on the [Adil Rahman Portfolio](https://adilrahman.cc) in the **Global Network** section.`,
+  },
+  {
     id: 'cloudflare-pages-npm-ci-wasm-trap',
     title: 'The Windows-to-Linux npm ci Trap: Debugging Missing WebAssembly Bindings on Cloudflare Pages',
     seoTitle: 'Cloudflare Pages npm ci Wasm Lockfile Fix | Adil Rahman',

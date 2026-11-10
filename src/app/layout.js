@@ -1,5 +1,6 @@
 import { Special_Elite, La_Belle_Aurore } from "next/font/google";
 import Script from "next/script";
+import VisitorTelemetry from "../components/VisitorTelemetry";
 import "./globals.css";
 
 const specialElite = Special_Elite({
@@ -230,6 +231,9 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body suppressHydrationWarning>
+        {/* Zero-Cookie Privacy-First Global Visitor Telemetry (All Endpoints) */}
+        <VisitorTelemetry />
+
         {/* Google Analytics (gtag.js) */}
         <Script
           strategy="afterInteractive"

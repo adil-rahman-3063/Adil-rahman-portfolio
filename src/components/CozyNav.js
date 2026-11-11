@@ -185,6 +185,8 @@ export default function CozyNav({ currentIndex, onTap }) {
           top: 0;
           left: 0;
           right: 0;
+          width: 100%;
+          box-sizing: border-box;
           z-index: 1000;
           background-color: rgba(35, 21, 19, 0.75); /* bgDark with opacity */
           backdrop-filter: blur(10px);
@@ -215,38 +217,44 @@ export default function CozyNav({ currentIndex, onTap }) {
         .nav-container {
           display: flex;
           align-items: center;
-          max-width: 100%;
+          width: 100%;
+          max-width: 1600px;
           margin: 0 auto;
-          padding: 16px 40px;
+          padding: 12px 20px;
+          box-sizing: border-box;
         }
 
         .logo-section {
           display: flex;
           align-items: center;
-          gap: 12px;
+          gap: 10px;
           flex-shrink: 0;
         }
 
         .logo-img {
-          height: 38px;
-          width: 38px;
+          height: 34px;
+          width: 34px;
           object-fit: contain;
           filter: brightness(0) invert(1); /* blends to white */
+          flex-shrink: 0;
         }
 
         .signature {
           font-family: var(--font-handwritten);
-          font-size: 24px;
+          font-size: 20px;
           color: #FAF6EE; /* paperCream */
           white-space: nowrap;
+          flex-shrink: 0;
         }
 
         .nav-links {
           display: flex;
           align-items: center;
-          gap: 16px;
+          gap: 4px;
           margin-left: auto;
-          margin-right: 24px;
+          margin-right: 14px;
+          flex-shrink: 1;
+          min-width: 0;
         }
 
         .nav-link-btn {
@@ -254,14 +262,16 @@ export default function CozyNav({ currentIndex, onTap }) {
           border: none;
           cursor: pointer;
           font-family: var(--font-header);
-          font-size: 13px;
-          letter-spacing: 1.5px;
-          padding: 6px 14px;
+          font-size: 11px;
+          letter-spacing: 0.8px;
+          padding: 6px 7px;
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 4px;
+          gap: 3px;
           transition: color 0.2s;
+          white-space: nowrap;
+          flex-shrink: 0;
         }
 
         .active-line {
@@ -277,16 +287,77 @@ export default function CozyNav({ currentIndex, onTap }) {
           border-radius: 30px;
           color: #FAF6EE;
           font-family: var(--font-mono);
-          font-size: 12px;
+          font-size: 11.5px;
           font-weight: bold;
-          padding: 12px 20px;
+          padding: 8px 16px;
           cursor: pointer;
+          white-space: nowrap;
+          flex-shrink: 0;
           transition: background-color 0.2s, color 0.2s, border-color 0.2s;
         }
         .contact-btn:hover {
           background-color: #FAF6EE;
           color: #231513;
           border-color: #FAF6EE;
+        }
+
+        @media (min-width: 1280px) {
+          .nav-container {
+            padding: 14px 28px;
+          }
+          .signature {
+            font-size: 22px;
+          }
+          .nav-links {
+            gap: 8px;
+            margin-right: 18px;
+          }
+          .nav-link-btn {
+            font-size: 12px;
+            letter-spacing: 1px;
+            padding: 6px 9px;
+          }
+          .contact-btn {
+            font-size: 12px;
+            padding: 9px 18px;
+          }
+        }
+
+        @media (min-width: 1440px) {
+          .nav-container {
+            padding: 16px 36px;
+          }
+          .signature {
+            font-size: 24px;
+          }
+          .nav-links {
+            gap: 12px;
+            margin-right: 22px;
+          }
+          .nav-link-btn {
+            font-size: 12.5px;
+            letter-spacing: 1.2px;
+            padding: 6px 11px;
+          }
+          .contact-btn {
+            font-size: 12px;
+            padding: 10px 20px;
+          }
+        }
+
+        @media (min-width: 1600px) {
+          .nav-container {
+            padding: 16px 40px;
+          }
+          .nav-links {
+            gap: 16px;
+            margin-right: 24px;
+          }
+          .nav-link-btn {
+            font-size: 13px;
+            letter-spacing: 1.5px;
+            padding: 6px 14px;
+          }
         }
 
         /* Mobile Nav Styles */

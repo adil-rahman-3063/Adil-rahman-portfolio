@@ -18,22 +18,22 @@ This checklist separates **brand-new URLs** that need manual indexing from **alr
 
 These URLs were newly created or published recently and require an initial manual crawl request in GSC:
 
-- [ ] `https://adilrahman.cc/blog/zero-cookie-visitor-map-cloudflare-supabase`
+- [x] `https://adilrahman.cc/blog/zero-cookie-visitor-map-cloudflare-supabase`
   - **Type**: New Technical Blog Post (Published Nov 10, 2026)
   - **Target Keywords**: *zero-cookie visitor map, Cloudflare edge Supabase map, Next.js country telemetry*
-- [ ] `https://adilrahman.cc/blog/cloudflare-pages-npm-ci-wasm-trap`
+- [x] `https://adilrahman.cc/blog/cloudflare-pages-npm-ci-wasm-trap`
   - **Type**: New Technical Blog Post (Published Nov 7, 2026)
   - **Target Keywords**: *Cloudflare Pages npm ci Wasm, missing WebAssembly bindings Cloudflare*
-- [ ] `https://adilrahman.cc/project/niche-sites/fileo`
+- [x] `https://adilrahman.cc/project/niche-sites/fileo`
   - **Type**: New Project Case Study
   - **Target Keywords**: *Fileo in-browser file converter, Astro 5 Wasm utility platform*
-- [ ] `https://adilrahman.cc/project/niche-sites`
+- [x] `https://adilrahman.cc/project/niche-sites`
   - **Type**: New Project Category Hub
   - **Target Keywords**: *niche sites portfolio, monetized web utilities*
-- [ ] `https://adilrahman.cc/reviews`
+- [x] `https://adilrahman.cc/reviews`
   - **Type**: Dedicated Reviews & Testimonials Hub
   - **Target Keywords**: *Adil Rahman reviews, verified Flutter developer testimonials, 5.0 star software engineer ratings*
-- [ ] `https://adilrahman.cc/privacy`
+- [x] `https://adilrahman.cc/privacy`
   - **Type**: Dedicated Privacy Policy & Architecture Disclosure
   - **Target Keywords**: *Adil Rahman privacy policy, zero-knowledge telemetry disclosure*
 
@@ -43,15 +43,15 @@ These URLs were newly created or published recently and require an initial manua
 
 These URLs were already active, but were updated with new structured data (`WebSite` schema, `BreadcrumbList`, crawlable hero links, and keyword anchor text) to accelerate rich snippet updates:
 
-- [ ] `https://adilrahman.cc/`
+- [x] `https://adilrahman.cc/`
   - **Update**: Injected `WebSite` schema for Google Site Name verification ("Adil Rahman"), crawlable `<a href>` Hero CTAs, and footer deep links.
-- [ ] `https://adilrahman.cc/blog`
+- [x] `https://adilrahman.cc/blog`
   - **Update**: Injected `CollectionPage` and `BreadcrumbList` schema.
-- [ ] `https://adilrahman.cc/services/flutter-developer`
+- [x] `https://adilrahman.cc/services/flutter-developer`
   - **Update**: Linked directly in footer and Hero cards with keyword anchor text.
-- [ ] `https://adilrahman.cc/services/shopify-developer`
+- [x] `https://adilrahman.cc/services/shopify-developer`
   - **Update**: Linked directly in footer and Hero cards with keyword anchor text.
-- [ ] `https://adilrahman.cc/services/nextjs-developer`
+- [x] `https://adilrahman.cc/services/nextjs-developer`
   - **Update**: Linked directly in footer and Hero cards with keyword anchor text.
 
 ---

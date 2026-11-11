@@ -269,7 +269,8 @@ export default function RootLayout({ children }) {
               function gtag(){dataLayer.push(arguments);}
               gtag('js', new Date());
               gtag('config', 'G-9BERHTPL4Q', {
-                page_path: window.location.pathname,
+                page_path: window.location.pathname + window.location.search,
+                page_location: window.location.href,
               });
             `,
           }}

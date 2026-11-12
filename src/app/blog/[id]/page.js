@@ -44,6 +44,11 @@ function renderMarkdown(md) {
   const lines = md.split('\n');
   const elements = [];
   let listItems = [];
+  let orderedListItems = [];
+  let blockquoteLines = [];
+  let inTable = false;
+  let tableHeader = [];
+  let tableRows = [];
   let inCodeBlock = false;
   let codeLines = [];
   let key = 0;
@@ -53,6 +58,63 @@ function renderMarkdown(md) {
       elements.push(<ul key={key++} className="blog-list">{listItems}</ul>);
       listItems = [];
     }
+  };
+
+  const flushOrderedList = () => {
+    if (orderedListItems.length > 0) {
+      elements.push(<ol key={key++} className="blog-ol">{orderedListItems}</ol>);
+      orderedListItems = [];
+    }
+  };
+
+  const flushBlockquote = () => {
+    if (blockquoteLines.length > 0) {
+      elements.push(
+        <blockquote key={key++} className="blog-blockquote">
+          {blockquoteLines.map((bLine, i) => (
+            <p key={i} className="blog-blockquote-p">{inlineRender(bLine)}</p>
+          ))}
+        </blockquote>
+      );
+      blockquoteLines = [];
+    }
+  };
+
+  const flushTable = () => {
+    if (inTable && tableHeader.length > 0) {
+      elements.push(
+        <div key={key++} className="blog-table-wrapper">
+          <table className="blog-table">
+            <thead>
+              <tr>
+                {tableHeader.map((h, i) => (
+                  <th key={i}>{inlineRender(h)}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {tableRows.map((row, ri) => (
+                <tr key={ri}>
+                  {row.map((c, ci) => (
+                    <td key={ci}>{inlineRender(c)}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      );
+    }
+    inTable = false;
+    tableHeader = [];
+    tableRows = [];
+  };
+
+  const flushAll = () => {
+    flushList();
+    flushOrderedList();
+    flushBlockquote();
+    flushTable();
   };
 
   const inlineRender = (text) => {
@@ -71,7 +133,7 @@ function renderMarkdown(md) {
 
   for (const line of lines) {
     if (line.startsWith('```')) {
-      flushList();
+      flushAll();
       if (inCodeBlock) {
         elements.push(
           <pre key={key++} className="blog-code-pre">
@@ -91,28 +153,84 @@ function renderMarkdown(md) {
       continue;
     }
 
-    if (line.startsWith('# ')) {
+    const trimmed = line.trim();
+
+    // Table row detection (| col | col |)
+    if (trimmed.startsWith('|') && trimmed.endsWith('|') && trimmed.length > 2) {
+      // Check if it's separator row: | :--- | :--- |
+      if (/^\|[\s\-:]+(\|[\s\-:]+)+\|$/.test(trimmed)) {
+        continue;
+      }
       flushList();
+      flushOrderedList();
+      flushBlockquote();
+      const cells = trimmed.slice(1, -1).split('|').map((s) => s.trim());
+      if (!inTable) {
+        inTable = true;
+        tableHeader = cells;
+      } else {
+        tableRows.push(cells);
+      }
+      continue;
+    } else if (inTable) {
+      flushTable();
+    }
+
+    // Blockquote (> text)
+    if (trimmed.startsWith('>')) {
+      flushList();
+      flushOrderedList();
+      flushTable();
+      blockquoteLines.push(trimmed.replace(/^>\s?/, ''));
+      continue;
+    } else if (blockquoteLines.length > 0) {
+      flushBlockquote();
+    }
+
+    // Unordered List
+    if (line.startsWith('- ') || line.startsWith('* ')) {
+      flushOrderedList();
+      flushTable();
+      flushBlockquote();
+      listItems.push(<li key={key++} className="blog-li">{inlineRender(line.slice(2))}</li>);
+      continue;
+    } else if (listItems.length > 0) {
+      flushList();
+    }
+
+    // Ordered List (1. , 2. )
+    const olMatch = line.match(/^(\d+)\.\s+(.*)$/);
+    if (olMatch) {
+      flushList();
+      flushTable();
+      flushBlockquote();
+      orderedListItems.push(<li key={key++} className="blog-ol-li">{inlineRender(olMatch[2])}</li>);
+      continue;
+    } else if (orderedListItems.length > 0) {
+      flushOrderedList();
+    }
+
+    if (line.startsWith('# ')) {
+      flushAll();
       elements.push(<h2 key={key++} className="blog-h2">{inlineRender(line.slice(2))}</h2>);
     } else if (line.startsWith('## ')) {
-      flushList();
+      flushAll();
       elements.push(<h2 key={key++} className="blog-h2">{inlineRender(line.slice(3))}</h2>);
     } else if (line.startsWith('### ')) {
-      flushList();
+      flushAll();
       elements.push(<h3 key={key++} className="blog-h3">{inlineRender(line.slice(4))}</h3>);
-    } else if (line.startsWith('- ') || line.startsWith('* ')) {
-      listItems.push(<li key={key++} className="blog-li">{inlineRender(line.slice(2))}</li>);
     } else if (line.trim() === '---') {
-      flushList();
+      flushAll();
       elements.push(<hr key={key++} className="blog-hr" />);
     } else if (line.trim() === '') {
-      flushList();
+      flushAll();
     } else {
-      flushList();
+      flushAll();
       elements.push(<p key={key++} className="blog-p">{inlineRender(line)}</p>);
     }
   }
-  flushList();
+
+  flushAll();
   if (inCodeBlock && codeLines.length > 0) {
     elements.push(
       <pre key={key++} className="blog-code-pre">
@@ -178,10 +296,27 @@ function ArticleJsonLd({ post }) {
     ],
   };
 
+  const schemas = [articleSchema, breadcrumbSchema];
+
+  if (post.faq && Array.isArray(post.faq) && post.faq.length > 0) {
+    schemas.push({
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: post.faq.map((item) => ({
+        '@type': 'Question',
+        name: item.question,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: item.answer,
+        },
+      })),
+    });
+  }
+
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify([articleSchema, breadcrumbSchema]) }}
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(schemas) }}
     />
   );
 }
@@ -469,6 +604,94 @@ export default async function BlogPostPage({ params }) {
           .blog-link:hover {
             color: #EFEBE9;
             text-decoration-color: rgba(239, 235, 233, 0.5);
+          }
+
+          /* Table Styles */
+          .blog-table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            margin: 28px 0;
+            border-radius: 8px;
+            border: 1px solid rgba(141, 110, 99, 0.25);
+            background: #140806;
+          }
+
+          .blog-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 14px;
+          }
+
+          .blog-table th {
+            background: rgba(141, 110, 99, 0.18);
+            color: #EFEBE9;
+            padding: 14px 16px;
+            font-weight: bold;
+            border-bottom: 1px solid rgba(141, 110, 99, 0.35);
+            letter-spacing: 0.5px;
+          }
+
+          .blog-table td {
+            padding: 12px 16px;
+            color: #BCAAA4;
+            border-bottom: 1px solid rgba(141, 110, 99, 0.15);
+            line-height: 1.6;
+          }
+
+          .blog-table tr:last-child td {
+            border-bottom: none;
+          }
+
+          .blog-table tr:hover td {
+            background: rgba(141, 110, 99, 0.08);
+          }
+
+          /* Blockquote / AI Snippet Callout */
+          .blog-blockquote {
+            border-left: 3px solid #8D6E63;
+            background: rgba(141, 110, 99, 0.1);
+            padding: 16px 20px;
+            margin: 24px 0;
+            border-radius: 0 8px 8px 0;
+            color: #D7CCC8;
+          }
+
+          .blog-blockquote-p {
+            font-size: 14px;
+            line-height: 1.7;
+            color: #D7CCC8;
+            margin: 0 0 8px 0;
+          }
+
+          .blog-blockquote-p:last-child {
+            margin-bottom: 0;
+          }
+
+          .blog-blockquote-p strong {
+            color: #EFEBE9;
+          }
+
+          /* Ordered List */
+          .blog-ol {
+            padding: 0;
+            margin: 0 0 24px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            list-style-type: decimal;
+            color: #8D6E63;
+          }
+
+          .blog-ol-li {
+            font-size: 15px;
+            color: #BCAAA4;
+            line-height: 1.75;
+            padding-left: 4px;
+          }
+
+          .blog-ol-li strong {
+            color: #EFEBE9;
           }
 
           /* Footer CTA */

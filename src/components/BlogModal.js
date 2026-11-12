@@ -203,6 +203,38 @@ export default function BlogModal({ blog, onClose }) {
           height: auto;
         }
 
+        .markdown-body blockquote {
+          border-left: 3px solid #8D6E63;
+          background-color: rgba(141, 110, 99, 0.08);
+          padding: 10px 14px;
+          margin: 16px 0;
+          border-radius: 0 6px 6px 0;
+          font-style: italic;
+          color: #5D4037;
+        }
+
+        .markdown-body table {
+          width: 100%;
+          border-collapse: collapse;
+          margin: 16px 0;
+          font-size: 13px;
+        }
+
+        .markdown-body th {
+          background-color: rgba(141, 110, 99, 0.12);
+          padding: 8px 12px;
+          border: 1px solid rgba(141, 110, 99, 0.2);
+          text-align: left;
+          font-weight: bold;
+          color: #3E2723;
+        }
+
+        .markdown-body td {
+          padding: 8px 12px;
+          border: 1px solid rgba(141, 110, 99, 0.15);
+          color: #4E342E;
+        }
+
         @media (max-width: 768px) {
           dialog.modal-dialog-root {
             padding: 12px;

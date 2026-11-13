@@ -5,6 +5,14 @@ import ReactMarkdown from 'react-markdown';
 export default function BlogModal({ blog, onClose }) {
   const dialogRef = useRef(null);
 
+  const formattedContent = React.useMemo(() => {
+    if (!blog?.content) return '';
+    // Ensure that each line containing a colon label (e.g. "**Read Time:**", "**Category:**", or any line followed by a label with ":") starts on its own line
+    return blog.content
+      .replace(/([^\n\r]+)\r?\n(\*\*[^*:]+:\*\*)/g, '$1\n\n$2')
+      .replace(/([^\n\r]+)\r?\n([A-Z][a-zA-Z\s]+:\s)/g, '$1\n\n$2');
+  }, [blog?.content]);
+
   useEffect(() => {
     const dialog = dialogRef.current;
     if (dialog && !dialog.open) {
@@ -55,7 +63,7 @@ export default function BlogModal({ blog, onClose }) {
         {/* Modal Body */}
         <div className="modal-body">
           <div className="markdown-body">
-            <ReactMarkdown>{blog.content}</ReactMarkdown>
+            <ReactMarkdown>{formattedContent}</ReactMarkdown>
           </div>
         </div>
       </div>

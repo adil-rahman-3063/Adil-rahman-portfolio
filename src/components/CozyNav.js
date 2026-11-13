@@ -1,18 +1,19 @@
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
 
-const labels = [
-  'HOME',
-  'ABOUT',
-  'EXPERIENCE',
-  'SKILLS',
-  'WORK ARCHIVE',
-  'TOOLS',
-  'WORKSPACE',
-  'BLOG',
-  'REVIEWS',
-  'NETWORK',
-  'CONTACT',
+const navItems = [
+  { label: 'HOME', sectionIndex: 0 },
+  { label: 'ABOUT', sectionIndex: 1 },
+  { label: 'EXPERIENCE', sectionIndex: 2 },
+  { label: 'SKILLS', sectionIndex: 3 },
+  { label: 'WORK ARCHIVE', sectionIndex: 4 },
+  { label: 'TOOLS', href: '/tools', sectionIndex: 5 },
+  { label: 'WORKSPACE', sectionIndex: 6 },
+  { label: 'BLOG', href: '/blog', sectionIndex: 7 },
+  { label: 'REVIEWS', href: '/reviews', sectionIndex: 8 },
+  { label: 'NETWORK', sectionIndex: 9 },
+  { label: 'CONTACT', sectionIndex: 10 },
 ];
 
 export default function CozyNav({ currentIndex, onTap }) {
@@ -92,7 +93,7 @@ export default function CozyNav({ currentIndex, onTap }) {
   const handleContactClick = (e) => {
     e.preventDefault();
     setIsVisible(true);
-    onTap(labels.length - 1);
+    onTap(navItems.length - 1);
   };
 
   return (
@@ -113,7 +114,7 @@ export default function CozyNav({ currentIndex, onTap }) {
           </div>
 
           <div className="nav-links">
-            {labels.slice(0, -1).map((label, idx) => {
+            {navItems.slice(0, -1).map((item, idx) => {
               const isActive = currentIndex === idx;
               const isHovered = hoveredIndex === idx;
 
@@ -121,16 +122,35 @@ export default function CozyNav({ currentIndex, onTap }) {
               if (isActive) color = '#FAF6EE'; // CozyTheme.paperCream
               else if (isHovered) color = '#8C7355'; // CozyTheme.accentGold
 
+              if (item.href) {
+                return (
+                  <Link
+                    key={item.label}
+                    href={item.href}
+                    onMouseEnter={() => setHoveredIndex(idx)}
+                    onMouseLeave={() => setHoveredIndex(null)}
+                    className="nav-link-btn"
+                    style={{ color }}
+                  >
+                    <span className="link-text">{item.label}</span>
+                    <div
+                      className="active-line"
+                      style={{ width: isActive ? '16px' : '0' }}
+                    />
+                  </Link>
+                );
+              }
+
               return (
                 <button
-                  key={label}
-                  onClick={() => handleNavClick(idx)}
+                  key={item.label}
+                  onClick={() => handleNavClick(item.sectionIndex)}
                   onMouseEnter={() => setHoveredIndex(idx)}
                   onMouseLeave={() => setHoveredIndex(null)}
                   className="nav-link-btn"
                   style={{ color }}
                 >
-                  <span className="link-text">{label}</span>
+                  <span className="link-text">{item.label}</span>
                   <div
                     className="active-line"
                     style={{ width: isActive ? '16px' : '0' }}
@@ -149,7 +169,7 @@ export default function CozyNav({ currentIndex, onTap }) {
       {/* Mobile Navigation */}
       <nav className={`mobile-nav ${isVisible ? 'nav-visible' : 'nav-hidden'}`}>
         <div className="mobile-nav-container">
-          {labels.map((label, idx) => {
+          {navItems.map((item, idx) => {
             const isActive = currentIndex === idx;
             const isHovered = hoveredIndex === idx;
 
@@ -157,16 +177,35 @@ export default function CozyNav({ currentIndex, onTap }) {
             if (isActive) color = '#FAF6EE';
             else if (isHovered) color = '#8C7355';
 
+            if (item.href) {
+              return (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  onMouseEnter={() => setHoveredIndex(idx)}
+                  onMouseLeave={() => setHoveredIndex(null)}
+                  className="mobile-nav-link-btn"
+                  style={{ color }}
+                >
+                  <span>{item.label}</span>
+                  <div
+                    className="active-line"
+                    style={{ width: isActive ? '12px' : '0' }}
+                  />
+                </Link>
+              );
+            }
+
             return (
               <button
-                key={label}
-                onClick={() => handleNavClick(idx)}
+                key={item.label}
+                onClick={() => handleNavClick(item.sectionIndex)}
                 onMouseEnter={() => setHoveredIndex(idx)}
                 onMouseLeave={() => setHoveredIndex(null)}
                 className="mobile-nav-link-btn"
                 style={{ color }}
               >
-                <span>{label}</span>
+                <span>{item.label}</span>
                 <div
                   className="active-line"
                   style={{ width: isActive ? '12px' : '0' }}
@@ -272,6 +311,11 @@ export default function CozyNav({ currentIndex, onTap }) {
           transition: color 0.2s;
           white-space: nowrap;
           flex-shrink: 0;
+          text-decoration: none;
+        }
+
+        .nav-link-btn:visited {
+          color: inherit;
         }
 
         .active-line {
@@ -431,6 +475,11 @@ export default function CozyNav({ currentIndex, onTap }) {
           align-items: center;
           gap: 4px;
           flex-shrink: 0;
+          text-decoration: none;
+        }
+
+        .mobile-nav-link-btn:visited {
+          color: inherit;
         }
       `}</style>
     </>

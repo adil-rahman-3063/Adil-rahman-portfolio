@@ -1,5 +1,303 @@
 export const allBlogs = [
   {
+    id: 'homeflix-background-transcoding-engine',
+    title: 'Building a Continuous Background Transcoding Engine for Homeflix: Priority Preemption & Streaming Architecture',
+    seoTitle: 'Homeflix: Background Transcoding Engine | Adil Rahman',
+    date: 'November 14, 2026',
+    readTime: '9 min read',
+    excerpt: 'How we engineered a background transcoding queue with priority preemption, Series Hub UI, and Chocolatey ffmpeg fixes for open-source media server Homeflix.',
+    faq: [
+      {
+        question: 'How does continuous background transcoding eliminate media streaming lag?',
+        answer: 'By proactively detecting non-direct-playable media containers (like MKV or multi-channel DTS/AC3 audio) and converting them to universal MP4/AAC in the background before the user hits play, the client can direct-stream files instantly without cold-start CPU spikes.'
+      },
+      {
+        question: 'What happens when a user plays a file while another is transcoding in the background?',
+        answer: 'The engine uses priority preemption. It gracefully sends SIGTERM (with a SIGKILL fallback) to the active FFmpeg background process, cleans up incomplete temporary chunks, promotes the user-selected media to #1 priority, and schedules the preempted item to resume later.'
+      },
+      {
+        question: 'How does the Homeflix Windows installer bundle standalone FFmpeg binaries without Chocolatey shims?',
+        answer: 'Chocolatey creates small wrapper stub executables (.exe shims) in ProgramData that depend on relative paths. The build script inspects and bypasses the shim, pulling true standalone FFmpeg binaries directly from chocolatey/lib/ffmpeg/tools/ffmpeg/bin into the NSIS Electron bundle.'
+      }
+    ],
+    content: `**Category:** Open Source / Distributed Media Streaming / Systems & Full-Stack Engineering
+
+**Read Time:** ~9 mins
+
+**Open Source Pull Request:** [github.com/kprakz/homeflix/pull/8](https://github.com/kprakz/homeflix/pull/8)
+
+**Forked Feature Branch:** [github.com/adil-rahman-3063/homeflix](https://github.com/adil-rahman-3063/homeflix/tree/feature/ui-and-background-queue)
+
+> **Quick Answer (AI / Snippet Block):**  
+> An open-source contribution to Homeflix introduces a continuous background video transcoding engine that eliminates on-the-fly playback lag. Using a priority preemption lifecycle (\`SIGTERM\`/\`SIGKILL\`), sequential series queuing, and regex scene parsing, unconverted media is pre-cached to MP4/AAC before playback, with user requests immediately elevated to #1 priority.
+
+---
+
+## Table of Contents
+1. [The Problem: The Flaws of On-The-Fly Transcoding](#the-problem-the-flaws-of-on-the-fly-transcoding)
+2. [Architectural Overview: Proactive Event-Driven Transcoding](#architectural-overview-proactive-event-driven-transcoding)
+3. [Deep Dive: Priority Preemption Lifecycle (\`SIGTERM\` & Safe Eviction)](#deep-dive-priority-preemption-lifecycle-sigterm--safe-eviction)
+4. [Sequential Conversion Queue Hierarchy](#sequential-conversion-queue-hierarchy)
+5. [Media Parsing Engine: Regex Extraction for Scene & P2P Standards](#media-parsing-engine-regex-extraction-for-scene--p2p-standards)
+6. [Front-End Overhaul: Series Hub, Floating Dashboard & Accessible HUD](#front-end-overhaul-series-hub-floating-dashboard--accessible-hud)
+7. [Windows Packaging & Resolving the Chocolatey FFmpeg Shim Bug](#windows-packaging--resolving-the-chocolatey-ffmpeg-shim-bug)
+8. [How to Clone, Build, and Run the Windows Installer Locally](#how-to-clone-build-and-run-the-windows-installer-locally)
+9. [Frequently Asked Questions (FAQ)](#frequently-asked-questions-faq)
+
+---
+
+## The Problem: The Flaws of On-The-Fly Transcoding
+
+Traditional self-hosted media servers (such as Plex or Jellyfin on lower-tier hardware) rely heavily on **just-in-time / on-the-fly transcoding**. When a user requests an incompatible file (e.g., an \`.mkv\` container, HEVC 10-bit video, or multi-channel DTS audio on a web client), the server spawns an active FFmpeg worker:
+
+- **Playback Start Latency:** The client waits 5 to 15 seconds while FFmpeg builds the initial streaming segments.
+- **CPU Spikes & Thermal Throttling:** Real-time transcoding pegs the host CPU at 100%, choking concurrent streams on the local network.
+- **Wasted Compute on Abandoned Streams:** If a user clicks away after 30 seconds, CPU cycles spent on real-time rendering are completely discarded.
+
+### Comparison: On-The-Fly vs. Proactive Background Engine
+
+| Metric | On-The-Fly Transcoding | Continuous Background Engine |
+| :--- | :--- | :--- |
+| **Playback Start Latency** | 5 to 15 seconds initial delay | **< 200 ms (Instant direct-stream)** |
+| **CPU Peak Spikes** | 90–100% load during playback | **Throttled background worker** |
+| **Multi-Device Concurrency** | Max 1–2 concurrent streams | **Zero server transcoding bottleneck** |
+| **Interrupted Sessions** | Wasted CPU cycles | **Resumable serialized queue with preemption** |
+
+---
+
+## Architectural Overview: Proactive Event-Driven Transcoding
+
+To eliminate cold-start buffering, I re-architected Homeflix to convert files ahead of time. The host server proactively traverses media directories and converts unsupported containers into browser-compatible H.264/AAC MP4 files cached locally.
+
+\`\`\`text
+[Media Library Scanner]
+        │
+        ▼
+[Sequential Queue Dispatcher]
+        │
+   ┌────┴──────────────────────────────────────┐
+   │ 1. Filter: Direct-stream bypass (.mp4)    │
+   │ 2. Evaluate Conversion Hierarchy          │
+   │ 3. Check Active Playback Streams          │
+   └────┬──────────────────────────────────────┘
+        │
+        ▼
+[FFmpeg Background Worker Thread]
+        │
+   ┌────┴──────────────────────────────────────┐
+   │ - Continuous transcode to .cache/         │
+   │ - Telemetry updates (speed, ETA, size)    │
+   └────┬──────────────────────────────────────┘
+        │ (User clicks "Play" on another video)
+        ▼
+[Priority Preemption Interceptor]
+        ├──> Send SIGTERM to active worker
+        ├──> Purge partial .part artifacts
+        ├──> Promote user-selected file to #1 Priority
+        └──> Re-enqueue preempted item to resume next
+\`\`\`
+
+---
+
+## Deep Dive: Priority Preemption Lifecycle (\`SIGTERM\` & Safe Eviction)
+
+The primary challenge with background transcoding is resource competition: if the server is already busy encoding a background movie and a user clicks **Play** on an unconverted episode, running two concurrent FFmpeg jobs would choke the CPU.
+
+To solve this, I designed an atomic priority preemption lifecycle:
+
+\`\`\`javascript
+// server.js - Priority Preemption Handler
+function preemptActiveConversion(nextPriorityId) {
+  if (!activeConversion || !activeConversion.process) return;
+
+  const currentItem = activeConversion.item;
+  console.log(\`[Queue] Preempting active item: \${currentItem.id} for priority item: \${nextPriorityId}\`);
+
+  // 1. Mark as preempted so cleanup does not mark as failed
+  activeConversion.preempted = true;
+
+  // 2. Graceful termination with SIGTERM
+  activeConversion.process.kill('SIGTERM');
+
+  // 3. Fallback SIGKILL watchdog if process does not exit within 2000ms
+  const killTimeout = setTimeout(() => {
+    if (activeConversion && activeConversion.process) {
+      console.warn(\`[Queue] Force killing unresponsive process: \${currentItem.id}\`);
+      activeConversion.process.kill('SIGKILL');
+    }
+  }, 2000);
+
+  // 4. Safely clean up partial unfinalized temporary files
+  cleanPartialCache(currentItem.tempPath);
+
+  // 5. Place preempted item back at the head of the resume queue
+  requeuePreemptedItem(currentItem);
+}
+\`\`\`
+
+By cleaning up temporary \`.part\` buffers immediately, we prevent disk corruption while guaranteeing that user-initiated playback requests receive 100% of available CPU headroom within milliseconds.
+
+---
+
+## Sequential Conversion Queue Hierarchy
+
+The queue engine implements a deterministic 5-tier scheduling hierarchy:
+
+1. **User-Prioritized File:** Immediate absolute priority via \`POST /api/queue/prioritize\`. Preempts any background worker.
+2. **Selected Series Cohort:** When a user opens a TV show hub, all remaining episodes of that specific series are elevated in chronological order (\`S01E01\`, \`S01E02\`, \`S01E03\`...) ahead of generic media.
+3. **Resumed Items:** Tasks that were previously preempted or paused resume their transcode.
+4. **Movies Ordered by Newest Addition:** Recently added films are prioritized over archival titles.
+5. **Series Ordered by Season/Episode:** Bulk library series convert sequentially.
+
+### Direct-Stream Bypass
+Universal \`.mp4\` files with standard AAC audio are filtered with \`mode: direct\`. This bypass prevents the engine from needlessly transcoding already-compatible containers, eliminating preemption loops and unnecessary disk writes.
+
+---
+
+## Media Parsing Engine: Regex Extraction for Scene & P2P Standards
+
+Media library files downloaded via P2P networks or Telegram groups typically arrive with chaotic release strings (e.g., \`Show.Title.S01E02.720p.HEVC.x265-GROUP.mkv\`).
+
+I overhauled the \`prettyName\` extraction engine with resilient regex pattern matchers:
+
+\`\`\`javascript
+function parseMediaMetadata(filename) {
+  // Extract Show Title, Season, Episode from scene strings
+  const tvMatch = filename.match(/^(.*?)[.\s_-]+S(\d{1,2})[.\s_-]*E(\d{1,2})/i);
+  if (tvMatch) {
+    const rawTitle = tvMatch[1].replace(/[._-]/g, ' ').trim();
+    const season = parseInt(tvMatch[2], 10);
+    const episode = parseInt(tvMatch[3], 10);
+    return {
+      type: 'series',
+      title: rawTitle,
+      season: season,
+      episode: episode,
+      label: \`S\${String(season).padStart(2, '0')}:E\${String(episode).padStart(2, '0')}\`
+    };
+  }
+
+  // Fallback: Movie title and 4-digit release year
+  const movieMatch = filename.match(/^(.*?)[.\s_(\[]+(19\d{2}|20\d{2})/);
+  if (movieMatch) {
+    return {
+      type: 'movie',
+      title: movieMatch[1].replace(/[._-]/g, ' ').trim(),
+      year: parseInt(movieMatch[2], 10)
+    };
+  }
+
+  return { type: 'unknown', title: filename.replace(/\.[^/.]+$/, '') };
+}
+\`\`\`
+
+---
+
+## Front-End Overhaul: Series Hub, Floating Dashboard & Accessible HUD
+
+Beyond the backend streaming pipeline, I executed a complete redesign of the Homeflix interface (\`public/index.html\`):
+
+1. **Multi-View Tabbed Routing:**
+   - **Home:** Dynamic hero banner showcasing active titles with instant Play/Resume action, plus horizontally scrollable rows (*Continue Watching*, *Recently Added*, *TV Shows*, *Movies*).
+   - **TV Shows & Movies Catalogues:** Strict separation between serialized shows and standalone movies with real-time sorting (*Recently Added*, *A-Z*, *Year*, *File Size*).
+
+2. **Dedicated Series Hub Modal (\`#showModal\`):**
+   - Dynamic season tabs (\`Season 1\`, \`Season 2\`...).
+   - High-resolution episode grid featuring automated video thumbnail generation, runtime badges, file size markers, and individual playback progress indicators.
+   - Intelligent "Next Up" resolution: automatically opens the next uncompleted episode when clicking the primary Play button.
+
+3. **Floating Converter Dashboard (\`#convWidget\`):**
+   - Bottom-corner floating widget with an active status LED indicator (Idle, Active, Paused).
+   - Real-time telemetry: conversion progress percentage, speed multiplier (e.g., \`3.4x\`), and remaining ETA countdown.
+   - Disk cache storage meter displaying cache usage vs. remaining free drive space.
+   - Full queue management: "Make Next" priority buttons and pause/resume controls.
+   - Automatically hides when the video player launches to prevent visual distraction.
+
+4. **Modern Accessible Video Player HUD:**
+   - Smooth scrubber with hover timestamp preview tooltip.
+   - Audio track switcher, subtitle CC picker sheet, and audio boost toggle.
+   - Complete keyboard shortcuts (\`Space\`/\`k\` for play/pause, \`Left\`/\`Right\`/\`j\`/\`l\` for seek, \`m\` for mute, \`f\` for fullscreen) and TV remote D-pad focus navigation.
+
+---
+
+## Windows Packaging & Resolving the Chocolatey FFmpeg Shim Bug
+
+When packaging the Electron desktop application for Windows using \`electron-builder\` and NSIS, the production build consistently failed on machines without a system-wide Chocolatey installation.
+
+### The Root Cause
+On Windows, Chocolatey does not place raw executable binaries into \`C:\\ProgramData\\chocolatey\\bin\\ffmpeg.exe\`. Instead, it generates a **70 KB executable shim stub** that depends on relative path resolutions to launch the actual engine. When bundled into an NSIS installer, the shim broke because the parent Chocolatey directory was missing.
+
+### The Fix in \`scripts/get-ffmpeg.mjs\`
+I updated the binary resolution script to detect Chocolatey shim stubs and resolve the true standalone binary directly from the vendor directory:
+
+\`\`\`javascript
+// scripts/get-ffmpeg.mjs
+import fs from 'fs';
+import path from 'path';
+
+export function resolveWindowsFFmpeg() {
+  const chocoBin = 'C:\\ProgramData\\chocolatey\\bin\\ffmpeg.exe';
+  const chocoVendor = 'C:\\ProgramData\\chocolatey\\lib\\ffmpeg\\tools\\ffmpeg\\bin\\ffmpeg.exe';
+
+  // If the target is a shim, bypass it and point to the true standalone binary
+  if (fs.existsSync(chocoVendor)) {
+    console.log('[Build] Bypassing Chocolatey shim, packaging true binary:', chocoVendor);
+    return chocoVendor;
+  }
+
+  return chocoBin;
+}
+\`\`\`
+
+This produced a self-contained, standalone Windows installer (\`dist/HOMEFLIX-Setup-1.5.0.exe\`, ~170 MB) that bundles native FFmpeg binaries and runs out of the box with zero third-party dependencies.
+
+---
+
+## How to Clone, Build, and Run the Windows Installer Locally
+
+You can test and run this complete feature branch directly from the forked repository.
+
+### Open Source Links
+- **Upstream Pull Request:** [github.com/kprakz/homeflix/pull/8](https://github.com/kprakz/homeflix/pull/8)
+- **Forked Repository Branch:** [github.com/adil-rahman-3063/homeflix/tree/feature/ui-and-background-queue](https://github.com/adil-rahman-3063/homeflix/tree/feature/ui-and-background-queue)
+
+### Step-by-Step Build Instructions
+
+\`\`\`bash
+# 1. Clone the specific feature branch
+git clone -b feature/ui-and-background-queue https://github.com/adil-rahman-3063/homeflix.git
+
+# 2. Navigate to the project root
+cd homeflix
+
+# 3. Install dependencies
+npm install
+
+# 4. Build the standalone Windows installer
+npm run dist
+
+# 5. Open the dist folder in File Explorer
+cd dist
+explorer .
+\`\`\`
+
+Once File Explorer opens, double-click **\`HOMEFLIX-Setup-1.5.0.exe\`** to run the installer. The app will launch the streaming server, initialize your local media folder, and launch the new tabbed UI with continuous background conversion ready.
+
+---
+
+## Frequently Asked Questions (FAQ)
+
+### Can Homeflix run on low-power devices like Raspberry Pi or mini PCs?
+Yes. Because the background conversion queue operates at a lower process priority and preempts when playback begins, low-power devices avoid CPU thermal throttling and stream universal MP4 files smoothly.
+
+### What happens if the server is powered off during an active conversion?
+The server stores conversion states in memory and writes temporary segments to a \`.part\` file. On boot, Homeflix purges incomplete \`.part\` files and re-queues the unconverted master file automatically.
+
+### Does Homeflix support hardware acceleration (NVENC / QuickSync)?
+The underlying FFmpeg wrapper supports hardware flags. When configured in \`server.js\`, compatible host GPUs can accelerate background transcoding speeds from \`3.4x\` to upwards of \`12x\` realtime.
+`
+  },
+  {
     id: 'whatsapp-automation-google-sheets-case-study',
     title: 'How to Build an Automated WhatsApp & Google Sheets Attendance System with Real-Time Error Alerts',
     seoTitle: 'WhatsApp Automation with Google Sheets & Apps Script | Adil Rahman',
@@ -21,6 +319,7 @@ export const allBlogs = [
       }
     ],
     content: `**Category:** DevOps & Automation / Messaging Architecture / Google Apps Script
+
 **Read Time:** ~8 mins
 
 > **Quick Answer (AI / Snippet Block):**  
@@ -232,6 +531,7 @@ The system checks the master sheet. If no match is found, it logs the attempt to
     readTime: '7 min read',
     excerpt: 'Build a real-time GitHub-style world visitor map with zero cookies or tracking using Cloudflare edge headers, Supabase atomic counters, and Next.js.',
     content: `**Category:** Frontend Graphics / Edge Architecture / Privacy Engineering
+
 **Read Time:** ~7 mins
 
 ## Introduction: The Spark of Inspiration
@@ -493,6 +793,7 @@ You can see this live on the [Adil Rahman Portfolio](https://adilrahman.cc) in t
     readTime: '6 min read',
     excerpt: 'Why local builds on Windows succeed while Cloudflare Pages Linux CI crashes with npm ci EUSAGE errors on Wasm packages—and how to fix package-lock.json parity.',
     content: `**Category:** DevOps / Edge Deployment / Node.js Tooling
+
 **Read Time:** ~6 mins
 
 ## Introduction: The "Green on Local, Red on CI" Mystery
@@ -656,6 +957,7 @@ If this passes locally inside a Linux container, it is mathematically guaranteed
     readTime: '5 min read',
     excerpt: 'Step-by-step checklist to migrate a local SQLite app to production Supabase PostgreSQL and Railway, with connection pooling and secure deployment.',
     content: `**Category:** DevOps / Database Engineering / Deployment Architecture
+
 **Read Time:** ~5 mins
 
 ## Introduction: The "Works on Localhost" Dilemma
@@ -752,6 +1054,7 @@ The proxy intercepts all calls to \`https://<project>.pages.dev/api/*\` and tran
     readTime: '5 min read',
     excerpt: "How I built a chronological 50% cold storage engine using Google Sheets to keep multi-tenant SaaS Postgres databases lean, fast, and 100% free.",
     content: `**Category:** SaaS Architecture / PostgreSQL / Cloud Storage
+
 **Read Time:** ~5 mins
 
 ## The Problem: The Hidden Cost of Chatty SaaS Data
@@ -847,6 +1150,7 @@ I built a dedicated restoration bridge (\`/api/data/restore-member\`):
     readTime: '4 min read',
     excerpt: "How a quick hack to bypass a broken iPhone camera module led to a deep dive into WebRTC hardware constraints—and an accidental fix for the root issue.",
     content: `**Category:** Tech Adventures / Mobile Exploration
+
 **Read Time:** ~4 mins
 
 ## Introduction: The $0 Hardware Glitch

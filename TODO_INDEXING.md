@@ -18,6 +18,13 @@ This checklist separates **brand-new URLs** that need manual indexing from **alr
 
 These URLs were newly created or published recently and require an initial manual crawl request in GSC:
 
+- [ ] `https://adilrahman.cc/blog/homeflix-background-transcoding-engine`
+  - **Type**: New Open-Source Engineering Blog Post (Published Nov 14, 2026)
+  - **Target Keywords**: *Homeflix background transcoding, priority preemption media server, self-hosted streaming server FFmpeg*
+- [x] `https://adilrahman.cc/blog/whatsapp-automation-google-sheets-case-study`
+  - **Type**: New Technical Blog Post (Published Nov 12, 2026)
+  - **Target Keywords**: *WhatsApp automation Google Sheets, LockService Apps Script, automated attendance system*
+
 - [x] `https://adilrahman.cc/blog/zero-cookie-visitor-map-cloudflare-supabase`
   - **Type**: New Technical Blog Post (Published Nov 10, 2026)
   - **Target Keywords**: *zero-cookie visitor map, Cloudflare edge Supabase map, Next.js country telemetry*

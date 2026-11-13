@@ -34,7 +34,7 @@ export default function BlogSection({ onBlogClick }) {
       </div>
 
       <div className="blogs-list">
-        {allBlogs.map((blog) => (
+        {allBlogs.slice(0, 5).map((blog) => (
           <div
             key={blog.id}
             onClick={() => onBlogClick?.(blog)}
@@ -70,6 +70,14 @@ export default function BlogSection({ onBlogClick }) {
           </div>
         ))}
       </div>
+
+      {allBlogs.length > 5 && (
+        <div className="blog-more-container">
+          <Link href="/blog" className="blog-more-btn">
+            Read More on Blog ({allBlogs.length} Articles) →
+          </Link>
+        </div>
+      )}
 
       <style jsx global>{`
         .blogs-list {
@@ -183,6 +191,41 @@ export default function BlogSection({ onBlogClick }) {
         .blog-direct-link:hover {
           background: #8D6E63;
           color: #FAF6EE !important;
+        }
+
+        .blog-more-container {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          width: 100%;
+          margin-top: 32px;
+        }
+
+        .blog-more-btn,
+        .blog-more-btn:visited {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          font-family: var(--font-mono);
+          font-size: 13px;
+          font-weight: bold;
+          color: #FAF6EE !important;
+          background-color: #231513;
+          border: 1.5px solid #8D6E63;
+          padding: 12px 28px;
+          border-radius: 30px;
+          text-decoration: none !important;
+          letter-spacing: 0.5px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+          transition: transform 0.2s, background-color 0.2s, border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .blog-more-btn:hover {
+          background-color: #8D6E63;
+          color: #FAF6EE !important;
+          border-color: #FAF6EE;
+          transform: translateY(-2px);
+          box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
         }
       `}</style>
     </section>

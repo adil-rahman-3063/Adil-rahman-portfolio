@@ -18,7 +18,10 @@ This checklist separates **brand-new URLs** that need manual indexing from **alr
 
 These URLs were newly created or published recently and require an initial manual crawl request in GSC:
 
-- [ ] `https://adilrahman.cc/blog/homeflix-background-transcoding-engine`
+- [ ] `https://adilrahman.cc/blog/in-browser-video-to-mp3-web-audio-api`
+  - **Type**: New Web Audio Systems Blog Post (Published Nov 15, 2026)
+  - **Target Keywords**: *in-browser video to mp3, Web Audio API decodeAudioData, client-side MP3 encoding lamejs, lossless WAV encoder*
+- [x] `https://adilrahman.cc/blog/homeflix-background-transcoding-engine`
   - **Type**: New Open-Source Engineering Blog Post (Published Nov 14, 2026)
   - **Target Keywords**: *Homeflix background transcoding, priority preemption media server, self-hosted streaming server FFmpeg*
 - [x] `https://adilrahman.cc/blog/whatsapp-automation-google-sheets-case-study`

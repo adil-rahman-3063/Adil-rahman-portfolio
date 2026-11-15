@@ -434,7 +434,7 @@ export default function Home() {
         /* Modern Web Guidance: Defer off-screen section layout/paint with intrinsic size placeholder */
         .section-wrapper.section-deferred {
           content-visibility: auto;
-          contain-intrinsic-size: auto none auto 600px;
+          contain-intrinsic-size: 1px 700px;
         }
 
         .hero-wrapper {

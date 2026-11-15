@@ -85,7 +85,7 @@ export const metadata = {
       "Hire Adil Rahman — 5.0★ verified full-stack, Flutter & Shopify developer. Fast 1-3 week MVP delivery, clean code & high-converting storefronts. Get a free quote.",
     images: [
       {
-        url: "/assets/og-image.png",
+        url: `${SITE_URL}/assets/og-image.png`,
         width: 1200,
         height: 630,
         alt: "Adil Rahman — Full-Stack, Flutter & Shopify Developer",
@@ -99,7 +99,7 @@ export const metadata = {
     title: "Freelance Full-Stack, Flutter & Shopify Developer | Adil Rahman",
     description:
       "Hire Adil Rahman — 5.0★ verified full-stack, Flutter & Shopify developer. 1-3 week MVP delivery. Fast turnaround & high-converting stores.",
-    images: ["/assets/og-image.png"],
+    images: [`${SITE_URL}/assets/og-image.png`],
     creator: "@adilrahmanms",
   },
 };

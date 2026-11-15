@@ -162,7 +162,7 @@ export default function HeroSection({ onAccessProjects, onContactMe, onGetQuote,
               fetchPriority="high"
               width="420"
               height="560"
-              decoding="async"
+              decoding="sync"
             />
           </div>
 

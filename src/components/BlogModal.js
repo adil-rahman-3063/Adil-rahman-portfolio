@@ -1,17 +1,9 @@
 'use client';
 import React, { useEffect, useRef } from 'react';
-import ReactMarkdown from 'react-markdown';
+import { renderMarkdown } from '../lib/renderMarkdown';
 
 export default function BlogModal({ blog, onClose }) {
   const dialogRef = useRef(null);
-
-  const formattedContent = React.useMemo(() => {
-    if (!blog?.content) return '';
-    // Ensure that each line containing a colon label (e.g. "**Read Time:**", "**Category:**", or any line followed by a label with ":") starts on its own line
-    return blog.content
-      .replace(/([^\n\r]+)\r?\n(\*\*[^*:]+:\*\*)/g, '$1\n\n$2')
-      .replace(/([^\n\r]+)\r?\n([A-Z][a-zA-Z\s]+:\s)/g, '$1\n\n$2');
-  }, [blog?.content]);
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -63,7 +55,7 @@ export default function BlogModal({ blog, onClose }) {
         {/* Modal Body */}
         <div className="modal-body">
           <div className="markdown-body">
-            <ReactMarkdown>{formattedContent}</ReactMarkdown>
+            {renderMarkdown(blog?.content)}
           </div>
         </div>
       </div>
@@ -221,26 +213,113 @@ export default function BlogModal({ blog, onClose }) {
           color: #5D4037;
         }
 
-        .markdown-body table {
+        .markdown-body table,
+        .markdown-body .blog-table {
           width: 100%;
           border-collapse: collapse;
-          margin: 16px 0;
+          margin: 0;
           font-size: 13px;
         }
 
-        .markdown-body th {
-          background-color: rgba(141, 110, 99, 0.12);
-          padding: 8px 12px;
+        .markdown-body .blog-table-wrapper {
+          width: 100%;
+          overflow-x: auto;
+          margin: 20px 0;
+          border-radius: 8px;
           border: 1px solid rgba(141, 110, 99, 0.2);
+          background: #FAF6EE;
+        }
+
+        .markdown-body th,
+        .markdown-body .blog-table th {
+          background-color: rgba(141, 110, 99, 0.15);
+          padding: 10px 14px;
+          border-bottom: 2px solid rgba(141, 110, 99, 0.25);
           text-align: left;
           font-weight: bold;
           color: #3E2723;
         }
 
-        .markdown-body td {
-          padding: 8px 12px;
-          border: 1px solid rgba(141, 110, 99, 0.15);
+        .markdown-body td,
+        .markdown-body .blog-table td {
+          padding: 10px 14px;
+          border-bottom: 1px solid rgba(141, 110, 99, 0.15);
           color: #4E342E;
+        }
+
+        .markdown-body .blog-table tr:last-child td {
+          border-bottom: none;
+        }
+
+        .markdown-body .blog-p {
+          margin-bottom: 16px;
+        }
+
+        .markdown-body .blog-h2,
+        .markdown-body .blog-h3 {
+          font-family: var(--font-header);
+          color: #3E2723;
+          margin-top: 24px;
+          margin-bottom: 12px;
+          border-bottom: 1px solid rgba(141, 110, 99, 0.15);
+          padding-bottom: 6px;
+        }
+
+        .markdown-body .blog-list,
+        .markdown-body .blog-ol {
+          margin-bottom: 16px;
+          padding-left: 24px;
+        }
+
+        .markdown-body .blog-li,
+        .markdown-body .blog-ol-li {
+          margin-bottom: 8px;
+          color: #4E342E;
+        }
+
+        .markdown-body .blog-inline-code {
+          background-color: rgba(141, 110, 99, 0.1);
+          color: #8D6E63;
+          padding: 2px 6px;
+          border-radius: 4px;
+          font-family: monospace;
+          font-size: 13px;
+        }
+
+        .markdown-body .blog-code-pre {
+          background-color: #231513;
+          color: #FAF6EE;
+          padding: 16px 20px;
+          border-radius: 8px;
+          overflow-x: auto;
+          margin: 18px 0;
+          font-size: 12.5px;
+          line-height: 1.6;
+        }
+
+        .markdown-body .blog-link {
+          color: #8D6E63;
+          text-decoration: underline;
+          font-weight: bold;
+        }
+        .markdown-body .blog-link:hover {
+          color: #3E2723;
+        }
+
+        .markdown-body .blog-blockquote {
+          border-left: 3px solid #8D6E63;
+          background-color: rgba(141, 110, 99, 0.08);
+          padding: 12px 18px;
+          margin: 20px 0;
+          border-radius: 0 8px 8px 0;
+          color: #5D4037;
+        }
+
+        .markdown-body .blog-blockquote-p {
+          margin-bottom: 8px;
+        }
+        .markdown-body .blog-blockquote-p:last-child {
+          margin-bottom: 0;
         }
 
         @media (max-width: 768px) {

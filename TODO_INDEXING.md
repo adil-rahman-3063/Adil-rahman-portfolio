@@ -18,7 +18,7 @@ This checklist separates **brand-new URLs** that need manual indexing from **alr
 
 These URLs were newly created or published recently and require an initial manual crawl request in GSC:
 
-- [ ] `https://adilrahman.cc/blog/in-browser-video-to-mp3-web-audio-api`
+- [x] `https://adilrahman.cc/blog/in-browser-video-to-mp3-web-audio-api`
   - **Type**: New Web Audio Systems Blog Post (Published Nov 15, 2026)
   - **Target Keywords**: *in-browser video to mp3, Web Audio API decodeAudioData, client-side MP3 encoding lamejs, lossless WAV encoder*
 - [x] `https://adilrahman.cc/blog/homeflix-background-transcoding-engine`

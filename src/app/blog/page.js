@@ -208,13 +208,11 @@ export default function BlogIndexPage() {
       />
 
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
-
         .blog-index-page {
           min-height: 100vh;
           background: linear-gradient(180deg, #1A0A08 0%, #231513 100%);
           color: #EFEBE9;
-          font-family: 'Special Elite', monospace;
+          font-family: var(--font-header), 'Special Elite', monospace;
         }
 
         .blog-nav {

@@ -30,7 +30,7 @@ export default function LoadingScreen() {
     // 3. Initiate fade-out after brief branding reveal
     const fadeTimer = setTimeout(() => {
       setPhase('fade');
-    }, 250);
+    }, 80);
 
     // 4. Failsafe timeout in case transitionend does not fire (e.g. background tab)
     const failsafeTimer = setTimeout(() => {

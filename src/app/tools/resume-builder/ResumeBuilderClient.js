@@ -6,6 +6,36 @@ import ResumeGuideModal from '../../../components/ResumeGuideModal';
 import SiteFooter from '../../../components/SiteFooter';
 
 export default function ResumeBuilderClient() {
+  const [showMobileNotice, setShowMobileNotice] = React.useState(false);
+  const [copiedLink, setCopiedLink] = React.useState(false);
+
+  React.useEffect(() => {
+    try {
+      const isMobile = window.innerWidth <= 768 || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+      const dismissed = sessionStorage.getItem('ats_builder_mobile_notice_dismissed');
+      if (isMobile && !dismissed) {
+        setShowMobileNotice(true);
+      }
+    } catch (err) {}
+  }, []);
+
+  const handleDismiss = () => {
+    try {
+      sessionStorage.setItem('ats_builder_mobile_notice_dismissed', '1');
+    } catch (err) {}
+    setShowMobileNotice(false);
+  };
+
+  const handleCopyLink = () => {
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(window.location.href);
+        setCopiedLink(true);
+        setTimeout(() => setCopiedLink(false), 2500);
+      }
+    } catch (err) {}
+  };
+
   React.useEffect(() => {
     function handleMessage(e) {
       if (e.data && e.data.type === 'RESUME_IFRAME_HEIGHT' && e.data.height) {
@@ -182,6 +212,51 @@ export default function ResumeBuilderClient() {
         secondaryBtn={{ label: "Explore Engineering Services", href: "/services" }}
         tertiaryBtn={{ label: "Projects Hub", href: "/project" }}
       />
+
+      {/* ── Mobile Device Recommendation Notice ── */}
+      {showMobileNotice && (
+        <div className="mobile-notice-overlay" onClick={handleDismiss}>
+          <div
+            className="mobile-notice-modal"
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="mobile-notice-title"
+          >
+            <button
+              type="button"
+              className="mobile-notice-close"
+              onClick={handleDismiss}
+              aria-label="Close Notice"
+            >
+              ×
+            </button>
+            <div className="mobile-notice-icon">💻</div>
+            <h3 id="mobile-notice-title" className="mobile-notice-title">
+              Best Experienced on a Computer
+            </h3>
+            <p className="mobile-notice-desc">
+              This ATS resume builder works on mobile, but formatting bullet points, custom reordering, and PDF export are much easier on a desktop or laptop.
+            </p>
+            <div className="mobile-notice-actions">
+              <button
+                type="button"
+                className="mobile-notice-btn-copy"
+                onClick={handleCopyLink}
+              >
+                {copiedLink ? '✓ Link Copied to Clipboard!' : '📋 Copy Link for Computer'}
+              </button>
+              <button
+                type="button"
+                className="mobile-notice-btn-continue"
+                onClick={handleDismiss}
+              >
+                Continue on Mobile →
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

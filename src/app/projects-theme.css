@@ -1529,3 +1529,203 @@
   margin: 0;
 }
 
+/* ─── Resume Builder Mobile Responsive ─── */
+@media (max-width: 768px) {
+  .builder-top-banner {
+    padding: 8px 14px;
+  }
+
+  .banner-inner {
+    gap: 8px;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .banner-left {
+    gap: 6px;
+  }
+
+  .tool-name {
+    font-size: 12px;
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .banner-cta-label {
+    display: none;
+  }
+
+  .pill-badge {
+    display: none;
+  }
+
+  .hire-cta-btn {
+    font-size: 11px;
+    padding: 4px 10px;
+  }
+
+  .builder-frame-wrapper {
+    height: 80vh;
+    min-height: 580px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .builder-guide-container {
+    padding: 36px 16px 28px;
+    gap: 32px;
+  }
+
+  .guide-pill-strip {
+    gap: 8px;
+  }
+
+  .guide-badge {
+    font-size: 10px;
+    padding: 4px 10px;
+  }
+
+  .guide-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .guide-card,
+  .faq-item {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 420px) {
+  .tool-name {
+    display: none;
+  }
+}
+
+/* ─── Mobile Computer Recommendation Popup ─── */
+.mobile-notice-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(16, 12, 11, 0.78);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: noticeFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.mobile-notice-modal {
+  background: #231513;
+  border: 1px solid rgba(141, 110, 99, 0.45);
+  border-radius: 16px;
+  max-width: 420px;
+  width: 100%;
+  padding: 26px 20px 22px;
+  text-align: center;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.6);
+  position: relative;
+  color: #FAF6EE;
+  animation: noticeSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.mobile-notice-close {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  color: #BCAAA4;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 4px 8px;
+  transition: color 0.15s ease;
+}
+.mobile-notice-close:hover {
+  color: #FAF6EE;
+}
+
+.mobile-notice-icon {
+  font-size: 40px;
+  line-height: 1;
+  margin-bottom: 12px;
+}
+
+.mobile-notice-title {
+  font-family: var(--font-special-elite), monospace;
+  font-size: 18px;
+  color: #FAF6EE;
+  margin: 0 0 10px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
+.mobile-notice-desc {
+  font-family: var(--font-special-elite), monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #D7CCC8;
+  margin: 0 0 22px;
+}
+
+.mobile-notice-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mobile-notice-btn-copy {
+  width: 100%;
+  padding: 11px 16px;
+  border-radius: 8px;
+  background: rgba(141, 110, 99, 0.2);
+  border: 1px solid rgba(141, 110, 99, 0.4);
+  color: #FAF6EE;
+  font-size: 12.5px;
+  font-weight: bold;
+  font-family: var(--font-special-elite), monospace;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+.mobile-notice-btn-copy:hover {
+  background: rgba(141, 110, 99, 0.35);
+  border-color: #8D6E63;
+}
+
+.mobile-notice-btn-continue {
+  width: 100%;
+  padding: 11px 16px;
+  border-radius: 8px;
+  background: #8D6E63;
+  border: none;
+  color: #FAF6EE;
+  font-size: 13px;
+  font-weight: bold;
+  font-family: var(--font-special-elite), monospace;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+.mobile-notice-btn-continue:hover {
+  background: #735348;
+}
+
+@keyframes noticeFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes noticeSlideUp {
+  from { opacity: 0; transform: translateY(12px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+
+

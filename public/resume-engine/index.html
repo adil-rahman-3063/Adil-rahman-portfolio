@@ -1502,6 +1502,10 @@
     @media (max-width: 760px) {
       .doc {
         grid-template-columns: 1fr;
+        max-width: 100%;
+        min-height: auto;
+        overflow-x: hidden;
+        box-sizing: border-box;
       }
 
       .sidebar::after {
@@ -1509,15 +1513,150 @@
       }
 
       .sidebar {
-        padding: 44px 24px 30px 24px;
+        padding: 56px 18px 24px 18px;
+        box-sizing: border-box;
+        overflow-x: hidden;
+      }
+
+      .name {
+        font-size: 28px;
+        line-height: 1.15;
+        word-break: break-word;
+      }
+
+      .tagline {
+        font-size: 13px;
+        margin: 0 0 20px 0;
+        padding-bottom: 16px;
       }
 
       .main {
-        padding: 34px 22px 60px 22px;
+        padding: 26px 18px 60px 18px;
+        box-sizing: border-box;
+        overflow-x: hidden;
+      }
+
+      h2.section {
+        font-size: 18px;
+        margin: 26px 0 4px 0;
+      }
+
+      /* Compact Floating Toolbar on Mobile */
+      .toolbar {
+        top: calc(8px + env(safe-area-inset-top, 0px));
+        right: 8px;
+        padding: 4px 6px;
+        gap: 4px;
+        border-radius: 8px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+      }
+
+      .toolbar .save-status {
+        display: none;
+      }
+
+      .toolbar button {
+        font-size: 11px;
+        padding: 5px 8px;
+        white-space: nowrap;
+      }
+
+      .btn-full-text {
+        display: none;
+      }
+
+      /* Compact Theme Launcher */
+      .theme-picker-launcher {
+        top: calc(8px + env(safe-area-inset-top, 0px));
+        left: 8px;
+        padding: 5px 9px;
+        font-size: 11px;
+        border-radius: 8px;
+        gap: 4px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
       }
 
       .theme-picker-panel {
-        width: calc(100vw - 32px);
+        top: calc(48px + env(safe-area-inset-top, 0px));
+        left: 8px;
+        right: 8px;
+        width: auto;
+        max-width: calc(100vw - 16px);
+        max-height: calc(100dvh - 58px);
+        padding: 14px;
+        box-sizing: border-box;
+      }
+
+      .print-hint {
+        top: calc(50px + env(safe-area-inset-top, 0px));
+        right: 8px;
+      }
+
+      /* Touch Target Improvements for Mobile */
+      .role-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2px;
+        margin-top: 14px;
+      }
+
+      .role-dates {
+        font-size: 11px;
+        margin-top: 1px;
+      }
+
+      .bullet-actions,
+      .sidebar .skill-row .row-actions {
+        opacity: 0.85;
+      }
+
+      .bullet-btn {
+        font-size: 11px;
+        padding: 3px 6px;
+        min-width: 22px;
+        min-height: 22px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        touch-action: manipulation;
+      }
+
+      .mini-btn {
+        font-size: 11.5px;
+        padding: 6px 10px;
+        min-height: 28px;
+        border-radius: 5px;
+        touch-action: manipulation;
+      }
+
+      .block-controls {
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 18px;
+      }
+
+      .pop-btn {
+        min-width: 32px;
+        height: 30px;
+        font-size: 13px;
+      }
+
+      .remove-inline {
+        font-size: 12px;
+        opacity: 0.85;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .theme-picker-launcher .theme-launcher-label {
+        display: none;
+      }
+      .theme-picker-launcher {
+        padding: 5px 8px;
+      }
+      .toolbar button {
+        padding: 4px 6px;
+        font-size: 10px;
       }
     }
   </style>
@@ -1623,8 +1762,8 @@
   <div class="toolbar no-print">
     <span class="save-status" id="saveStatus">Autosaves as you type</span>
     <button class="btn-secondary" id="resetBtn">Reset</button>
-    <button class="btn-secondary" id="atsPrintBtn">Download ATS PDF</button>
-    <button class="btn-primary" id="printBtn">Download Design PDF</button>
+    <button class="btn-secondary" id="atsPrintBtn"><span class="btn-full-text">Download </span>ATS PDF</button>
+    <button class="btn-primary" id="printBtn"><span class="btn-full-text">Download </span>Design PDF</button>
   </div>
   <div class="print-hint no-print" id="printHint" role="button" tabindex="0" title="Click to view ATS export tip" aria-label="ATS export tips and instructions">
     <span class="print-hint-icon" aria-hidden="true">!</span>

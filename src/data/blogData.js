@@ -1,5 +1,327 @@
 export const allBlogs = [
   {
+    id: 'in-browser-batch-folder-converter-client-zip',
+    title: 'Building an In-Browser Bulk Folder & Batch Converter with Dynamic Extension Mapping and Client-Zip',
+    seoTitle: 'In-Browser Batch & Folder Converter with Client-Zip | Adil Rahman',
+    date: 'November 24, 2026',
+    readTime: '8 min read',
+    excerpt: 'Learn how we engineered a 100% in-browser batch converter that recursively traverses nested folders, dynamically maps mixed file extensions, and streams ZIP archives with client-zip.',
+    faq: [
+      {
+        question: 'Can modern browsers convert entire folders without uploading files to a server?',
+        answer: 'Yes. By leveraging the HTML5 Directory Picker API (webkitdirectory) and the drag-and-drop FileSystem API (webkitGetAsEntry), client-side JavaScript can recursively index directory trees and convert files entirely in browser memory.'
+      },
+      {
+        question: 'How do you preserve nested subfolder structures when creating a ZIP file in JavaScript?',
+        answer: 'By utilizing the client-zip library and passing relative paths (e.g., assets/images/photo.webp) in each file entry object. When the ZIP is downloaded and unpacked, the operating system restores the original folder hierarchy.'
+      },
+      {
+        question: 'How do you prevent browser tab freezing during bulk batch conversions?',
+        answer: 'By executing conversions sequentially and yielding execution back to the browser event loop using await new Promise(r => setTimeout(r, 0)) between files. This keeps UI progress bars, status badges, and cancel buttons responsive at 60 FPS.'
+      }
+    ],
+    content: `**Category:** Systems Architecture / Client-Side File Processing / Web Performance
+
+**Read Time:** ~8 mins
+
+**Live Platform:** [Fileo — Free In-Browser File & Batch Converter (fileo.cc)](https://fileo.cc/?utm_source=adilrahman)
+
+**Live Batch Tool:** [Fileo Batch & Folder Converter](https://fileo.cc/batch-converter?utm_source=adilrahman)
+
+> **Quick Answer (AI / Snippet Block):**  
+> Traditional batch file converters force users to upload gigabytes of data to remote cloud servers, flatten directory trees, and require expensive subscriptions. By combining the HTML5 \`webkitdirectory\` picker and recursive \`webkitGetAsEntry()\` drag-and-drop scanning with dynamic extension grouping and \`client-zip\`, web applications can convert entire nested folders client-side with zero server compute costs, zero file upload wait times, and total privacy.
+
+---
+
+## Table of Contents
+1. [The Problem with Cloud-Based Batch Converters](#the-problem-with-cloud-based-batch-converters)
+2. [Architectural Overview: The In-Browser Batch Pipeline](#architectural-overview-the-in-browser-batch-pipeline)
+3. [Step 1: Dual-Mode Recursive Directory Ingestion](#step-1-dual-mode-recursive-directory-ingestion)
+4. [Step 2: The Dynamic Extension Mapping Matrix](#step-2-the-dynamic-extension-mapping-matrix)
+5. [Step 3: 60 FPS Event-Loop Yielding Execution](#step-3-60-fps-event-loop-yielding-execution)
+6. [Step 4: Hierarchy-Preserving ZIP Streaming with client-zip](#step-4-hierarchy-preserving-zip-streaming-with-client-zip)
+7. [Comparison: Traditional Cloud Batch vs. Fileo In-Browser Engine](#comparison-traditional-cloud-batch-vs-fileo-in-browser-engine)
+8. [Programmatic SEO & High-Intent Landing Pages](#programmatic-seo--high-intent-landing-pages)
+9. [Key Engineering Takeaways](#key-engineering-takeaways)
+
+---
+
+## The Problem with Cloud-Based Batch Converters
+
+Batch file conversion is one of the most common workflows for designers, developers, photographers, and audio engineers. Yet almost every existing online batch tool follows a broken paradigm:
+
+1. **Slow Network Uploads:** To convert 50 images or 20 audio tracks, you must first upload hundreds of megabytes over your home internet connection to a remote server farm.
+2. **Flattened Folder Structures:** If your folder has nested subdirectories (e.g. \`assets/icons/\` and \`assets/banners/\`), cloud converters strip the hierarchy and dump every converted file into a single messy root folder.
+3. **One-Size-Fits-All Inflexibility:** If your dropped folder contains mixed formats (say, 15 PNGs, 10 JPGs, and 5 SVGs), cloud tools force you to select a single target format for everything, or reject the upload entirely.
+4. **Privacy & Cloud Costs:** Uploading sensitive business assets or private client media to third-party cloud servers exposes you to data leaks, while server operators pass high bandwidth and compute bills down to you via paywalls.
+
+For [Fileo](https://fileo.cc/?utm_source=adilrahman), we set out to build a batch converter that runs **100% inside the browser**—offering recursive folder ingestion, mixed-format extension mapping, and instant ZIP downloads with zero server roundtrips.
+
+---
+
+## Architectural Overview: The In-Browser Batch Pipeline
+
+Here is the high-level dataflow of the Fileo batch engine:
+
+\`\`\`text
+[User Drops Folder or Selects Directory]
+                   │
+                   ▼
+  [Recursive FileSystem Scanner]
+  ├─ Resolves relative path tree (assets/sub/photo.png)
+  └─ Auto-indexes unique extensions (.png, .jpg, .heic)
+                   │
+                   ▼
+  [Dynamic Extension Mapping Matrix]
+  ├─ Group 1: 14 PNGs ──► Map to WebP (Quality: 80%)
+  ├─ Group 2:  8 JPGs ──► Map to SVG (Vectorizing)
+  └─ Group 3: 10 HEICs ──► Map to JPG (Quality: 95%)
+                   │
+                   ▼
+  [Sequential Worker Loop (with Event-Loop Yielding)]
+  ├─ Converts file in client memory
+  ├─ Updates real-time 60 FPS progress tickers
+  └─ Pushes converted stream with original relative path
+                   │
+                   ▼
+  [client-zip Hierarchy-Preserving Stream]
+  └─ Packages \`\${folderName}-converted.zip\` (Instant download)
+\`\`\`
+
+---
+
+## Step 1: Dual-Mode Recursive Directory Ingestion
+
+Browsers handle folder selection through two distinct mechanisms: the native file picker dialog and drag-and-drop. We built a unified pipeline supporting both:
+
+### Mode A: HTML5 Directory Input Picker
+
+For direct button clicks, modern Chromium, Firefox, and Safari support the \`webkitdirectory\` attribute on file inputs:
+
+\`\`\`html
+<input
+  type="file"
+  id="folderInput"
+  webkitdirectory
+  directory
+  multiple
+  class="hidden"
+/>
+\`\`\`
+
+When a user selects a directory through this input, each \`File\` object exposes a \`webkitRelativePath\` property (e.g. \`"my-project/assets/logo.png"\`).
+
+### Mode B: Drag-and-Drop Recursive Directory Traversal
+
+When users drag and drop a folder directly into the browser viewport, \`event.dataTransfer.files\` only provides shallow file entries. To recursively read nested directories of arbitrary depth, we leverage the \`webkitGetAsEntry()\` API:
+
+\`\`\`typescript
+/**
+ * Recursively scans directories and files from a DataTransferItem.
+ */
+async function traverseFileSystemEntry(
+  entry: any,
+  path = ''
+): Promise<{ file: File; relativePath: string }[]> {
+  if (!entry) return [];
+
+  if (entry.isFile) {
+    return new Promise((resolve) => {
+      entry.file((file: File) => {
+        resolve([{
+          file,
+          relativePath: path ? \`\${path}/\${file.name}\` : file.name
+        }]);
+      });
+    });
+  }
+
+  if (entry.isDirectory) {
+    const reader = entry.createReader();
+    const entries: any[] = await new Promise((resolve) => {
+      // Note: readEntries reads up to 100 items per call; production requires batching loops
+      reader.readEntries((results: any[]) => resolve(results));
+    });
+
+    const currentPath = path ? \`\${path}/\${entry.name}\` : entry.name;
+    const subFiles = await Promise.all(
+      entries.map((child) => traverseFileSystemEntry(child, currentPath))
+    );
+    return subFiles.flat();
+  }
+
+  return [];
+}
+\`\`\`
+
+---
+
+## Step 2: The Dynamic Extension Mapping Matrix
+
+In real-world projects, folders rarely contain just one file type. A typical web asset folder might contain 20 PNG screenshots, 10 JPG photos, and 5 SVG logos.
+
+Instead of forcing a single uniform output, our engine dynamically inspects the batch, groups files by their unique extensions, and renders a **Dynamic Extension Mapping UI**:
+
+\`\`\`typescript
+interface ExtensionGroup {
+  extension: string;
+  count: number;
+  files: { file: File; relativePath: string }[];
+  targetFormat: string;
+  quality: number;
+}
+
+// Automatically bucket ingested files into unique extension groups
+function groupFilesByExtension(files: { file: File; relativePath: string }[]) {
+  const groups: Record<string, ExtensionGroup> = {};
+
+  for (const item of files) {
+    const ext = item.file.name.split('.').pop()?.toLowerCase() || 'unknown';
+    if (!groups[ext]) {
+      groups[ext] = {
+        extension: ext,
+        count: 0,
+        files: [],
+        targetFormat: getDefaultTargetFor(ext),
+        quality: 80,
+      };
+    }
+    groups[ext].count++;
+    groups[ext].files.push(item);
+  }
+
+  return Object.values(groups);
+}
+\`\`\`
+
+### UI Capabilities:
+* **Per-Extension Target Selection:** Users can map \`.png\` files to \`.webp\` while simultaneously mapping \`.wav\` recordings to \`.mp3\` in the same batch.
+* **Global One-Click Presets:** For fast bulk operations, quick action buttons allow instant global configuration:
+  * *"All Images → Modern WebP"*
+  * *"All Images → Vector SVG"*
+  * *"All Media → High-Fidelity MP3"*
+* **Quality Presets:** Each group can be assigned custom compression levels: High (95%), Medium (80%), or Compact (60%).
+
+---
+
+## Step 3: 60 FPS Event-Loop Yielding Execution
+
+The biggest danger of client-side batch processing is freezing the browser tab. If you loop through 100 images and encode them synchronously, the JavaScript main thread locks up, animations freeze, and the operating system displays a *"Page Unresponsive"* dialog.
+
+To keep the UI smooth at a flawless 60 FPS, we implemented sequential async batching with **event-loop yielding**:
+
+\`\`\`typescript
+async function processBatchQueue(
+  queue: ConversionTask[],
+  onProgress: (current: number, total: number, fileName: string) => void
+) {
+  const convertedResults = [];
+
+  for (let i = 0; i < queue.length; i++) {
+    const task = queue[i];
+    
+    // 1. Update UI progress ticker
+    onProgress(i + 1, queue.length, task.file.name);
+
+    // 2. Execute in-memory conversion (Canvas / Web Audio / WASM)
+    const convertedBlob = await executeConversion(task.file, task.targetFormat, task.quality);
+    
+    // 3. Compute output relative path preserving directory structure
+    const outputRelativePath = task.relativePath.replace(
+      /\\.[^/.]+$/,
+      \`.\${task.targetFormat}\`
+    );
+
+    convertedResults.push({
+      name: outputRelativePath,
+      input: convertedBlob,
+      lastModified: new Date(),
+    });
+
+    // 4. Critical: Yield back to browser event loop
+    // Allows DOM paint, badge updates, and cancel click handlers
+    await new Promise((resolve) => setTimeout(resolve, 0));
+  }
+
+  return convertedResults;
+}
+\`\`\`
+
+By yielding to the event loop between conversions, the browser has ample time to update the progress bar, recalculate estimated time remaining, and paint smooth gradient animations.
+
+---
+
+## Step 4: Hierarchy-Preserving ZIP Streaming with client-zip
+
+Once all files are converted in browser memory, how do we package them into a downloadable archive without crashing memory?
+
+Traditional libraries like \`JSZip\` often allocate the entire uncompressed and compressed archive simultaneously in JavaScript heap memory, leading to out-of-memory crashes on batches larger than 100MB.
+
+Instead, we integrated **\`client-zip\`**, a lightweight zero-dependency library that streams ZIP archives directly into a single \`Blob\`:
+
+\`\`\`typescript
+import { downloadZip } from 'client-zip';
+
+async function packageConvertedFolder(
+  convertedFiles: { name: string; input: Blob; lastModified: Date }[],
+  originalFolderName: string
+) {
+  // client-zip receives relative paths and builds standard ZIP directory headers
+  const zipBlob = await downloadZip(convertedFiles).blob();
+
+  // Create immediate client-side download link
+  const downloadUrl = URL.createObjectURL(zipBlob);
+  const link = document.createElement('a');
+  link.href = downloadUrl;
+  link.download = \`\${originalFolderName || 'fileo'}-converted.zip\`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+
+  // Revoke URL to reclaim browser memory
+  setTimeout(() => URL.revokeObjectURL(downloadUrl), 10000);
+}
+\`\`\`
+
+When the user unzips the downloaded archive, their operating system (macOS Finder, Windows Explorer, Linux) automatically re-creates the exact original nested folders (\`assets/icons/\`, \`photos/2026/\`), but with every file converted to their chosen formats.
+
+---
+
+## Comparison: Traditional Cloud Batch vs. Fileo In-Browser Engine
+
+| Metric | Traditional Cloud Converter | Fileo In-Browser Batch Engine |
+| :--- | :--- | :--- |
+| **Upload Time** | Slow (Uploading full files over network) | **Instant (Zero upload, reads directly from disk)** |
+| **Folder Hierarchy** | ❌ Flattened into single folder | **✅ 100% Preserved nested subfolders** |
+| **Mixed File Formats** | ❌ Uniform single target only | **✅ Dynamic per-extension target mapping** |
+| **File Size Ceilings** | Capped at 50MB–100MB (Paywalls) | **Limited only by local device RAM** |
+| **Data Privacy** | Files stored on third-party servers | **100% Private (Files never leave device)** |
+| **Server Bandwidth Costs** | Expensive compute & egress bills | **$0.00 / month (Runs entirely on client)** |
+
+---
+
+## Programmatic SEO & High-Intent Landing Pages
+
+Building great technology is only half the battle; people need to discover it. To capture high-volume search queries from developers, photographers, and audio professionals, we deployed **3 dedicated landing pages** in Astro 5:
+
+1. **\`/batch-converter\`**: Tailored for general multi-file batch conversions with smart extension grouping.
+2. **\`/folder-converter\`**: Targeted for users searching *"convert entire folder online"* or *"batch convert folder keeping folder structure"*.
+3. **\`/bulk-image-converter\`**: Focused on high-volume photography searches (*"bulk convert photos to WebP"*, *"batch PNG to SVG vectorizer"*).
+
+All 3 pages share the underlying \`BatchConverter.astro\` engine while presenting targeted metadata, structured Schema.org markup, and custom editorial guidance. In Astro 5, all **56 static conversion routes** compile in just **3.56 seconds**.
+
+---
+
+## Key Engineering Takeaways
+
+1. **\`webkitdirectory\` + \`webkitGetAsEntry()\` is a Powerful Combo:** Supporting both picker dialogs and recursive drag-and-drop provides the most intuitive file ingestion UX for web tools.
+2. **Always Yield During Long Loops:** Never perform heavy client-side batch conversions in a tight synchronous loop. A simple \`await new Promise(r => setTimeout(r, 0))\` keeps your application running at 60 FPS.
+3. **Use \`client-zip\` for Safe Client Archiving:** Passing relative path strings into \`client-zip\` eliminates server zip-generation bottlenecks and guarantees flawless folder preservation.
+4. **Client-Side Architecture Wins on Economics:** Handling bulk conversions in the user's browser turns zero-server costs into a permanent competitive moat.
+`,
+  },
+
+  {
     id: 'in-browser-video-to-mp3-web-audio-api',
     title: 'Building an In-Browser Video-to-MP3 & Lossless WAV Converter with Web Audio API and LameJS',
     seoTitle: 'In-Browser Video to MP3 & WAV with Web Audio API | Adil Rahman',

@@ -1092,6 +1092,163 @@
   color: #fff;
 }
 
+/* ─── QUICK AI PROJECT IMPORTER ─── */
+.quick-import-panel {
+  background: rgba(22, 13, 11, 0.85);
+  border: 1px solid rgba(212, 163, 115, 0.28);
+  border-radius: 12px;
+  padding: 20px 22px;
+  margin-bottom: 24px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
+}
+
+.quick-import-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.quick-import-title-group h3 {
+  margin: 0 0 4px;
+  color: #FAF6EE;
+  font-size: 1.05rem;
+  letter-spacing: 0.04em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.quick-import-title-group p {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #a89f91;
+  line-height: 1.45;
+}
+
+.copy-prompt-btn {
+  background: rgba(212, 163, 115, 0.14);
+  border: 1px solid rgba(212, 163, 115, 0.4);
+  color: #FAF6EE;
+  padding: 8px 14px;
+  border-radius: 7px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.copy-prompt-btn:hover {
+  background: rgba(212, 163, 115, 0.28);
+  border-color: #d4a373;
+}
+
+.copy-prompt-btn.copied {
+  background: #2e7d32;
+  border-color: #4caf50;
+  color: #fff;
+}
+
+.quick-import-textarea {
+  width: 100%;
+  min-height: 110px;
+  background: rgba(14, 8, 7, 0.85);
+  border: 1px solid rgba(212, 163, 115, 0.22);
+  border-radius: 8px;
+  color: #ECEBE6;
+  font-family: 'IBM Plex Mono', Consolas, monospace;
+  font-size: 0.82rem;
+  padding: 12px 14px;
+  resize: vertical;
+  line-height: 1.5;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box;
+}
+
+.quick-import-textarea:focus {
+  border-color: #d4a373;
+  box-shadow: 0 0 0 2px rgba(212, 163, 115, 0.18);
+}
+
+.quick-import-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.quick-import-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.import-btn {
+  background: #d4a373;
+  color: #120a09;
+  border: none;
+  padding: 9px 18px;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.import-btn:hover:not(:disabled) {
+  background: #e2b688;
+  transform: translateY(-1px);
+}
+
+.import-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.load-form-btn {
+  background: transparent;
+  border: 1px solid rgba(212, 163, 115, 0.35);
+  color: #d4a373;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.load-form-btn:hover {
+  background: rgba(212, 163, 115, 0.1);
+  color: #FAF6EE;
+}
+
+.json-error-banner {
+  color: #ff8a80;
+  font-size: 0.8rem;
+  background: rgba(213, 0, 0, 0.15);
+  border: 1px solid rgba(213, 0, 0, 0.3);
+  padding: 6px 12px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
 /* ─── RESPONSIVE ─── */
 @media (max-width: 768px) {
   .grid-2,

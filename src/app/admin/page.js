@@ -30,6 +30,12 @@ export default function AdminPage() {
   const [projSearch, setProjSearch] = useState('');
   const [reviewFilter, setReviewFilter] = useState('all'); // 'all' | 'approved' | 'pending'
 
+  // Quick AI Project Importer state
+  const [rawJsonInput, setRawJsonInput] = useState('');
+  const [jsonError, setJsonError] = useState(null);
+  const [importLoading, setImportLoading] = useState(false);
+  const [promptCopied, setPromptCopied] = useState(false);
+
   // Modals & Editing states
   const [showAddProject, setShowAddProject] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
@@ -221,6 +227,167 @@ export default function AdminPage() {
     } else {
       alert('Delete failed: ' + error.message);
     }
+  };
+
+  // ─── QUICK AI PROJECT IMPORTER ────────────────────────────────────────────────
+  const AI_EXTRACTION_PROMPT = `You are an expert technical portfolio curator. Analyze this current repository/workspace (inspect README.md, package.json, pubspec.yaml, git remotes, source code, and key features) and generate a ready-to-paste project object for my portfolio website (adilrahman.cc).
+
+Return ONLY a raw JSON object (or \`\`\`json\`\`\` block) following this exact schema:
+
+{
+  "id": "kebab-case-slug",
+  "title": "Project Name",
+  "subtitle": "Short Punchy Title // Primary Tech Stack",
+  "status": "Production // Live",
+  "tagline": "A single compelling sentence describing the product and core value proposition.",
+  "description": "2-3 technical sentences detailing the architecture, frontend/backend stack, deployment platform, and performance highlights.",
+  "features": [
+    "Feature Name: Specific technical detail of how it works and what it delivers.",
+    "Feature Name: Specific technical detail of how it works and what it delivers.",
+    "Feature Name: Specific technical detail of how it works and what it delivers.",
+    "Feature Name: Specific technical detail of how it works and what it delivers."
+  ],
+  "tech": [
+    "Tech 1", "Tech 2", "Tech 3", "Tech 4", "Tech 5"
+  ],
+  "links": [
+    { "text": "Live Site", "url": "https://..." },
+    { "text": "GitHub Repository", "url": "https://github.com/adil-rahman-3063/..." }
+  ],
+  "categories": [
+    "saas"
+  ],
+  "order": 1
+}`;
+
+  const parseProjectJson = (text) => {
+    if (!text || !text.trim()) throw new Error('Please paste a JSON object.');
+
+    let clean = text.trim();
+    if (clean.includes('```')) {
+      clean = clean.replace(/```(?:json|javascript|js)?\s*/gi, '').replace(/```/g, '').trim();
+    }
+    clean = clean.replace(/^(?:const|let|var|export const)\s+\w+\s*=\s*/, '').replace(/;$/, '').trim();
+
+    let data;
+    try {
+      data = JSON.parse(clean);
+    } catch (parseErr) {
+      throw new Error(`JSON syntax error: ${parseErr.message}`);
+    }
+
+    if (!data || typeof data !== 'object') {
+      throw new Error('Pasted content must be a valid JSON object.');
+    }
+
+    if (!data.id || !data.title) {
+      throw new Error('Project JSON must include at least an "id" and a "title".');
+    }
+
+    let featuresStr = '';
+    if (Array.isArray(data.features)) {
+      featuresStr = data.features.join(';\n');
+    } else if (typeof data.features === 'string') {
+      featuresStr = data.features;
+    }
+
+    let techStr = '';
+    if (Array.isArray(data.tech)) {
+      techStr = data.tech.join(', ');
+    } else if (typeof data.tech === 'string') {
+      techStr = data.tech;
+    }
+
+    let linkTexts = '';
+    let linkUrls = '';
+    if (Array.isArray(data.links)) {
+      linkTexts = data.links.map((l) => l.text || 'Live Site').join(' | ');
+      linkUrls = data.links.map((l) => l.url || '').join(' | ');
+    } else if (data.link_texts && data.link_urls) {
+      linkTexts = String(data.link_texts);
+      linkUrls = String(data.link_urls);
+    }
+
+    let categoriesStr = '';
+    if (Array.isArray(data.categories)) {
+      categoriesStr = data.categories.join(', ');
+    } else if (typeof data.categories === 'string') {
+      categoriesStr = data.categories;
+    }
+
+    return {
+      id: String(data.id).trim().toLowerCase(),
+      title: String(data.title).trim(),
+      subtitle: String(data.subtitle || '').trim(),
+      status: String(data.status || 'Production // Live').trim(),
+      tagline: String(data.tagline || '').trim(),
+      description: String(data.description || '').trim(),
+      features: featuresStr.trim(),
+      tech: techStr.trim(),
+      link_texts: linkTexts.trim(),
+      link_urls: linkUrls.trim(),
+      categories: categoriesStr.trim() || 'personal-project',
+      order: Number(data.order) || (projects.length + 1),
+    };
+  };
+
+  const handleQuickImport = async () => {
+    setJsonError(null);
+    setImportLoading(true);
+    try {
+      const payload = parseProjectJson(rawJsonInput);
+      const existing = projects.find((p) => p.id === payload.id);
+
+      const { data, error } = await supabase
+        .from('projects')
+        .upsert([payload])
+        .select();
+
+      if (error) throw error;
+
+      if (payload.categories.toLowerCase().includes('saas')) {
+        await supabase.from('saas').upsert([payload]);
+      } else if (existing) {
+        await supabase.from('saas').delete().eq('id', payload.id);
+      }
+
+      if (existing) {
+        setProjects(projects.map((p) => (p.id === payload.id ? { ...p, ...payload } : p)));
+        notify(`Project "${payload.title}" updated in Supabase!`);
+      } else {
+        setProjects([...projects, (data && data[0]) ? data[0] : payload]);
+        notify(`Project "${payload.title}" successfully added to Supabase!`);
+      }
+
+      setRawJsonInput('');
+    } catch (err) {
+      setJsonError(err.message || 'Failed to parse JSON. Please check syntax.');
+    } finally {
+      setImportLoading(false);
+    }
+  };
+
+  const handleLoadIntoForm = () => {
+    setJsonError(null);
+    try {
+      const payload = parseProjectJson(rawJsonInput);
+      setEditingProject(null);
+      setProjectForm(payload);
+      setShowAddProject(true);
+      notify(`Loaded "${payload.title}" into modal form for review.`);
+    } catch (err) {
+      setJsonError(err.message || 'Invalid JSON format.');
+    }
+  };
+
+  const handleCopyPrompt = () => {
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(AI_EXTRACTION_PROMPT);
+        setPromptCopied(true);
+        setTimeout(() => setPromptCopied(false), 2500);
+      }
+    } catch (err) {}
   };
 
   // ─── REVIEW CRUD ──────────────────────────────────────────────────────────────
@@ -663,6 +830,79 @@ export default function AdminPage() {
                 <button onClick={fetchAllData} className="refresh-btn">
                   ↻ Refresh
                 </button>
+              </div>
+            </div>
+
+            {/* ── Quick AI Project Importer (Single Textbox -> Supabase) ── */}
+            <div className="quick-import-panel">
+              <div className="quick-import-header">
+                <div className="quick-import-title-group">
+                  <h3>
+                    <span>⚡</span> Quick AI Project Importer
+                  </h3>
+                  <p>
+                    Paste the JSON generated by an AI assistant in any project workspace to add it directly to Supabase.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleCopyPrompt}
+                  className={`copy-prompt-btn ${promptCopied ? 'copied' : ''}`}
+                  title="Copy the universal extraction prompt for Cursor, Claude, Antigravity, or ChatGPT"
+                >
+                  {promptCopied ? '✓ Prompt Copied to Clipboard!' : '📋 Copy AI Prompt'}
+                </button>
+              </div>
+
+              <textarea
+                value={rawJsonInput}
+                onChange={(e) => {
+                  setRawJsonInput(e.target.value);
+                  if (jsonError) setJsonError(null);
+                }}
+                placeholder='Paste project JSON here... e.g. { "id": "my-tool", "title": "My Tool", "subtitle": "...", "features": [...], "tech": [...], "categories": ["saas"] }'
+                className="quick-import-textarea"
+                rows={5}
+              />
+
+              {jsonError && (
+                <div style={{ marginTop: '8px' }}>
+                  <span className="json-error-banner">⚠️ {jsonError}</span>
+                </div>
+              )}
+
+              <div className="quick-import-footer">
+                <div className="quick-import-actions">
+                  <button
+                    type="button"
+                    onClick={handleQuickImport}
+                    disabled={importLoading || !rawJsonInput.trim()}
+                    className="import-btn"
+                  >
+                    {importLoading ? 'Importing to Supabase...' : '🚀 Import Directly to Supabase'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleLoadIntoForm}
+                    disabled={!rawJsonInput.trim()}
+                    className="load-form-btn"
+                  >
+                    ✏️ Load into Form to Review
+                  </button>
+                </div>
+                {rawJsonInput && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setRawJsonInput('');
+                      setJsonError(null);
+                    }}
+                    className="cancel-btn"
+                    style={{ padding: '6px 12px', fontSize: '0.78rem' }}
+                  >
+                    Clear
+                  </button>
+                )}
               </div>
             </div>
 

@@ -18,6 +18,9 @@ This checklist separates **brand-new URLs** that need manual indexing from **alr
 
 These URLs were newly created or published recently and require an initial manual crawl request in GSC:
 
+- [ ] `https://adilrahman.cc/blog/how-windows-defender-amsi-flagged-powershell-csharp`
+  - **Type**: New Windows Internals & Antivirus Systems Blog Post (Published Nov 26, 2026)
+  - **Target Keywords**: *Windows Defender AMSI PowerShell, ScriptContainedMaliciousContent, CopyFromScreen high DPI scaling, Node.js PowerShell EncodedCommand UTF-16LE, libuv read ENOTCONN, Windows csc.exe compiler*
 - [x] `https://adilrahman.cc/blog/how-windows-defender-amsi-flagged-powershell-csharp`
   - **Type**: New Windows Internals & Antivirus Systems Blog Post (Published Nov 26, 2026)
   - **Target Keywords**: *Windows Defender AMSI PowerShell, ScriptContainedMaliciousContent, CopyFromScreen high DPI scaling, Node.js PowerShell EncodedCommand UTF-16LE, libuv read ENOTCONN, Windows csc.exe compiler*

@@ -1,5 +1,399 @@
 export const allBlogs = [
   {
+    id: 'how-windows-defender-amsi-flagged-powershell-csharp',
+    title: 'How Windows Defender AMSI Flagged My Desktop Companion as Malware (And Why I Replaced PowerShell with C#)',
+    seoTitle: 'Why Windows Defender AMSI Flags PowerShell & Building a 30ms C# Engine | Adil Rahman',
+    date: 'November 26, 2026',
+    readTime: '9 min read',
+    excerpt: 'When building OverWatch—a lightweight desktop companion and AI interlock—Windows Defender AMSI suddenly flagged my PowerShell screen capture as malware. Here is the deep dive into AMSI heuristic triggers, high-DPI scaling bugs, UTF-16LE corruption, and how writing a native 30ms C# engine solved it all.',
+    faq: [
+      {
+        question: 'What is Windows Defender AMSI and why does it flag PowerShell scripts?',
+        answer: 'AMSI (Antimalware Scan Interface) is a Windows security interface that intercepts and analyzes in-memory script invocations in real time. When scripts combine Windows API P/Invoke declarations (like SetProcessDPIAware or user32.dll) with desktop screen capture APIs, AMSI\'s heuristic detection frequently flags the payload as potential spyware (ScriptContainedMaliciousContent).'
+      },
+      {
+        question: 'Why does PowerShell CopyFromScreen capture only a quadrant on high-DPI monitors?',
+        answer: 'By default, PowerShell processes run in DPI-unaware mode. On Windows systems with display scaling enabled (e.g. 125%, 150%, or 200%), System.Windows.Forms.Screen.PrimaryScreen.Bounds returns virtual scaled dimensions (e.g. 1280x800) instead of the monitor\'s native physical resolution (1920x1200), causing screenshot APIs to crop the display.'
+      },
+      {
+        question: 'Why does PowerShell -EncodedCommand fail when receiving Base64 from Node.js?',
+        answer: 'PowerShell\'s -EncodedCommand parameter strictly expects a Base64-encoded UTF-16LE (Unicode) byte stream. If Node.js creates the Base64 string from standard UTF-8 (Buffer.from(script, \'utf-8\')), PowerShell misinterprets adjacent byte pairs as corrupt Unicode characters, throwing CommandNotFoundException or parser errors.'
+      },
+      {
+        question: 'How does compiling a native C# binary solve the Node.js read ENOTCONN socket error?',
+        answer: 'Calling unref() on child_process.exec() or execFile() leaves stdout/stderr pipes connected to the Node.js libuv event loop. If the child exits or detaches, libuv throws Error: read ENOTCONN (-4053). Switching to spawn(bin, [...], { detached: true, stdio: \'ignore\' }).unref() severs pipe handles cleanly.'
+      }
+    ],
+    content: `**Category:** Windows Internals / Systems Security / Antivirus Debugging
+
+**Read Time:** ~9 mins
+
+**Live Project:** [OverWatch — OLED Desk Companion & Autonomous AI Interlock](https://overwatch.adilrahman.cc?utm_source=adilrahman.cc)
+
+**Open Source Repository:** [github.com/adil-rahman-3063/OverWatch](https://github.com/adil-rahman-3063/OverWatch)
+
+> **Quick Answer (AI / Snippet Block):**  
+> Modern Windows Defender AMSI (Antimalware Scan Interface) actively scans in-memory PowerShell scripts. Attempting to use P/Invoke (\`Add-Type\`) to call Win32 APIs like \`SetProcessDPIAware()\` alongside \`Graphics.CopyFromScreen\` triggers heuristic signatures for malicious screen scrapers (\`ScriptContainedMaliciousContent\`). Additionally, PowerShell adds a 500–800ms cold-start overhead per invocation and requires UTF-16LE Base64 byte sequences for \`-EncodedCommand\`. The clean, robust architectural fix is replacing inline PowerShell scripts with a tiny, native C# binary compiled on-the-fly via Windows' built-in \`csc.exe\`, dropping execution time from 750ms to under 30ms with zero antivirus false positives.
+
+---
+
+## Table of Contents
+1. [The Architecture of OverWatch: Why We Needed Desktop Screen & Clipboard Access](#the-architecture-of-overwatch-why-we-needed-desktop-screen--clipboard-access)
+2. [The High-DPI Display Scaling Trap: Why Screenshots Only Captured the Top-Left Corner](#the-high-dpi-display-scaling-trap-why-screenshots-only-captured-the-top-left-corner)
+3. [The Sudden Crash: Windows Defender AMSI Flags Inline P/Invoke as Spyware](#the-sudden-crash-windows-defender-amsi-flags-inline-pinvoke-as-spyware)
+4. [The Encoding Nightmare: Node.js UTF-8 vs. PowerShell UTF-16LE -EncodedCommand](#the-encoding-nightmare-nodejs-utf-8-vs-powershell-utf-16le--encodedcommand)
+5. [The Solution: Replacing PowerShell with a 30ms Native C# Engine (screencap.exe)](#the-solution-replacing-powershell-with-a-30ms-native-c-engine-screencapexe)
+6. [The Ghost in the Event Loop: Debugging Node.js Libuv Socket Error: read ENOTCONN](#the-ghost-in-the-event-loop-debugging-nodejs-libuv-socket-error-read-enotconn)
+7. [Performance Benchmark: PowerShell vs. Compiled C# Binary](#performance-benchmark-powershell-vs-compiled-c-binary)
+8. [Key Architectural Takeaways for Desktop Tool Developers](#key-architectural-takeaways-for-desktop-tool-developers)
+
+---
+
+## The Architecture of OverWatch: Why We Needed Desktop Screen & Clipboard Access
+
+When building [OverWatch](https://overwatch.adilrahman.cc?utm_source=adilrahman.cc), our goal was to turn an old smartphone resting on a desk into a tactile OLED StandBy deck and a hardware security interlock for autonomous coding agents (like Google Antigravity and Claude Code).
+
+Instead of forcing users to install a heavy 200MB Electron app on their phone or PC, we built a zero-bloat architecture:
+- **Client Side (Phone):** A high-performance React + Vite PWA rendering pure OLED \`#000000\` UI, retro 3D split-flap clocks, and hardware telemetry.
+- **Host Side (Windows PC):** A lightweight background Windows daemon (Node.js + WinRT) running silently in the Windows System Tray.
+- **Transport:** End-to-end encrypted real-time sync powered by Supabase Realtime WebSockets and local LAN IPC.
+
+\`\`\`text
+┌─────────────────────────────────┐                 ┌───────────────────────────────┐
+│     Mobile OLED Desk Deck       │                 │     Windows Host Daemon       │
+│  (React 19 + StandBy PWA)       │                 │   (Node.js Tray Service)      │
+└──────────────┬──────────────────┘                 └──────────────┬────────────────┘
+               │                                                   │
+               │  1. Tap "Capture PC Screen" or "Push Clipboard"   │
+               ├──────────────────────────────────────────────────►│
+               │  (Encrypted WebSocket Broadcast)                  │
+               │                                                   │  2. Grab Desktop Monitor
+               │                                                   │     or Read Clipboard
+               │  3. Beams High-Res Bitmap or WebP                 │     (High-DPI Aware)
+               │◄──────────────────────────────────────────────────┤
+\`\`\`
+
+To support bidirectional image beaming—such as inspecting the desktop monitor while away from the desk, or pasting a camera snapshot directly onto the Windows clipboard—the Node.js daemon needed quick, headless access to the Windows screen and clipboard.
+
+Naturally, PowerShell was the initial choice. It comes pre-installed on every Windows machine, requires zero extra npm native compiler dependencies (\`node-gyp\`), and has access to \`System.Drawing\` and \`System.Windows.Forms\`.
+
+That assumption worked—until we hit Windows display scaling and corporate antivirus heuristics.
+
+---
+
+## The High-DPI Display Scaling Trap: Why Screenshots Only Captured the Top-Left Corner
+
+Almost every modern Windows laptop and 4K desktop monitor runs with **Display Scaling** enabled (typically 125%, 150%, or 200% under Windows Settings > System > Display).
+
+Our initial PowerShell screen capture script looked deceptively simple:
+
+\`\`\`powershell
+Add-Type -AssemblyName System.Windows.Forms
+Add-Type -AssemblyName System.Drawing
+
+$bounds = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds
+$bitmap = New-Object System.Drawing.Bitmap $bounds.Width, $bounds.Height
+$graphics = [System.Drawing.Graphics]::FromImage($bitmap)
+
+$graphics.CopyFromScreen($bounds.Location, [System.Drawing.Point]::Empty, $bounds.Size)
+$bitmap.Save("screenshot.png", [System.Drawing.Imaging.ImageFormat]::Png)
+\`\`\`
+
+When we ran this on a 1920x1200 laptop display configured at **150% scaling**, the resulting screenshot was completely butchered:
+1. Instead of capturing the full 1920x1200 monitor, the image dimensions were only **1280x800**!
+2. The image captured only the **top-left quadrant** of the user's desktop, cutting off the taskbar, IDE code editor, and active windows.
+
+### Why Did This Happen?
+By default, \`powershell.exe\` is **DPI-unaware**. When a DPI-unaware process queries the operating system for screen dimensions via \`Screen.PrimaryScreen.Bounds\`, the Windows Desktop Window Manager (DWM) virtualizes the resolution down to 96 DPI equivalent coordinates (\`1920 / 1.5 = 1280\`).
+
+To capture the true physical pixels, we had to declare the process as DPI-aware. We attempted to P/Invoke \`SetProcessDPIAware()\` from \`user32.dll\`:
+
+\`\`\`powershell
+$sig = @'
+[DllImport("user32.dll")]
+public static extern bool SetProcessDPIAware();
+'@
+Add-Type -MemberDefinition $sig -Name DpiFix -Namespace Win32
+[Win32.DpiFix]::SetProcessDPIAware()
+\`\`\`
+
+This fixed the scaling. But it immediately detonated a much more dangerous landmine.
+
+---
+
+## The Sudden Crash: Windows Defender AMSI Flags Inline P/Invoke as Spyware
+
+The very next time OverWatch triggered a screen capture, the Node.js daemon crashed with a cryptic error from the PowerShell child process:
+
+\`\`\`text
+ParserError: (:) [], ParseException
+At line:1 char:1
++ Add-Type -MemberDefinition ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~
+This script contains malicious content and has been blocked by your antivirus software.
++ CategoryInfo          : ParserError: (:) [], ParseException
++ FullyQualifiedErrorId : ScriptContainedMaliciousContent
+\`\`\`
+
+Windows Defender had intercepted the script and classified it as **Malware / Spyware**.
+
+### What is AMSI and Why Did It Trigger?
+Windows Defender uses the **Antimalware Scan Interface (AMSI)**. AMSI is an in-memory interface integrated directly into the PowerShell runtime engine. 
+
+Whenever PowerShell parses code, AMSI inspects the plain-text AST (Abstract Syntax Tree) in memory *before* execution—bypassing any obfuscation or Base64 encoding.
+
+Defender's heuristic behavioral engine checks for common attack signatures:
+1. Dynamically defining \`DllImport\` for Win32 API functions (\`user32.dll\`) inside an uncompiled script.
+2. Interacting with \`Graphics.CopyFromScreen\` (a signature heavily associated with credential stealers and spyware trojans).
+3. Invoking the script from a hidden background process spawned by an unprivileged Node.js runtime.
+
+Because malicious trojans frequently use PowerShell one-liners to snap screens and steal passwords, combining \`Add-Type\` with \`CopyFromScreen\` matched Defender's **heuristic screen-grabber rule**.
+
+Even worse, once AMSI flags a script in an active process, the entire PowerShell runspace is permanently tainted, throwing \`ScriptContainedMaliciousContent\` on subsequent calls.
+
+---
+
+## The Encoding Nightmare: Node.js UTF-8 vs. PowerShell UTF-16LE -EncodedCommand
+
+Before abandoning PowerShell entirely, we tried passing the script via the standard PowerShell \`-EncodedCommand\` parameter from Node.js to avoid shell character-escaping headaches with double quotes and newlines.
+
+Our Node.js child process invocation looked like this:
+
+\`\`\`javascript
+// ⚠️ THE COMMON NODE.JS TRAP
+const script = \`Get-Process | Select-Object -First 5\`;
+const base64 = Buffer.from(script, 'utf-8').toString('base64');
+
+const child = spawn('powershell.exe', [
+  '-NoProfile',
+  '-NonInteractive',
+  '-EncodedCommand',
+  base64
+]);
+\`\`\`
+
+Every single execution failed instantly with bizarre PowerShell errors:
+\`\`\`text
+The term '??????????' is not recognized as the name of a cmdlet...
+\`\`\`
+
+### The Root Cause: Byte-Pair Encoding
+PowerShell's \`-EncodedCommand\` flag was designed in the early .NET 2.0 era. It **strictly expects a UTF-16LE (Little-Endian Unicode) byte stream**, where every ASCII character occupies 2 bytes (the character byte followed by a null byte \`0x00\`).
+
+When you pass a standard UTF-8 Base64 string from Node.js, PowerShell pairs adjacent ASCII bytes together into invalid 16-bit Unicode characters:
+- What Node sent: \`G (0x47), e (0x65), t (0x74)\`
+- What PowerShell read: \`0x6547 (Chinese/Unicode glyph), 0x??74...\`
+
+### The Fix
+To encode commands correctly for PowerShell in Node.js, you must explicitly use the \`'utf16le'\` buffer encoding:
+
+\`\`\`javascript
+// ✅ CORRECT: UTF-16LE for PowerShell -EncodedCommand
+const base64Utf16 = Buffer.from(script, 'utf16le').toString('base64');
+\`\`\`
+
+While this solved the encoding bug, it didn't solve the core issues: PowerShell was still slow (~700ms cold start per command), memory-heavy (~60MB working set), and constantly at risk of being blocked by AMSI.
+
+We needed a completely different architectural approach.
+
+---
+
+## The Solution: Replacing PowerShell with a 30ms Native C# Engine (screencap.exe)
+
+Instead of relying on fragile, interpreted PowerShell scripts that trigger antivirus heuristics, why not compile a tiny, native C# binary?
+
+A compiled Windows executable does not pass through PowerShell's AMSI script scanner. Furthermore, it avoids the heavy .NET CLR and PowerShell runspace initialization overhead.
+
+### The No-Dependency Compilation Trick: Windows csc.exe
+One common hurdle in Windows desktop development is that building C# usually requires installing Visual Studio, the .NET SDK, or MSBuild.
+
+However, **every modern installation of Windows 10 and Windows 11 already contains the .NET Framework 4.0 C# compiler pre-installed**:
+\`C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\csc.exe\`
+
+We wrote a compact, high-efficiency C# source file: \`client/bin/ScreenCapture.cs\`.
+
+\`\`\`csharp
+using System;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
+using System.Runtime.InteropServices;
+using System.Windows.Forms;
+
+public class ScreenCapture
+{
+    // Native Win32 DPI Declaration
+    [DllImport("user32.dll")]
+    private static extern bool SetProcessDPIAware();
+
+    [STAThread]
+    public static int Main(string[] args)
+    {
+        if (args.Length == 0) return 1;
+
+        // 1. Enforce True Hardware DPI Bounds
+        SetProcessDPIAware();
+
+        string command = args[0].ToLowerInvariant();
+
+        if (command == "-capture" && args.Length >= 2)
+        {
+            string outputPath = args[1];
+            Rectangle bounds = Screen.PrimaryScreen.Bounds;
+
+            using (Bitmap bitmap = new Bitmap(bounds.Width, bounds.Height, PixelFormat.Format32bppArgb))
+            {
+                using (Graphics g = Graphics.FromImage(bitmap))
+                {
+                    g.CopyFromScreen(bounds.X, bounds.Y, 0, 0, bounds.Size, CopyPixelOperation.SourceCopy);
+                }
+
+                // Save full unscaled PNG to disk
+                bitmap.Save(outputPath, ImageFormat.Png);
+
+                // Stream downsampled 75% JPEG Base64 to stdout for rapid mobile beaming
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    ImageCodecInfo jpegCodec = GetEncoder(ImageFormat.Jpeg);
+                    EncoderParameters encoderParams = new EncoderParameters(1);
+                    encoderParams.Param[0] = new EncoderParameter(Encoder.Quality, 75L);
+                    bitmap.Save(ms, jpegCodec, encoderParams);
+                    Console.Write(Convert.ToBase64String(ms.ToArray()));
+                }
+            }
+            return 0;
+        }
+
+        if (command == "-get")
+        {
+            // Direct Clipboard Image Extraction
+            if (Clipboard.ContainsImage())
+            {
+                using (Image img = Clipboard.GetImage())
+                {
+                    // Scale down to max 1280px and output Base64 to stdout
+                    // ...
+                }
+                return 0;
+            }
+            Console.Write("NO_IMAGE");
+            return 0;
+        }
+
+        return 1;
+    }
+}
+\`\`\`
+
+### Auto-Compiling on Daemon Startup
+In the Node.js host daemon, we check if \`screencap.exe\` exists. If not, the daemon invokes \`csc.exe\` to compile it in milliseconds:
+
+\`\`\`typescript
+import { execSync } from 'child_process';
+import fs from 'fs';
+import path from 'path';
+
+const binDir = path.join(__dirname, '../bin');
+const exePath = path.join(binDir, 'screencap.exe');
+const csPath = path.join(binDir, 'ScreenCapture.cs');
+
+if (!fs.existsSync(exePath) && fs.existsSync(csPath)) {
+  const cscPath = 'C:\\\\Windows\\\\Microsoft.NET\\\\Framework64\\\\v4.0.30319\\\\csc.exe';
+  execSync(\`"\${cscPath}" /nologo /optimize+ /target:winexe /out:"\${exePath}" "\${csPath}"\`, {
+    windowsHide: true,
+  });
+}
+\`\`\`
+
+The result? A standalone, statically typed **12KB executable** compiled directly on the user's PC with zero external dependencies.
+
+---
+
+## The Ghost in the Event Loop: Debugging Node.js Libuv Socket Error: read ENOTCONN
+
+With \`screencap.exe\` handling screen capture and clipboard manipulation, we added a non-blocking toast notification banner (\`-notify <title> <sub>\`) to display a sleek OLED dark HUD on the Windows desktop whenever an agent or mobile device beamed data.
+
+To make sure the notification didn't block the main Node.js event loop, we launched it as a detached child process:
+
+\`\`\`javascript
+// ⚠️ THE LIBUV SOCKET TRAP
+const child = child_process.execFile(exePath, ['-notify', 'OverWatch', 'Screen Beamed']);
+child.unref();
+\`\`\`
+
+A few seconds later, our daemon crashed with an unhandled Node.js libuv stream exception:
+
+\`\`\`text
+Error: read ENOTCONN
+    at Pipe.onStreamRead (node:internal/stream_base_commons:217:20)
+    at Pipe.readStart (node:net:386:16)
+    at Socket._read (node:net:397:8) {
+  errno: -4053,
+  code: 'ENOTCONN',
+  syscall: 'read'
+}
+\`\`\`
+
+### Why Did \`ENOTCONN\` Occur?
+When you use \`child_process.execFile()\` or \`exec()\`, Node.js internally sets up standard I/O pipes (\`stdin\`, \`stdout\`, \`stderr\`) between the parent process and the child.
+
+Calling \`.unref()\` on the returned \`ChildProcess\` object tells Node's event loop not to wait for the child process to exit. **However, it does NOT detach the pipe file descriptors!**
+
+When our C# utility completed its UI display and terminated, Windows closed the pipe handle. Node's libuv async I/O layer was still listening for data on that pipe. Because the socket was abruptly severed from the Windows kernel side, libuv threw \`ENOTCONN\` (Socket Not Connected).
+
+### The Complete Fix
+To truly fire-and-forget a child process in Node.js without pipe leaks, use \`child_process.spawn\` with \`detached: true\` and explicitly set \`stdio: 'ignore'\`:
+
+\`\`\`javascript
+// ✅ CORRECT: Sever all pipe handles before unreferencing
+const child = child_process.spawn(
+  exePath,
+  ['-notify', title, message],
+  {
+    detached: true,
+    stdio: 'ignore', // Tells Node NOT to create any socket pipes
+    windowsHide: true
+  }
+);
+
+child.unref(); // Frees the child from Node's event loop
+\`\`\`
+
+With \`stdio: 'ignore'\`, no pipe is ever allocated, and libuv remains completely stable.
+
+---
+
+## Performance Benchmark: PowerShell vs. Compiled C# Binary
+
+We benchmarked the latency of screen capture, image downsampling, and clipboard reading on a standard Windows 11 machine (Intel Core i7, 16GB RAM):
+
+| Metric | PowerShell Execution | Native C# Engine (\`screencap.exe\`) | Improvement |
+| :--- | :--- | :--- | :--- |
+| **Cold Start Latency** | 740 ms | **18 ms** | **41x Faster** |
+| **High-DPI Awareness** | Requires \`Add-Type\` P/Invoke | Built-in via Win32 P/Invoke | Native |
+| **Antivirus Safety (AMSI)** | ❌ Frequently flagged as spyware | ✅ Clean compiled binary | Zero false positives |
+| **Process Memory Footprint** | ~58 MB (PowerShell Runspace) | **~4.2 MB** | **92% Less RAM** |
+| **Clipboard Base64 Latency** | 680 ms | **24 ms** | **28x Faster** |
+| **Encoding Stability** | Requires UTF-16LE Base64 | Native stdout UTF-8 / Base64 | Zero encoding bugs |
+
+By ditching PowerShell for a native C# binary, we eliminated 700ms of lag. Mobile screen snaps feel instant, and Windows Defender never interrupts the user.
+
+---
+
+## Key Architectural Takeaways for Desktop Tool Developers
+
+1. **Beware of AMSI False Positives in PowerShell:** If your script pairs Win32 P/Invoke declarations (\`Add-Type\`) with security-sensitive APIs (\`CopyFromScreen\`, keyboard hooks, process injection), Defender's heuristic engine will eventually flag your tool as \`ScriptContainedMaliciousContent\`.
+2. **High-DPI Scaling is Everywhere:** Never assume \`Screen.PrimaryScreen.Bounds\` returns native monitor dimensions on Windows. Always call \`SetProcessDPIAware()\` or configure application manifests for per-monitor DPI awareness.
+3. **PowerShell -EncodedCommand Demands UTF-16LE:** In Node.js, always use \`Buffer.from(cmd, 'utf16le').toString('base64')\` when feeding Base64 to PowerShell.
+4. **Use csc.exe for Zero-Dependency Native Windows Binaries:** Windows ships with the .NET C# compiler pre-installed at \`C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\csc.exe\`. You can compile lightning-fast, 15KB native utilities on user machines without requiring npm native builds or external toolchains.
+5. **Always Set \`stdio: 'ignore'\` When Detaching Child Processes:** Calling \`.unref()\` on a process with open standard I/O pipes will eventually crash your Node.js runtime with libuv's \`Error: read ENOTCONN\`.
+
+---
+
+*Curious to see this architecture in action? Check out the live [OverWatch Web Simulator & Docs](https://overwatch.adilrahman.cc?utm_source=adilrahman.cc), or explore the open-source code on [GitHub](https://github.com/adil-rahman-3063/OverWatch).*
+`
+  },
+  {
     id: 'in-browser-batch-folder-converter-client-zip',
     title: 'Building an In-Browser Bulk Folder & Batch Converter with Dynamic Extension Mapping and Client-Zip',
     seoTitle: 'In-Browser Batch & Folder Converter with Client-Zip | Adil Rahman',

@@ -18,7 +18,10 @@ This checklist separates **brand-new URLs** that need manual indexing from **alr
 
 These URLs were newly created or published recently and require an initial manual crawl request in GSC:
 
-- [ ] `https://adilrahman.cc/blog/in-browser-batch-folder-converter-client-zip`
+- [x] `https://adilrahman.cc/blog/how-windows-defender-amsi-flagged-powershell-csharp`
+  - **Type**: New Windows Internals & Antivirus Systems Blog Post (Published Nov 26, 2026)
+  - **Target Keywords**: *Windows Defender AMSI PowerShell, ScriptContainedMaliciousContent, CopyFromScreen high DPI scaling, Node.js PowerShell EncodedCommand UTF-16LE, libuv read ENOTCONN, Windows csc.exe compiler*
+- [x] `https://adilrahman.cc/blog/in-browser-batch-folder-converter-client-zip`
   - **Type**: New Batch Systems & Web Performance Blog Post (Published Nov 24, 2026)
   - **Target Keywords**: *in-browser batch converter, folder converter client-zip, webkitdirectory recursive converter, client-side ZIP streaming*
 - [x] `https://adilrahman.cc/blog/in-browser-video-to-mp3-web-audio-api`

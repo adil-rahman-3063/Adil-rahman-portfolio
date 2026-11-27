@@ -131,6 +131,51 @@ export const allProjects = [
     "order": "1"
   },
   {
+    "id": "overwatch",
+    "title": "OverWatch",
+    "subtitle": "OLED Desk Companion & AI Security Interlock // WinRT & React",
+    "status": "Featured // Open Source",
+    "tagline": "Turn an old phone into an OLED StandBy desk companion and physical 'Fail-Closed' hardware interlock for AI coding agents.",
+    "description": "An open-source hardware interlock and StandBy desk companion that links an old smartphone to a Windows PC via Supabase Realtime WebSockets. Intercepts terminal commands from autonomous AI coding agents (Antigravity, Claude Code) with a 20-second fail-closed countdown, while rendering a 3D mechanical split-flap clock with procedural Web Audio synthesis, Windows WinRT media sessions, and PC hardware telemetry.",
+    "features": [
+      "Physical 'Fail-Closed' AI Interlock: Intercepts PreToolUse hooks from terminal coding agents, ringing the mobile deck across the room with a 20-second timeout before hard-killing unauthorized commands.",
+      "3D Mechanical Split-Flap Clock: Procedural Web Audio synthesis generating realistic plastic leaf snaps (2600Hz bandpass) and acoustic housing resonance without static audio asset lag.",
+      "True Windows WinRT Media Sessions: Isolated play, pause, and track controls for Spotify and YouTube Music without accidentally unpausing idle browser video tabs.",
+      "Live PC Hardware & Quota Telemetry: Real-time CPU, RAM, and rolling AI token reset countdown gauges beamed via low-overhead background daemons.",
+      "Bidirectional Image & Clipboard Beamer: 1-tap mobile camera snap directly to Windows clipboard, and DPI-aware desktop screenshot capture via native compiled C# engine.",
+      "Zero-Window Windows System Tray Daemon: Headless background service with auto-revive watchdog, companion port resilience, and 1-click Windows setup (setup.bat)."
+    ],
+    "tech": [
+      "React 19",
+      "TypeScript",
+      "Vite",
+      "Tailwind CSS",
+      "Node.js",
+      "C# (.NET 4.0)",
+      "WinRT",
+      "PowerShell",
+      "Supabase Realtime",
+      "Web Audio API"
+    ],
+    "links": [
+      {
+        "text": "Live Simulator",
+        "url": "https://overwatch.adilrahman.cc?utm_source=adilrahman.cc"
+      },
+      {
+        "text": "GitHub Repository",
+        "url": "https://github.com/adil-rahman-3063/OverWatch"
+      }
+    ],
+    "categories": [
+      "featured",
+      "personal",
+      "personal-project",
+      "open-source"
+    ],
+    "order": "1"
+  },
+  {
     "id": "zmr",
     "title": "ZMR Music",
     "subtitle": "Premium YouTube Music Client // Flutter",
@@ -707,7 +752,14 @@ export function projectBelongsToCategory(project, categorySlug) {
     return cats.includes('freelance');
   }
   if (slug === 'personal-project' || slug === 'personal') {
-    return cats.includes('personal');
+    return (
+      cats.includes('personal') ||
+      cats.includes('personal-project') ||
+      cats.includes('personal-projects') ||
+      cats.includes('open-source') ||
+      cats.some((c) => c.includes('personal')) ||
+      (!cats.includes('saas') && !cats.includes('freelance') && !cats.includes('niche-sites') && !cats.includes('niche-site') && !cats.includes('niche'))
+    );
   }
   return cats.includes(slug);
 }

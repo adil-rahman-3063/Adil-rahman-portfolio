@@ -25,10 +25,16 @@ const githubRepoMap = {
   sirr: 'adil-rahman-3063/Sirr',
   cloudagent: 'adil-rahman-3063/cloudagent',
   fileo: 'adil-rahman-3063/fileo',
+  overwatch: 'adil-rahman-3063/OverWatch',
 };
 
 // Deep engineering architecture profiles to provide comprehensive technical depth
 const technicalDeepDives = {
+  overwatch: {
+    architecture: 'Lightweight desktop daemon built with Node.js, WinRT, and native C# (.NET 4.0) communicating with a responsive React 19/Vite StandBy OLED web deck over Supabase Realtime WebSockets and local LAN IPC.',
+    challenges: 'Windows Defender AMSI heuristic false positives on PowerShell screen capture scripts and high-DPI scaling coordinate virtualizations. Solved by building an in-memory compiled 12KB C# utility (screencap.exe) using Windows built-in csc.exe, and managing libuv socket lifecycle with stdio: ignore.',
+    security: 'Strict Fail-Closed Law: all terminal commands from autonomous coding agents (Antigravity, Claude Code) are intercepted via PreToolUse hooks. If approval is not granted on mobile within 20s or if the host disconnects, the command is terminated immediately.',
+  },
   zmr: {
     architecture: 'Engineered in Flutter utilizing Riverpod for immutable state management and strict unidirectional data flows. Audio processing relies on just_audio with background isolates and system-level media notification bindings for uninterrupted audio delivery on Android and iOS.',
     challenges: 'Solving streaming latency and dynamic crossfading without gap artifacts. Designed an in-memory queue manager that prefetches upcoming chunks and computes sinusoidal volume ramps across track transitions.',

@@ -1,4 +1,4 @@
-import { allProjects } from '../../data/projectsData';
+import { allProjects, fetchProjectsFromSupabase } from '../../data/projectsData';
 import ProjectsHubClient from './ProjectsHubClient';
 
 const SITE_URL = 'https://adilrahman.cc';
@@ -25,6 +25,7 @@ export const metadata = {
   },
 };
 
-export default function ProjectsIndexPage() {
-  return <ProjectsHubClient initialProjects={allProjects} />;
+export default async function ProjectsIndexPage() {
+  const allLive = await fetchProjectsFromSupabase();
+  return <ProjectsHubClient initialProjects={allLive} />;
 }

@@ -51,14 +51,27 @@ function renderProjectCard(project, categorySlug, defaultBadge) {
 export default function CategoryDirectoryClient({ category, initialProjects = [], allInitialProjects = [] }) {
   const [allProjectsList, setAllProjectsList] = useState(allInitialProjects);
 
-  // Sync live from Supabase on mount
+  // Sync live from Supabase on mount with instant localStorage cache paint
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const cached = localStorage.getItem('cached_projects');
+      if (cached) {
+        try {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setAllProjectsList(parsed);
+          }
+        } catch (_) {}
+      }
+    }
+
     let isMounted = true;
     const sync = async () => {
       try {
         const live = await fetchProjectsFromSupabase();
         if (isMounted && Array.isArray(live) && live.length > 0) {
           setAllProjectsList(live);
+          localStorage.setItem('cached_projects', JSON.stringify(live));
         }
       } catch (err) {
         console.warn('Live fetch warning in category directory:', err);

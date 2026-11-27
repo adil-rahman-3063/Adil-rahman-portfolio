@@ -1,4 +1,4 @@
-import { allProjects, PROJECT_CATEGORIES, getCategoryProjects } from '../../../data/projectsData';
+import { allProjects, PROJECT_CATEGORIES, getCategoryProjects, fetchProjectsFromSupabase } from '../../../data/projectsData';
 import { notFound } from 'next/navigation';
 import CategoryDirectoryClient from './CategoryDirectoryClient';
 
@@ -60,7 +60,8 @@ export default async function ProjectCategoryPage({ params }) {
 
   if (!cat) notFound();
 
-  const projects = getCategoryProjects(normCategory);
+  const allLive = await fetchProjectsFromSupabase();
+  const projects = getCategoryProjects(normCategory, allLive);
 
   const collectionSchema = {
     '@context': 'https://schema.org',
@@ -118,7 +119,7 @@ export default async function ProjectCategoryPage({ params }) {
       <CategoryDirectoryClient
         category={category}
         initialProjects={projects}
-        allInitialProjects={allProjects}
+        allInitialProjects={allLive}
       />
     </>
   );

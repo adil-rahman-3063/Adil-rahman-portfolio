@@ -18,9 +18,12 @@ This checklist separates **brand-new URLs** that need manual indexing from **alr
 
 These URLs were newly created or published recently and require an initial manual crawl request in GSC:
 
-- [x] `https://adilrahman.cc/blog/how-windows-defender-amsi-flagged-powershell-csharp`
-  - **Type**: New Windows Internals & Antivirus Systems Blog Post (Published Nov 26, 2026)
-  - **Target Keywords**: *Windows Defender AMSI PowerShell, ScriptContainedMaliciousContent, CopyFromScreen high DPI scaling, Node.js PowerShell EncodedCommand UTF-16LE, libuv read ENOTCONN, Windows csc.exe compiler*
+- [ ] `https://adilrahman.cc/blog/hybrid-video-transcoding-in-browser-cloud-ffmpeg`
+  - **Type**: New Web Performance & Cloud Video Engineering Blog Post (Published Nov 27, 2026)
+  - **Target Keywords**: *in-browser video conversion javascript, MediaRecorder webm to mp4, client side video compression without server, free ffmpeg docker microservice render, hybrid client server video processing*
+- [ ] `https://adilrahman.cc/blog/windows-foreground-lock-bypass-attachthreadinput`
+  - **Type**: New Windows Systems & Desktop Automation Blog Post (Published Nov 27, 2026)
+  - **Target Keywords**: *SetForegroundWindow not working Windows 11, AttachThreadInput foreground lock bypass, SPI_SETFOREGROUNDLOCKTIMEOUT bypass C# nodejs, AppActivate not focusing window, inject keystrokes unfocused window*
 - [x] `https://adilrahman.cc/blog/how-windows-defender-amsi-flagged-powershell-csharp`
   - **Type**: New Windows Internals & Antivirus Systems Blog Post (Published Nov 26, 2026)
   - **Target Keywords**: *Windows Defender AMSI PowerShell, ScriptContainedMaliciousContent, CopyFromScreen high DPI scaling, Node.js PowerShell EncodedCommand UTF-16LE, libuv read ENOTCONN, Windows csc.exe compiler*

@@ -660,3 +660,88 @@ When you are ready to publish these to [adilrahman.cc](https://adilrahman.cc):
    ```
 3. Run `npm run build` to verify that Next.js generates static routes for all 3 posts.
 4. Distribute using the social promo snippets above!
+
+---
+
+# 🚀 Blog Post: Building a Hybrid Video Transcoding Engine (Fileo)
+
+* **ID / Slug:** `hybrid-video-transcoding-in-browser-cloud-ffmpeg`
+* **Title:** Building a Hybrid Video Transcoding Engine: 200MB In-Browser Processing with Zero-Cost Cloud FFmpeg Fallback
+* **SEO Title:** Hybrid Video Transcoding: In-Browser Client + Cloud FFmpeg Architecture | Adil Rahman
+* **Date:** November 27, 2026
+* **Read Time:** 10 min read
+* **Canonical URL:** `https://adilrahman.cc/blog/hybrid-video-transcoding-in-browser-cloud-ffmpeg`
+* **Target Project:** [Fileo (fileo.cc)](https://fileo.cc/?utm_source=adilrahman)
+* **Target Keywords:** `in-browser video conversion javascript`, `MediaRecorder webm to mp4`, `client side video compression without server`, `free ffmpeg docker microservice render`, `hybrid client server video processing`
+
+### Social Promo Snippets
+
+* **X (Twitter):**
+  > Cloud video transcoding bills can bankrupt indie SaaS apps overnight. 💸
+  > 
+  > But running 1GB video files in WebAssembly chokes client memory and crashes browser tabs.
+  > 
+  > Here is how I built Fileo's Hybrid Video Engine:
+  > • Desktop <= 200MB: Transcoded 100% locally via hardware `MediaRecorder` ($0 server cost, 0ms lag)
+  > • Files > 200MB (up to 1GB): Streamed in 1MB chunks to a self-cleaning Render.com FFmpeg Docker microservice
+  > 
+  > Deep dive on the architecture:
+  > https://adilrahman.cc/blog/hybrid-video-transcoding-in-browser-cloud-ffmpeg?utm_source=x
+  > 
+  > #WebDev #VideoEngineering #Docker #Python #Astro #Cloudflare
+
+* **LinkedIn:**
+  > Cloud transcoding APIs (AWS Elemental MediaConvert, Cloudinary) charge $0.015 - $0.030 per video minute. If you run a high-volume media utility, that economic model is completely unsustainable.
+  > 
+  > On the other hand, compiling full FFmpeg to WebAssembly (ffmpeg.wasm) frequently crashes browser tabs on files larger than 300MB due to 32-bit memory boundaries.
+  > 
+  > For Fileo (fileo.cc), we built a Hybrid Media Engine:
+  > 1. Desktop In-Browser Tier (<= 200MB): Transcodes video directly on the user's GPU/CPU using native `MediaRecorder` and the Web Audio API. 0 server compute costs, 0 network latency, 100% privacy.
+  > 2. Mobile In-Browser Tier (<= 100MB): Keeps iOS Safari and Android Chrome responsive without memory evictions.
+  > 3. Cloud Container Tier (Files > 200MB up to 1GB): Streams in 1MB chunks to a containerized FastAPI + Linux FFmpeg service running on Render's free tier, protected by a zero-hardcoded combined key security protocol.
+  > 
+  > Read the complete engineering writeup:
+  > https://adilrahman.cc/blog/hybrid-video-transcoding-in-browser-cloud-ffmpeg?utm_source=linkedin
+
+---
+
+# 🚀 Blog Post: Why SetForegroundWindow Fails on Windows 11 (OverWatch)
+
+* **ID / Slug:** `windows-foreground-lock-bypass-attachthreadinput`
+* **Title:** Why SetForegroundWindow Fails on Windows 11 (And How to Bypass the Foreground Lock with AttachThreadInput)
+* **SEO Title:** Fix SetForegroundWindow on Windows 11 with AttachThreadInput | Adil Rahman
+* **Date:** November 27, 2026
+* **Read Time:** 9 min read
+* **Canonical URL:** `https://adilrahman.cc/blog/windows-foreground-lock-bypass-attachthreadinput`
+* **Target Project:** [OverWatch (overwatch.adilrahman.cc)](https://overwatch.adilrahman.cc?utm_source=adilrahman.cc)
+* **Target Keywords:** `SetForegroundWindow not working Windows 11`, `AttachThreadInput foreground lock bypass`, `SPI_SETFOREGROUNDLOCKTIMEOUT bypass C# nodejs`, `AppActivate not focusing window`, `inject keystrokes unfocused window`
+
+### Social Promo Snippets
+
+* **X (Twitter):**
+  > Ever tried writing Windows automation only for `SetForegroundWindow` or `AppActivate` to silently fail and just flash yellow in the taskbar? 💀
+  > 
+  > That's the Windows NT Foreground Lock (`SPI_SETFOREGROUNDLOCKTIMEOUT`).
+  > 
+  > Even worse: sending `{ENTER}` to an unfocused window will insert accidental newlines directly into your code!
+  > 
+  > Here is how we bypassed the lock cleanly using Win32 `AttachThreadInput` in OverWatch:
+  > https://adilrahman.cc/blog/windows-foreground-lock-bypass-attachthreadinput?utm_source=x
+  > 
+  > #Windows #Win32 #SoftwareEngineering #Automation #CSharp #NodeJS
+
+* **LinkedIn:**
+  > If you develop desktop automation tools, background daemons, or remote macro bridges on Windows, you have almost certainly encountered the Windows Foreground Lock wall.
+  > 
+  > Since Windows 98/2000, Windows NT strictly prohibits background processes from stealing window focus (`SPI_SETFOREGROUNDLOCKTIMEOUT`). If a background tray service attempts to call `SetForegroundWindow` or `WScript.Shell.AppActivate`, Windows suppresses it and merely flashes the target window in the taskbar.
+  > 
+  > While building OverWatch, our mobile StandBy deck needed to beam prompt commands into active coding agents (Antigravity/VS Code). When the IDE was unfocused, blind keystrokes were inserting newline characters into open source code files!
+  > 
+  > We solved this by using native Win32 Thread Input Queue Attachment:
+  > 1. Join daemon thread to target IDE thread via `AttachThreadInput(daemonThread, targetThread, TRUE)`
+  > 2. Restore and bring window to front via `ShowWindow(SW_RESTORE)` and `SetForegroundWindow`
+  > 3. Immediately detach threads with `AttachThreadInput(..., FALSE)`
+  > 4. Programmatically send `Ctrl+L` to focus the AI chat input before pasting (`Ctrl+V`) and submitting (`Enter`)
+  > 
+  > Full architecture breakdown and production TypeScript/PowerShell implementation:
+  > https://adilrahman.cc/blog/windows-foreground-lock-bypass-attachthreadinput?utm_source=linkedin
